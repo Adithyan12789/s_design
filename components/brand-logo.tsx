@@ -24,14 +24,19 @@ export function BrandLogo({
     lg: 'brand-logo--lg',
   }
 
+  const emblemSrc =
+    variant === 'dark'
+      ? '/s-design-emblem-clean.png'
+      : '/s-design-emblem-white.png'
+
   const content = (
     <div className={`brand-logo-lockup ${sizeClasses[size]} brand-logo--${variant} ${className}`}>
       <div className="brand-logo-emblem" aria-hidden="true">
         <Image
-          src="/s-design-logo.jpg"
+          src={emblemSrc}
           alt="S_Designs Architectural Logo"
-          width={80}
-          height={80}
+          width={32}
+          height={32}
           className="brand-logo-image"
           priority
         />
@@ -52,3 +57,4 @@ export function BrandLogo({
     </Link>
   )
 }
+

@@ -170,7 +170,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       {/* Detail Footer */}
       <footer className="detail-footer">
-        <BrandLogo href="/#top" size="sm" />
+        <BrandLogo href="/#top" size="sm" variant="dark" />
         <div className="project-pager-nav">
           <Link href={`/work/${prevProject.slug}`} className="pager-link">
             <ArrowLeft size={14} /> Previous: {prevProject.title}

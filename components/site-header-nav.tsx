@@ -27,7 +27,7 @@ export function SiteHeaderNav({
       <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       <header className={`detail-header ${className}`}>
-        <BrandLogo href="/#top" />
+        <BrandLogo href="/#top" variant="dark" />
 
         <div className="flex items-center gap-6">
           {showBackLink && (

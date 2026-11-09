@@ -22,9 +22,7 @@ a { color: inherit; text-decoration: none; }
 @keyframes grid-shift { to { background-position: 74px 74px; } }
 @keyframes rings-breathe { 50% { transform: scale(1.08) rotate(16deg); opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .section-ambient { animation: none; } }
-.hero-content, .intro-copy, .statement-copy, .contact-layout { animation: rise-in .9s cubic-bezier(.2,.7,.2,1) both; }
-.hero-content h1 { animation: title-reveal 1.25s .12s cubic-bezier(.2,.7,.2,1) both; }
-.hero-content .hero-bottom { animation: rise-in .9s .35s cubic-bezier(.2,.7,.2,1) both; }
+.intro-copy, .statement-copy, .contact-layout { animation: rise-in .9s cubic-bezier(.2,.7,.2,1) both; }
 .project-card, .service-row { animation: rise-in .8s cubic-bezier(.2,.7,.2,1) both; animation-timeline: view(); animation-range: entry 12% cover 28%; }
 .project-card:nth-child(2) { animation-delay: .12s; }
 .project-card:nth-child(3) { animation-delay: .22s; }
@@ -38,29 +36,33 @@ a { color: inherit; text-decoration: none; }
 @keyframes rise-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes title-reveal { from { opacity: 0; transform: translateY(34px) scale(.985); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: translateY(0) scale(1); clip-path: inset(0 0 0 0); } }
 @keyframes soft-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 50% { box-shadow: 0 0 0 10px rgba(255,255,255,.06); } }
-@media (prefers-reduced-motion: reduce) { .reactbits-background, .hero-content, .intro-copy, .statement-copy, .contact-layout, .project-card, .service-row { animation: none; } }
-.site-header { position: fixed; z-index: 10; top: 0; left: 0; width: 100%; padding: 22px 4.8vw; display: flex; align-items: center; justify-content: space-between; color: #f5f1e9; background: linear-gradient(180deg, rgba(18,18,16,.65), transparent); backdrop-filter: blur(8px); text-shadow: 0 1px 18px rgba(0,0,0,.42); }
+@media (prefers-reduced-motion: reduce) { .reactbits-background, .intro-copy, .statement-copy, .contact-layout, .project-card, .service-row { animation: none; } }
+.site-header { position: fixed; z-index: 10; top: 0; left: 0; width: 100%; height: 76px; padding: 0 4.8vw; display: flex; align-items: center; justify-content: space-between; color: #f5f1e9; background: linear-gradient(180deg, rgba(18,18,16,.65), transparent); backdrop-filter: blur(8px); text-shadow: 0 1px 18px rgba(0,0,0,.42); }
 .site-shell > .site-header { z-index: 10; }
 .site-shell > .hero > .hero-content, .site-shell > .hero > .hero-index { z-index: 4; }
 .site-shell > .hero > .hero-image, .site-shell > .hero > .hero-overlay { z-index: 1; }
 
 /* Brand Architectural Logo Lockup & Wordmark */
 .brand-logo-link, .wordmark { display: inline-flex; align-items: center; text-decoration: none; color: inherit; line-height: 1; }
-.brand-logo-lockup { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; color: inherit; }
-.brand-logo-emblem { position: relative; width: 42px; height: 42px; border-radius: 9px; overflow: hidden; background: #ffffff; border: 1px solid rgba(255, 255, 255, 0.45); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease; }
+.brand-logo-lockup { display: inline-flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; line-height: 1; }
+.brand-logo-emblem { position: relative; width: 38px; height: 38px; border-radius: 9px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease; }
+.brand-logo--glass .brand-logo-emblem { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16); }
+.brand-logo--dark .brand-logo-emblem { background: #ffffff; border: 1px solid rgba(32, 31, 28, 0.14); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06); }
 .brand-logo-link:hover .brand-logo-emblem,
-.wordmark:hover .brand-logo-emblem { transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28); }
-.brand-logo-image { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; transform: scale(1.24); display: block; }
-.brand-logo-emblem-glow { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(0, 75, 145, 0.15); pointer-events: none; }
-.brand-logo-text { display: flex; flex-direction: column; justify-content: center; gap: 4px; line-height: 1; }
-.brand-logo-name { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 600; letter-spacing: 0.16em; line-height: 1; color: inherit; text-transform: uppercase; }
-.brand-logo-sub { font-family: var(--font-mono), monospace; font-size: 8px; letter-spacing: 0.22em; line-height: 1; opacity: 0.75; text-transform: uppercase; color: inherit; }
+.wordmark:hover .brand-logo-emblem { transform: translateY(-1px) scale(1.04); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28); }
+.brand-logo-image { width: 23px; height: 23px; object-fit: contain; display: block; flex-shrink: 0; }
+.brand-logo-emblem-glow { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.brand-logo-text { display: flex; flex-direction: column; justify-content: center; gap: 3px; line-height: 1; }
+.brand-logo-name { font-family: Georgia, 'Times New Roman', serif; font-size: 15px; font-weight: 600; letter-spacing: 0.16em; line-height: 1; color: inherit; text-transform: uppercase; margin: 0; }
+.brand-logo-sub { font-family: var(--font-mono), monospace; font-size: 7.5px; letter-spacing: 0.24em; line-height: 1; opacity: 0.75; text-transform: uppercase; color: inherit; margin: 0; }
 
-.brand-logo--sm .brand-logo-emblem { width: 32px; height: 32px; border-radius: 7px; }
+.brand-logo--sm .brand-logo-emblem { width: 30px; height: 30px; border-radius: 7px; }
+.brand-logo--sm .brand-logo-image { width: 18px; height: 18px; }
 .brand-logo--sm .brand-logo-name { font-size: 13px; }
 .brand-logo--sm .brand-logo-sub { font-size: 6.5px; }
 
-.brand-logo--lg .brand-logo-emblem { width: 52px; height: 52px; border-radius: 12px; }
+.brand-logo--lg .brand-logo-emblem { width: 48px; height: 48px; border-radius: 12px; }
+.brand-logo--lg .brand-logo-image { width: 28px; height: 28px; }
 .brand-logo--lg .brand-logo-name { font-size: 18px; }
 .brand-logo--lg .brand-logo-sub { font-size: 9px; }
 
@@ -197,7 +199,7 @@ em { color: var(--bronze); font-style: italic; }
 @keyframes orbit-float { 50% { transform: translate(-24px, 20px) rotate(24deg); } }
 
 @media (max-width: 700px) {
-  .site-header { padding: 22px 6vw; }
+  .site-header { height: 72px; padding: 0 6vw; }
   .menu-button { display: none; }
   .section-pad { padding: 86px 6vw; }
   .intro { display: block; }
@@ -853,16 +855,25 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 .hero-title-line {
   display: block;
   overflow: hidden;
-  line-height: 0.94;
+  line-height: 1.02;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
 }
 .hero-word-wrapper {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  margin-right: 0.24em;
+}
+.hero-word-wrapper:last-child {
+  margin-right: 0;
 }
 .hero-word-inner {
   display: inline-block;
   will-change: transform, opacity;
+  padding-right: 0.05em;
 }
 .hero-word-inner.is-accent em {
   color: var(--bronze-light);

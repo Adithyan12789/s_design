@@ -6,7 +6,6 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import { ReactBitsBackground } from '@/components/react-bits-background'
 import { TiltProjectCard } from '@/components/tilt-project-card'
 import { BrandLogo } from '@/components/brand-logo'
-import { CinematicLoader } from '@/components/motion/cinematic-loader'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ParallaxImage } from '@/components/motion/parallax-image'
@@ -37,9 +36,6 @@ export default function Page() {
 
   return (
     <main className="site-shell">
-      {/* Cinematic Entrance Curtain */}
-      <CinematicLoader />
-
       {/* Full-Screen Architectural Navigation Overlay */}
       <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 

@@ -83,7 +83,7 @@ export default function WorkPage() {
 
       {/* Footer */}
       <footer className="detail-footer">
-        <BrandLogo href="/#top" size="sm" />
+        <BrandLogo href="/#top" size="sm" variant="dark" />
         <div className="footer-links">
           <Link href="/">Home</Link>
           <Link href="/work">All Works</Link>
