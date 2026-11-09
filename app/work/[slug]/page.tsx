@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, ArrowUpRight, MapPin, Calendar, Maximize2, Layers, Compass } from 'lucide-react'
 import { ProjectImage3D } from '@/components/project-image-3d'
 import { ProjectGalleryInteractive } from '@/components/project-gallery-interactive'
+import { BrandLogo } from '@/components/brand-logo'
+import { SiteHeaderNav } from '@/components/site-header-nav'
+import { StaggeredHeading } from '@/components/motion/staggered-heading'
+import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { projects } from '@/lib/projects'
 
 export function generateStaticParams() {
@@ -32,20 +36,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="project-detail-page">
-      {/* Top Header */}
-      <header className="detail-header">
-        <Link className="wordmark" href="/#top" aria-label="S_Designs home">
-          S_Designs<span>ARCHITECTURE / OBJECTS</span>
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link className="back-link" href="/work">
-            <ArrowLeft size={15} /> All Works
-          </Link>
-          <Link className="nav-cta" href="/#contact">
-            Start a project <ArrowUpRight size={14} />
-          </Link>
-        </div>
-      </header>
+      {/* Top Header with Full Navigation Overlay */}
+      <SiteHeaderNav showBackLink backHref="/work" backLabel="All Works" />
 
       {/* Hero Section */}
       <section className="detail-hero">
@@ -62,9 +54,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <span>CASE STUDY 0{index + 1} OF 0{projects.length}</span>
           </div>
           <p className="eyebrow">{project.category} · {project.location}</p>
-          <h1>
-            <span>{project.title}</span>
-          </h1>
+          <StaggeredHeading
+            tag="h1"
+            animateOnInit
+            lines={[{ text: project.title }]}
+          />
           <p className="detail-hero-meta">{project.meta}</p>
           <div className="detail-hero-scroll">
             Scroll to explore <span>↓</span>
@@ -78,16 +72,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           ( 01 ) <span>Architectural Intent</span>
         </div>
         <div className="detail-intro-grid">
-          <h2>
-            Designed for<br />
-            <em>quiet living.</em>
-          </h2>
+          <StaggeredHeading
+            tag="h2"
+            lines={[
+              { text: 'Designed for' },
+              { text: 'quiet living.', isAccent: true },
+            ]}
+          />
           <div className="detail-intro-copy-block">
-            <p className="lead-paragraph">{project.description}</p>
-            <p className="sub-paragraph">
-              Every detail was developed through physical mockups and light studies on site,
-              ensuring a seamless dialogue between built geometry and the surrounding landscape.
-            </p>
+            <ScrollReveal delay={0.15}>
+              <p className="lead-paragraph">{project.description}</p>
+              <p className="sub-paragraph">
+                Every detail was developed through physical mockups and light studies on site,
+                ensuring a seamless dialogue between built geometry and the surrounding landscape.
+              </p>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -97,35 +96,37 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="section-kicker">
           ( 02 ) <span>Key Specifications</span>
         </div>
-        <div className="detail-facts-grid">
-          <div className="spec-card">
-            <MapPin className="spec-icon" size={18} />
-            <span>Location</span>
-            <strong>{project.location}</strong>
-          </div>
-          <div className="spec-card">
-            <Calendar className="spec-icon" size={18} />
-            <span>Completed</span>
-            <strong>{project.year}</strong>
-          </div>
-          <div className="spec-card">
-            <Maximize2 className="spec-icon" size={18} />
-            <span>Scale / Area</span>
-            <strong>{project.area}</strong>
-          </div>
-          <div className="spec-card">
-            <Layers className="spec-icon" size={18} />
-            <span>Typology</span>
-            <strong>{project.type}</strong>
-          </div>
-          {project.details.map((detail, dIdx) => (
-            <div key={detail} className="spec-card">
-              <Compass className="spec-icon" size={18} />
-              <span>Detail 0{dIdx + 1}</span>
-              <strong>{detail}</strong>
+        <ScrollReveal variant="stagger-children" stagger={0.06}>
+          <div className="detail-facts-grid">
+            <div className="spec-card">
+              <MapPin className="spec-icon" size={18} />
+              <span>Location</span>
+              <strong>{project.location}</strong>
             </div>
-          ))}
-        </div>
+            <div className="spec-card">
+              <Calendar className="spec-icon" size={18} />
+              <span>Completed</span>
+              <strong>{project.year}</strong>
+            </div>
+            <div className="spec-card">
+              <Maximize2 className="spec-icon" size={18} />
+              <span>Scale / Area</span>
+              <strong>{project.area}</strong>
+            </div>
+            <div className="spec-card">
+              <Layers className="spec-icon" size={18} />
+              <span>Typology</span>
+              <strong>{project.type}</strong>
+            </div>
+            {project.details.map((detail, dIdx) => (
+              <div key={detail} className="spec-card">
+                <Compass className="spec-icon" size={18} />
+                <span>Detail 0{dIdx + 1}</span>
+                <strong>{detail}</strong>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* Interactive Gallery */}
@@ -169,9 +170,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       {/* Detail Footer */}
       <footer className="detail-footer">
-        <Link className="wordmark" href="/#top">
-          S_Designs<span>ARCHITECTURE / OBJECTS</span>
-        </Link>
+        <BrandLogo href="/#top" size="sm" />
         <div className="project-pager-nav">
           <Link href={`/work/${prevProject.slug}`} className="pager-link">
             <ArrowLeft size={14} /> Previous: {prevProject.title}

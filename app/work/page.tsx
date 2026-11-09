@@ -1,7 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { WorkGalleryView } from '@/components/work-gallery-view'
+import { BrandLogo } from '@/components/brand-logo'
+import { SiteHeaderNav } from '@/components/site-header-nav'
+import { StaggeredHeading } from '@/components/motion/staggered-heading'
+import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { projects } from '@/lib/projects'
 
 export const metadata: Metadata = {
@@ -12,20 +16,8 @@ export const metadata: Metadata = {
 export default function WorkPage() {
   return (
     <main className="work-archive-page">
-      {/* Top Header */}
-      <header className="detail-header">
-        <Link className="wordmark" href="/#top" aria-label="S_Designs home">
-          S_Designs<span>ARCHITECTURE / OBJECTS</span>
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link className="back-link" href="/#work">
-            <ArrowLeft size={15} /> Back to home
-          </Link>
-          <Link className="nav-cta" href="/#contact">
-            Start a project <ArrowUpRight size={14} />
-          </Link>
-        </div>
-      </header>
+      {/* Top Header with Architectural Navigation */}
+      <SiteHeaderNav showBackLink backHref="/#work" backLabel="Back to home" />
 
       {/* Hero Introduction Banner */}
       <section className="work-hero-banner">
@@ -33,34 +25,41 @@ export default function WorkPage() {
           ( PORTFOLIO / 2021 — 2024 ) <span>ARCHITECTURAL ARCHIVE</span>
         </div>
         <div className="work-hero-content">
-          <h1>
-            Selected works &amp;<br />
-            <em>considered spaces.</em>
-          </h1>
+          <StaggeredHeading
+            tag="h1"
+            animateOnInit
+            lines={[
+              { text: 'Selected works &' },
+              { text: 'considered spaces.', isAccent: true },
+            ]}
+          />
+
           <div className="work-hero-aside">
-            <p>
-              Each project begins with a deep reading of its landscape, light, and material heritage.
-              Browse our complete archive of built residences, retreats, and cultural pavilions.
-            </p>
-            <div className="work-hero-metrics">
-              <div className="metric-box">
-                <span className="metric-number">0{projects.length}</span>
-                <span className="metric-label">Commissions</span>
+            <ScrollReveal delay={0.2}>
+              <p>
+                Each project begins with a deep reading of its landscape, light, and material heritage.
+                Browse our complete archive of built residences, retreats, and cultural pavilions.
+              </p>
+              <div className="work-hero-metrics">
+                <div className="metric-box">
+                  <span className="metric-number">0{projects.length}</span>
+                  <span className="metric-label">Commissions</span>
+                </div>
+                <div className="metric-box">
+                  <span className="metric-number">04</span>
+                  <span className="metric-label">Countries</span>
+                </div>
+                <div className="metric-box">
+                  <span className="metric-number">100%</span>
+                  <span className="metric-label">Bespoke Design</span>
+                </div>
               </div>
-              <div className="metric-box">
-                <span className="metric-number">04</span>
-                <span className="metric-label">Countries</span>
-              </div>
-              <div className="metric-box">
-                <span className="metric-number">100%</span>
-                <span className="metric-label">Bespoke Design</span>
-              </div>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* Interactive Gallery */}
+      {/* Interactive Gallery with Filters & Quick View */}
       <section className="work-gallery-section">
         <WorkGalleryView projects={projects} />
       </section>
@@ -84,9 +83,7 @@ export default function WorkPage() {
 
       {/* Footer */}
       <footer className="detail-footer">
-        <Link className="wordmark" href="/#top">
-          S_Designs<span>ARCHITECTURE / OBJECTS</span>
-        </Link>
+        <BrandLogo href="/#top" size="sm" />
         <div className="footer-links">
           <Link href="/">Home</Link>
           <Link href="/work">All Works</Link>
@@ -101,4 +98,3 @@ export default function WorkPage() {
     </main>
   )
 }
-
