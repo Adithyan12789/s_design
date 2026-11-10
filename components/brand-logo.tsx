@@ -26,7 +26,7 @@ export function BrandLogo({
 
   const emblemSrc =
     variant === 'dark'
-      ? '/s-design-emblem-transparent.png'
+      ? '/s-design-emblem-clean.png'
       : '/s-design-emblem-white.png'
 
   const content = (
@@ -35,8 +35,8 @@ export function BrandLogo({
         <Image
           src={emblemSrc}
           alt="S_Designs Architectural Logo"
-          width={36}
-          height={36}
+          width={32}
+          height={32}
           className="brand-logo-image"
           priority
         />
@@ -44,7 +44,7 @@ export function BrandLogo({
       </div>
       <div className="brand-logo-text">
         <span className="brand-logo-name">S_DE_SIGN</span>
-        {showSubtitle && <span className="brand-logo-sub">— STUDIO —</span>}
+        {showSubtitle && <span className="brand-logo-sub">ARCHITECTURE / STUDIO</span>}
       </div>
     </div>
   )
