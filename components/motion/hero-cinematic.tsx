@@ -28,10 +28,11 @@ export function HeroCinematic({
 }: HeroCinematicProps) {
   const pinWrapperRef = useRef<HTMLDivElement | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
-  const initialUiRef = useRef<HTMLDivElement | null>(null)
+  const bgPhotoRef = useRef<HTMLDivElement | null>(null)
+  const vignetteRef = useRef<HTMLDivElement | null>(null)
+  const initialPromptsRef = useRef<HTMLDivElement | null>(null)
   const maskStageRef = useRef<HTMLDivElement | null>(null)
-  const revealedImgRef = useRef<HTMLDivElement | null>(null)
-  
+
   // 4 Independent Volumetric Fog Layers
   const fogGroundRef = useRef<HTMLDivElement | null>(null)
   const fogWispsRef = useRef<HTMLDivElement | null>(null)
@@ -55,7 +56,7 @@ export function HeroCinematic({
     // -------------------------------------------------------------
     const canvas = canvasRef.current
     let animFrameId: number | null = null
-    let globalMistIntensity = 1.0
+    let globalMistIntensity = 0.0
 
     if (canvas && !prefersReducedMotion) {
       const ctx2d = canvas.getContext('2d')
@@ -70,7 +71,6 @@ export function HeroCinematic({
         }
         window.addEventListener('resize', handleResize)
 
-        // Generate 24 organic multi-scale mist puffs
         const particles: Array<{
           x: number
           y: number
@@ -81,7 +81,7 @@ export function HeroCinematic({
           phase: number
         }> = []
 
-        for (let i = 0; i < 24; i++) {
+        for (let i = 0; i < 22; i++) {
           particles.push({
             x: Math.random() * width,
             y: Math.random() * height,
@@ -98,7 +98,6 @@ export function HeroCinematic({
           time += 0.007
           ctx2d.clearRect(0, 0, width, height)
 
-          // Only render if mist is active
           if (globalMistIntensity > 0.01) {
             for (let i = 0; i < particles.length; i++) {
               const p = particles[i]
@@ -137,35 +136,42 @@ export function HeroCinematic({
 
     const ctx = gsap.context(() => {
       if (prefersReducedMotion) {
-        gsap.set(revealedImgRef.current, {
-          opacity: 0.9,
-          scale: 1,
-          clipPath: 'inset(0% 0% 0% 0% round 0px)',
-        })
+        gsap.set(bgPhotoRef.current, { opacity: 1, scale: 1 })
+        gsap.set(maskStageRef.current, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0%)' })
         gsap.set(editorialCardRef.current, { opacity: 1, y: 0 })
         return
       }
 
-      // Initial States before user interaction
-      gsap.set(maskStageRef.current, { scale: 0.95, opacity: 0, y: 30 })
-      gsap.set(revealedImgRef.current, {
+      // -----------------------------------------------------------
+      // INITIAL STATE (STAGE 1): Full-Screen Architectural Image FIRST
+      // No large typography or studio name at the beginning.
+      // -----------------------------------------------------------
+      gsap.set(bgPhotoRef.current, { opacity: 1, scale: 1.04, yPercent: 0 })
+      gsap.set(vignetteRef.current, { opacity: 0.25 })
+
+      // Typography is strictly hidden at initial screen
+      gsap.set(maskStageRef.current, {
         opacity: 0,
-        scale: 1.14,
-        clipPath: 'inset(18% 12% 18% 12% round 14px)',
-        filter: 'brightness(0.72) contrast(1.18) saturate(0.88)',
+        y: 40,
+        scale: 0.94,
+        clipPath: 'inset(100% 0% 0% 0%)',
       })
-      gsap.set(editorialCardRef.current, { opacity: 0, y: 38, scale: 0.97 })
-      
-      // Initial Fog States
-      gsap.set(fogGroundRef.current, { xPercent: 12, yPercent: 0, opacity: 0 })
+
+      // Fog layers are strictly hidden at initial screen
+      gsap.set(fogGroundRef.current, { xPercent: 15, yPercent: 0, opacity: 0 })
       gsap.set(fogWispsRef.current, { xPercent: -30, opacity: 0 })
-      gsap.set(fogCumulusRef.current, { xPercent: -20, scale: 1.05, opacity: 0 })
-      gsap.set(fogHazeRef.current, { xPercent: 8, opacity: 0 })
-      gsap.set(initialUiRef.current, { opacity: 0, y: 18 })
+      gsap.set(fogCumulusRef.current, { xPercent: -20, scale: 1.0, opacity: 0 })
+      gsap.set(fogHazeRef.current, { opacity: 0 })
+
+      // Editorial card is hidden at initial screen
+      gsap.set(editorialCardRef.current, { opacity: 0, y: 35, scale: 0.97 })
+
+      // Initial clean minimal prompts are visible
+      gsap.set(initialPromptsRef.current, { opacity: 0, y: 15 })
 
       if (headerEl) gsap.set(headerEl, { y: -35, opacity: 0 })
 
-      // Stage 01 Entrance (Initial landing at scroll 0)
+      // Page Load Entrance (Scroll = 0)
       const entranceTl = gsap.timeline({ delay: 0.12 })
 
       if (headerEl) {
@@ -177,53 +183,37 @@ export function HeroCinematic({
         })
       }
 
+      // Background image slow cinematic breathe into scale: 1.0
       entranceTl.to(
-        maskStageRef.current,
+        bgPhotoRef.current,
         {
           scale: 1.0,
-          opacity: 1,
-          y: 0,
-          duration: 1.3,
-          ease: 'power3.out',
-        },
-        0.18
-      )
-
-      entranceTl.to(
-        [
-          fogHazeRef.current,
-          fogCumulusRef.current,
-          fogWispsRef.current,
-          fogGroundRef.current,
-        ],
-        {
-          opacity: (i) => (i === 0 ? 0.25 : i === 1 ? 0.22 : i === 2 ? 0.26 : 0.36),
-          duration: 1.5,
+          duration: 2.0,
           ease: 'power2.out',
-          stagger: 0.12,
         },
-        0.35
+        0.1
       )
 
+      // Minimal eyebrow and scroll prompt fade in smoothly
       entranceTl.to(
-        initialUiRef.current,
+        initialPromptsRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.85,
+          duration: 0.9,
           ease: 'power2.out',
         },
-        0.65
+        0.55
       )
 
-      // -------------------------------------------------------------
-      // Master Scrubbed Scroll Timeline (One Synchronized Engine)
-      // -------------------------------------------------------------
+      // -----------------------------------------------------------
+      // MASTER SCROLL TIMELINE (7 COORIDINATED STAGES)
+      // -----------------------------------------------------------
       const masterTl = gsap.timeline({
         scrollTrigger: {
           trigger: pinWrapper,
           start: 'top top',
-          end: '+=280%',
+          end: '+=300%',
           pin: stageEl,
           scrub: 1.2,
           anticipatePin: 1,
@@ -231,11 +221,13 @@ export function HeroCinematic({
           onUpdate: (self) => {
             const p = self.progress
 
-            // Synchronize canvas mist intensity with scroll
-            if (p < 0.45) {
-              globalMistIntensity = 1.0
-            } else if (p < 0.75) {
-              globalMistIntensity = Math.max(0, 1 - (p - 0.45) / 0.3)
+            // Synchronize micro-mist intensity
+            if (p < 0.28) {
+              globalMistIntensity = 0.0
+            } else if (p < 0.55) {
+              globalMistIntensity = Math.min(1.0, (p - 0.28) / 0.25)
+            } else if (p < 0.85) {
+              globalMistIntensity = Math.max(0, 1 - (p - 0.55) / 0.3)
             } else {
               globalMistIntensity = 0.0
             }
@@ -245,175 +237,172 @@ export function HeroCinematic({
               hudFillRef.current.style.width = `${Math.round(p * 100)}%`
             }
             if (hudTextRef.current) {
-              if (p < 0.2) {
-                hudTextRef.current.innerText = 'STAGE 01 // TYPOGRAPHY MASK'
+              if (p < 0.14) {
+                hudTextRef.current.innerText = 'STAGE 01 // ARCHITECTURAL CANVAS'
+              } else if (p < 0.32) {
+                hudTextRef.current.innerText = 'STAGE 02 // CINEMATIC DRIFT'
               } else if (p < 0.52) {
-                hudTextRef.current.innerText = 'STAGE 02 // ATMOSPHERIC DISPERSAL'
-              } else if (p < 0.84) {
-                hudTextRef.current.innerText = 'STAGE 03 // ARCHITECTURAL REVEAL'
+                hudTextRef.current.innerText = 'STAGE 03 // ATMOSPHERIC MIST'
+              } else if (p < 0.74) {
+                hudTextRef.current.innerText = 'STAGE 04 // TYPOGRAPHY REVEAL'
+              } else if (p < 0.86) {
+                hudTextRef.current.innerText = 'STAGE 05 // BRANDING MONOGRAPH'
+              } else if (p < 0.97) {
+                hudTextRef.current.innerText = 'STAGE 06 // STUDIO ETHOS'
               } else {
-                hudTextRef.current.innerText = 'STAGE 04 // EDITORIAL MONOGRAPH'
+                hudTextRef.current.innerText = 'STAGE 07 // EXPLORE STUDIO'
               }
             }
           },
         },
       })
 
-      // STAGE 01 -> STAGE 02: Initial UI exit, Typography expansion, Fog flow
-      // A. Initial UI cues fade cleanly
-      masterTl.to(
-        initialUiRef.current,
-        {
-          opacity: 0,
-          y: -24,
-          duration: 0.18,
-          ease: 'power2.in',
-        },
-        0.0
-      )
-
-      // B. Typography scale transformation with synchronized internal shift
+      // STAGE 1 -> STAGE 2 (0.00 - 0.14): Clean UI exit, subtle image drift begins
       masterTl
         .to(
-          maskStageRef.current,
+          initialPromptsRef.current,
           {
-            scale: 3.4,
-            y: -14,
-            duration: 0.5,
-            ease: 'power2.inOut',
-          },
-          0.0
-        )
-        .to(
-          maskStageRef.current,
-          {
-            scale: 7.2,
-            y: -32,
             opacity: 0,
-            duration: 0.3,
-            ease: 'power3.in',
+            y: -20,
+            duration: 0.14,
+            ease: 'power2.in',
           },
-          0.5
+          0.0
         )
-
-      // C. Multi-layer Volumetric Fog choreography with distinct speeds & directions
-      // 1. Low Ground Mist: sweeps right-to-left along lower 40%
-      masterTl
         .to(
-          fogGroundRef.current,
+          bgPhotoRef.current,
           {
-            xPercent: -35,
-            yPercent: -8,
-            opacity: 0.85,
-            duration: 0.48,
+            scale: 1.08,
+            yPercent: -6,
+            duration: 0.45,
             ease: 'none',
           },
           0.0
         )
         .to(
-          fogGroundRef.current,
+          vignetteRef.current,
           {
-            xPercent: -60,
-            opacity: 0.08,
-            duration: 0.35,
-            ease: 'power2.out',
-          },
-          0.48
-        )
-
-      // 2. High Wisps: drifts left-to-right across upper half
-      masterTl
-        .to(
-          fogWispsRef.current,
-          {
-            xPercent: 24,
-            opacity: 0.78,
-            duration: 0.5,
+            opacity: 0.58,
+            duration: 0.45,
             ease: 'none',
           },
-          0.05
+          0.0
         )
+
+      // STAGE 3 (0.18 - 0.52): Atmospheric fog moves across the architectural photograph
+      masterTl
+        // Low Ground Mist sweeps across lower third
+        .to(
+          fogGroundRef.current,
+          {
+            xPercent: -28,
+            yPercent: -6,
+            opacity: 0.85,
+            duration: 0.45,
+            ease: 'none',
+          },
+          0.16
+        )
+        // High Wisps drift across upper half
         .to(
           fogWispsRef.current,
           {
-            xPercent: 48,
-            opacity: 0.0,
+            xPercent: 18,
+            opacity: 0.78,
+            duration: 0.45,
+            ease: 'none',
+          },
+          0.18
+        )
+        // Central Cumulus rolls in diagonally
+        .to(
+          fogCumulusRef.current,
+          {
+            xPercent: 16,
+            scale: 1.32,
+            opacity: 0.92,
+            duration: 0.45,
+            ease: 'none',
+          },
+          0.2
+        )
+        // Deep Haze softly diffuses background
+        .to(
+          fogHazeRef.current,
+          {
+            opacity: 0.55,
+            duration: 0.4,
+            ease: 'none',
+          },
+          0.2
+        )
+
+      // STAGE 4 (0.46 - 0.72): Oversized studio name reveals progressively through fog
+      masterTl
+        .to(
+          maskStageRef.current,
+          {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            opacity: 1,
+            y: 0,
+            scale: 1.0,
+            duration: 0.28,
+            ease: 'power3.out',
+          },
+          0.46
+        )
+        // Fog drifts across the letters, partially concealing and parting around them
+        .to(
+          fogCumulusRef.current,
+          {
+            xPercent: 36,
+            scale: 1.45,
+            opacity: 0.35,
             duration: 0.3,
             ease: 'power2.out',
           },
-          0.55
-        )
-
-      // 3. Central Cumulus Bank: rolls diagonally across center
-      masterTl
-        .to(
-          fogCumulusRef.current,
-          {
-            xPercent: 28,
-            scale: 1.34,
-            opacity: 0.92,
-            duration: 0.48,
-            ease: 'none',
-          },
-          0.04
+          0.52
         )
         .to(
-          fogCumulusRef.current,
+          fogWispsRef.current,
           {
-            xPercent: 55,
-            opacity: 0.0,
-            duration: 0.32,
+            xPercent: 38,
+            opacity: 0.2,
+            duration: 0.28,
             ease: 'power2.out',
           },
           0.52
         )
 
-      // 4. Deep Ambient Haze: subtle background counter-drift
+      // STAGE 5 (0.72 - 0.86): Typography branding locks in with architectural imagery in letters
       masterTl
         .to(
-          fogHazeRef.current,
+          maskStageRef.current,
           {
-            xPercent: -14,
-            opacity: 0.55,
-            duration: 0.5,
-            ease: 'none',
-          },
-          0.0
-        )
-        .to(
-          fogHazeRef.current,
-          {
-            opacity: 0.04,
-            duration: 0.3,
+            scale: 1.03,
+            duration: 0.18,
             ease: 'power2.out',
           },
-          0.5
+          0.72
+        )
+        .to(
+          fogGroundRef.current,
+          {
+            opacity: 0.12,
+            duration: 0.2,
+            ease: 'power2.out',
+          },
+          0.72
         )
 
-      // STAGE 03: Full-Screen Architectural Image Clip-Path Reveal & Settling
-      // The image expands its aperture, settles scale, and brightens to crystal clarity
-      masterTl.to(
-        revealedImgRef.current,
-        {
-          clipPath: 'inset(0% 0% 0% 0% round 0px)',
-          scale: 1.0,
-          opacity: 1.0,
-          filter: 'brightness(1.0) contrast(1.0) saturate(1.0)',
-          duration: 0.34,
-          ease: 'power2.out',
-        },
-        0.5
-      )
-
-      // STAGE 04: Editorial Monograph Card Reveal
-      // Appears smoothly AFTER the architectural photograph has settled
+      // STAGE 6 (0.84 - 0.96): Supporting headline, description, and CTA appear smoothly
       masterTl.to(
         editorialCardRef.current,
         {
           opacity: 1,
           y: 0,
           scale: 1.0,
-          duration: 0.16,
+          duration: 0.14,
           ease: 'power3.out',
         },
         0.84
@@ -430,19 +419,20 @@ export function HeroCinematic({
   return (
     <div ref={pinWrapperRef} className="hero-scroll-pin-wrapper">
       <section ref={stageRef} className="hero-scroll-stage" id="top">
-        {/* Subtle Architectural Blueprint Precision Grid */}
-        <div className="hero-ambient-blueprint-grid" aria-hidden="true" />
-
-        {/* Layer 1: Revealed Full-Bleed Architectural Photograph (Clip-Path Aperture) */}
+        {/* Layer 1: Full-Bleed Architectural Photograph (Clean and visible from the start) */}
         <div
-          ref={revealedImgRef}
-          className="scroll-hero-revealed-image"
+          ref={bgPhotoRef}
+          className="scroll-hero-full-photo"
           style={{ backgroundImage: `url(${imageUrl})` }}
           role="img"
           aria-label="Monolithic contemporary architectural villa"
-        >
-          <div className="scroll-hero-revealed-overlay" />
-        </div>
+        />
+
+        {/* Ambient Vignette Overlay (Subtly darkens only as typography reveals) */}
+        <div ref={vignetteRef} className="scroll-hero-ambient-vignette" aria-hidden="true" />
+
+        {/* Subtle Architectural Blueprint Precision Grid */}
+        <div className="hero-ambient-blueprint-grid" aria-hidden="true" />
 
         {/* Layer 2: Deep Ambient Volumetric Haze */}
         <div
@@ -452,7 +442,34 @@ export function HeroCinematic({
           aria-hidden="true"
         />
 
-        {/* Layer 3: Oversized Typography with Synchronized Architectural Image Mask */}
+        {/* Layer 3: High Altitude Wispy Cloud Drift */}
+        <div
+          ref={fogWispsRef}
+          className="fog-layer fog-layer--wisps"
+          style={{ backgroundImage: 'url(/fog-high-wisps.png)' }}
+          aria-hidden="true"
+        />
+
+        {/* Layer 4: Central Billowing Cumulus Fog Bank */}
+        <div
+          ref={fogCumulusRef}
+          className="fog-layer fog-layer--cumulus"
+          style={{ backgroundImage: 'url(/fog-dense-cumulus.png)' }}
+          aria-hidden="true"
+        />
+
+        {/* Layer 5: Dynamic Micro-Mist Particle Canvas */}
+        <canvas ref={canvasRef} className="scroll-hero-canvas-mist" aria-hidden="true" />
+
+        {/* Layer 6: Low Mountain Ground Mist */}
+        <div
+          ref={fogGroundRef}
+          className="fog-layer fog-layer--ground"
+          style={{ backgroundImage: 'url(/fog-ground-mist.png)' }}
+          aria-hidden="true"
+        />
+
+        {/* Layer 7: Oversized Studio Typography (Revealed through fog on scroll) */}
         <div ref={maskStageRef} className="scroll-hero-mask-stage">
           <div className="scroll-hero-masked-headline">
             <span
@@ -470,35 +487,8 @@ export function HeroCinematic({
           </div>
         </div>
 
-        {/* Layer 4: Central Billowing Cumulus Fog Bank */}
-        <div
-          ref={fogCumulusRef}
-          className="fog-layer fog-layer--cumulus"
-          style={{ backgroundImage: 'url(/fog-dense-cumulus.png)' }}
-          aria-hidden="true"
-        />
-
-        {/* Layer 5: High Altitude Wispy Cloud Drift */}
-        <div
-          ref={fogWispsRef}
-          className="fog-layer fog-layer--wisps"
-          style={{ backgroundImage: 'url(/fog-high-wisps.png)' }}
-          aria-hidden="true"
-        />
-
-        {/* Layer 6: Dynamic Micro-Mist Particle Canvas */}
-        <canvas ref={canvasRef} className="scroll-hero-canvas-mist" aria-hidden="true" />
-
-        {/* Layer 7: Low Mountain Ground Mist */}
-        <div
-          ref={fogGroundRef}
-          className="fog-layer fog-layer--ground"
-          style={{ backgroundImage: 'url(/fog-ground-mist.png)' }}
-          aria-hidden="true"
-        />
-
-        {/* Stage 01: Initial Editorial UI Prompts */}
-        <div ref={initialUiRef} className="scroll-hero-initial-ui">
+        {/* Stage 1: Initial Minimal Screen UI (No oversized typography at beginning) */}
+        <div ref={initialPromptsRef} className="scroll-hero-initial-ui">
           <div className="scroll-hero-top-eyebrow">
             <span className="dot">●</span>
             <span>{eyebrow}</span>
@@ -511,7 +501,7 @@ export function HeroCinematic({
               <div className="scroll-indicator-mouse">
                 <div className="scroll-indicator-dot" />
               </div>
-              <span>Scroll to reveal</span>
+              <span>Scroll to explore</span>
             </div>
 
             <a
@@ -524,7 +514,7 @@ export function HeroCinematic({
           </div>
         </div>
 
-        {/* Stage 04: Final Editorial Monograph Card */}
+        {/* Stage 6: Editorial Monograph Card (Appears after studio branding) */}
         <div ref={editorialCardRef} className="scroll-hero-editorial-card">
           <div className="editorial-card-kicker">
             ( 01 ) MONOGRAPH · MONOLITHIC HORIZON
@@ -549,9 +539,9 @@ export function HeroCinematic({
           </div>
         </div>
 
-        {/* HUD Corner Stage Tracker */}
+        {/* HUD Corner Stage Tracker (7 Stages) */}
         <div className="scroll-hero-hud-progress" aria-hidden="true">
-          <span ref={hudTextRef}>STAGE 01 // TYPOGRAPHY MASK</span>
+          <span ref={hudTextRef}>STAGE 01 // ARCHITECTURAL CANVAS</span>
           <div className="hud-progress-track">
             <div ref={hudFillRef} className="hud-progress-fill" />
           </div>

@@ -1031,34 +1031,35 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   100% { transform: translateY(0); opacity: 0; }
 }
 
-/* Layer 1: Revealed Full-Bleed Architectural Image */
-.scroll-hero-revealed-image {
+/* Layer 1: Full-Bleed Architectural Photograph (Visible from the start) */
+.scroll-hero-full-photo {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 1;
   background-size: cover;
   background-position: center center;
-  opacity: 0;
-  clip-path: inset(18% 12% 18% 12% round 14px);
+  opacity: 1;
   transform-origin: center center;
-  will-change: transform, opacity, clip-path, filter;
-  filter: brightness(0.72) contrast(1.18) saturate(0.88);
+  will-change: transform, filter;
+  filter: brightness(0.96) contrast(1.02);
 }
 
-.scroll-hero-revealed-overlay {
+.scroll-hero-ambient-vignette {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 2;
   background: 
-    radial-gradient(circle at center, rgba(16, 16, 14, 0.1) 0%, rgba(16, 16, 14, 0.65) 100%),
-    linear-gradient(0deg, rgba(16, 16, 14, 0.75) 0%, transparent 60%);
+    radial-gradient(circle at center, rgba(16, 16, 14, 0.08) 0%, rgba(16, 16, 14, 0.52) 100%),
+    linear-gradient(0deg, rgba(16, 16, 14, 0.6) 0%, transparent 60%);
   pointer-events: none;
+  opacity: 0.35;
+  will-change: opacity;
 }
 
-/* Layer 3: Oversized Masked Typography */
+/* Layer 3: Oversized Masked Typography (Revealed progressively through fog) */
 .scroll-hero-mask-stage {
   position: relative;
-  z-index: 6;
+  z-index: 8;
   width: 100%;
   max-width: 1500px;
   padding: 0 4vw;
@@ -1068,7 +1069,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   justify-content: center;
   text-align: center;
   transform-origin: center center;
-  will-change: transform, opacity;
+  will-change: transform, opacity, clip-path;
   pointer-events: none;
 }
 
@@ -1095,15 +1096,15 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   -webkit-background-clip: text;
   background-clip: text;
   will-change: transform, letter-spacing;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
-  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.7));
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.28);
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.75));
 }
 
 .masked-line--primary {
   font-size: clamp(68px, 14vw, 210px);
   letter-spacing: -0.04em;
   margin-bottom: 0.05em;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.25);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .masked-line--secondary {
