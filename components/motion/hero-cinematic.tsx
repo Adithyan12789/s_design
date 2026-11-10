@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { ArrowDownRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -152,6 +153,7 @@ export function HeroCinematic({
       // Typography is strictly hidden at initial screen
       gsap.set(maskStageRef.current, {
         opacity: 0,
+        visibility: 'hidden',
         y: 40,
         scale: 0.94,
         clipPath: 'inset(100% 0% 0% 0%)',
@@ -339,6 +341,7 @@ export function HeroCinematic({
 
       // STAGE 4 (0.46 - 0.72): Oversized studio name reveals progressively through fog
       masterTl
+        .set(maskStageRef.current, { visibility: 'visible' }, 0.44)
         .to(
           maskStageRef.current,
           {
@@ -438,7 +441,7 @@ export function HeroCinematic({
         <div
           ref={fogHazeRef}
           className="fog-layer fog-layer--haze"
-          style={{ backgroundImage: 'url(/fog-bank-3.png)' }}
+          style={{ backgroundImage: 'url(/fog-bank-3.png)', opacity: 0 }}
           aria-hidden="true"
         />
 
@@ -446,7 +449,7 @@ export function HeroCinematic({
         <div
           ref={fogWispsRef}
           className="fog-layer fog-layer--wisps"
-          style={{ backgroundImage: 'url(/fog-high-wisps.png)' }}
+          style={{ backgroundImage: 'url(/fog-high-wisps.png)', opacity: 0 }}
           aria-hidden="true"
         />
 
@@ -454,7 +457,7 @@ export function HeroCinematic({
         <div
           ref={fogCumulusRef}
           className="fog-layer fog-layer--cumulus"
-          style={{ backgroundImage: 'url(/fog-dense-cumulus.png)' }}
+          style={{ backgroundImage: 'url(/fog-dense-cumulus.png)', opacity: 0 }}
           aria-hidden="true"
         />
 
@@ -465,12 +468,26 @@ export function HeroCinematic({
         <div
           ref={fogGroundRef}
           className="fog-layer fog-layer--ground"
-          style={{ backgroundImage: 'url(/fog-ground-mist.png)' }}
+          style={{ backgroundImage: 'url(/fog-ground-mist.png)', opacity: 0 }}
           aria-hidden="true"
         />
 
-        {/* Layer 7: Oversized Studio Typography (Revealed through fog on scroll) */}
-        <div ref={maskStageRef} className="scroll-hero-mask-stage">
+        {/* Layer 7: Architectural Emblem + Oversized Studio Typography (Revealed through fog on scroll) */}
+        <div
+          ref={maskStageRef}
+          className="scroll-hero-mask-stage"
+          style={{ opacity: 0, visibility: 'hidden' }}
+        >
+          <div className="scroll-hero-revealed-emblem" aria-hidden="true">
+            <Image
+              src="/s-design-emblem-white.png"
+              alt="S_Designs Arch Blueprint"
+              width={76}
+              height={76}
+              className="scroll-hero-emblem-img"
+              priority
+            />
+          </div>
           <div className="scroll-hero-masked-headline">
             <span
               className="masked-line masked-line--primary"
@@ -478,11 +495,8 @@ export function HeroCinematic({
             >
               S_DE_SIGN
             </span>
-            <span
-              className="masked-line masked-line--secondary"
-              style={{ backgroundImage: `url(${imageUrl})` }}
-            >
-              {titleLine2 || 'QUIET PRESENCE'}
+            <span className="masked-line-sub">
+              — STUDIO —
             </span>
           </div>
         </div>
@@ -515,7 +529,7 @@ export function HeroCinematic({
         </div>
 
         {/* Stage 6: Editorial Monograph Card (Appears after studio branding) */}
-        <div ref={editorialCardRef} className="scroll-hero-editorial-card">
+        <div ref={editorialCardRef} className="scroll-hero-editorial-card" style={{ opacity: 0 }}>
           <div className="editorial-card-kicker">
             ( 01 ) MONOGRAPH · MONOLITHIC HORIZON
           </div>
