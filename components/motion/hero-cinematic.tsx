@@ -28,9 +28,7 @@ export function HeroCinematic({
 }: HeroCinematicProps) {
   const pinWrapperRef = useRef<HTMLDivElement | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
-  const portalMaskRef = useRef<HTMLDivElement | null>(null)
   const initialUiRef = useRef<HTMLDivElement | null>(null)
-  const scrollCueRef = useRef<HTMLDivElement | null>(null)
   const maskStageRef = useRef<HTMLDivElement | null>(null)
   const revealedImgRef = useRef<HTMLDivElement | null>(null)
   const fogDeepRef = useRef<HTMLDivElement | null>(null)
@@ -67,6 +65,7 @@ export function HeroCinematic({
         }
         window.addEventListener('resize', handleResize)
 
+        // Generate 22 organic mist puffs with random scale and speeds
         const particles: Array<{
           x: number
           y: number
@@ -129,42 +128,49 @@ export function HeroCinematic({
 
     const ctx = gsap.context(() => {
       if (prefersReducedMotion) {
-        // Fallback for reduced motion
-        gsap.set(portalMaskRef.current, { display: 'none' })
-        gsap.set(revealedImgRef.current, { opacity: 0.9, scale: 1 })
+        // Fallback for reduced motion: show revealed image and mask cleanly without pin
+        gsap.set(revealedImgRef.current, { opacity: 0.85, scale: 1 })
         gsap.set(editorialCardRef.current, { opacity: 1, y: 0 })
-        if (headerEl) gsap.set(headerEl, { y: 0, opacity: 1 })
         return
       }
 
-      // Initial Entrance State (Scroll = 0):
-      // Only the image mask is shown! Header, site name, and details are hidden.
-      gsap.set(portalMaskRef.current, { scale: 0.92, opacity: 0 })
-      gsap.set(maskStageRef.current, { opacity: 0, scale: 0.85, y: 30 })
-      gsap.set(revealedImgRef.current, { opacity: 0, scale: 1.15 })
+      // Initial Entrance (Page Load at scroll 0)
+      gsap.set(maskStageRef.current, { scale: 0.94, opacity: 0, y: 35 })
+      gsap.set(revealedImgRef.current, { opacity: 0, scale: 1.18 })
       gsap.set(editorialCardRef.current, { opacity: 0, y: 40 })
-      gsap.set(initialUiRef.current, { opacity: 0, y: 15 })
-      gsap.set(scrollCueRef.current, { opacity: 0, y: 15 })
+      gsap.set(fogForeRef.current, { xPercent: 20, opacity: 0 })
+      gsap.set(fogMidRef.current, { xPercent: -30, opacity: 0 })
+      gsap.set(fogDeepRef.current, { xPercent: 10, opacity: 0 })
+      gsap.set(initialUiRef.current, { opacity: 0, y: 20 })
 
-      // Header is initially hidden so the user sees ONLY the pure image mask first
-      if (headerEl) gsap.set(headerEl, { y: -40, opacity: 0 })
-
-      // Baseline fog presence
-      gsap.set(fogForeRef.current, { xPercent: 15, opacity: 0 })
-      gsap.set(fogMidRef.current, { xPercent: -20, opacity: 0 })
-      gsap.set(fogDeepRef.current, { xPercent: 5, opacity: 0 })
+      if (headerEl) gsap.set(headerEl, { y: -35, opacity: 0 })
 
       const entranceTl = gsap.timeline({ delay: 0.15 })
 
-      // 1. Reveal pure image mask portal smoothly
-      entranceTl.to(portalMaskRef.current, {
-        scale: 1.0,
-        opacity: 1,
-        duration: 1.5,
-        ease: 'power3.out',
-      })
+      // Animate fixed header drop-in
+      if (headerEl) {
+        entranceTl.to(headerEl, {
+          y: 0,
+          opacity: 1,
+          duration: 1.1,
+          ease: 'power3.out',
+        })
+      }
 
-      // 2. Introduce atmospheric fog gently
+      // Masked typography entrance
+      entranceTl.to(
+        maskStageRef.current,
+        {
+          scale: 1.0,
+          opacity: 1,
+          y: 0,
+          duration: 1.4,
+          ease: 'power3.out',
+        },
+        0.2
+      )
+
+      // Fog layers introduce subtle atmosphere
       entranceTl.to(
         [fogDeepRef.current, fogMidRef.current, fogForeRef.current],
         {
@@ -173,25 +179,22 @@ export function HeroCinematic({
           ease: 'power2.out',
           stagger: 0.15,
         },
-        0.35
+        0.4
       )
 
-      // 3. Show subtle scroll cue at bottom
+      // Initial UI cues fade in
       entranceTl.to(
-        scrollCueRef.current,
+        initialUiRef.current,
         {
           opacity: 1,
           y: 0,
           duration: 0.9,
           ease: 'power2.out',
         },
-        0.8
+        0.7
       )
 
-      // -----------------------------------------------------------
       // Master Scroll-Driven Pin Scrub Timeline
-      // When user scrolls -> Details, Site Name, and Texts Reveal!
-      // -----------------------------------------------------------
       const masterTl = gsap.timeline({
         scrollTrigger: {
           trigger: pinWrapper,
@@ -207,102 +210,63 @@ export function HeroCinematic({
               hudFillRef.current.style.width = `${Math.round(p * 100)}%`
             }
             if (hudTextRef.current) {
-              if (p < 0.22) {
-                hudTextRef.current.innerText = 'STAGE 01 // IMAGE MASK'
-              } else if (p < 0.55) {
-                hudTextRef.current.innerText = 'STAGE 02 // SITE NAME REVEAL'
-              } else if (p < 0.82) {
-                hudTextRef.current.innerText = 'STAGE 03 // IMAGE EXPANSION'
+              if (p < 0.25) {
+                hudTextRef.current.innerText = 'STAGE 01 // TYPOGRAPHY MASK'
+              } else if (p < 0.58) {
+                hudTextRef.current.innerText = 'STAGE 02 // ATMOSPHERIC FOG'
+              } else if (p < 0.84) {
+                hudTextRef.current.innerText = 'STAGE 03 // IMAGE REVEAL'
               } else {
-                hudTextRef.current.innerText = 'STAGE 04 // EDITORIAL SETTLE'
+                hudTextRef.current.innerText = 'STAGE 04 // ARCHITECTURAL SETTLE'
               }
             }
           },
         },
       })
 
+      // STAGE 1 -> STAGE 2: Fade initial UI, expand typography, move fog layers
       masterTl
-        // 1. Bottom cue fades out as soon as scroll begins
+        // 1. Initial UI prompts fade out quickly as user scrolls
         .to(
-          scrollCueRef.current,
+          initialUiRef.current,
           {
             opacity: 0,
-            y: -15,
-            duration: 0.15,
+            y: -28,
+            duration: 0.25,
             ease: 'power2.in',
           },
           0.0
         )
 
-        // 2. Portal mask scales and cross-fades into masked typography (Site Name)
+        // 2. Typography scales up from 1.0 to 3.2 (Stage 2) and accelerates through to 8.5 (Stage 3)
         .to(
-          portalMaskRef.current,
+          maskStageRef.current,
           {
-            scale: 1.35,
-            opacity: 0,
-            duration: 0.35,
+            scale: 3.2,
+            y: -15,
+            duration: 0.5,
             ease: 'power2.inOut',
           },
           0.0
         )
-
-        // 3. REVEAL SITE NAME & TEXTS ON SCROLL:
-        // Masked typography with S_DE_SIGN and QUIET PRESENCE fades in and scales
         .to(
           maskStageRef.current,
           {
-            opacity: 1,
-            scale: 1.25,
-            y: 0,
-            duration: 0.38,
-            ease: 'power3.out',
-          },
-          0.05
-        )
-
-      // Fixed site header (Brand logo, navigation) drops in from top as user scrolls
-      if (headerEl) {
-        masterTl.to(
-          headerEl,
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.3,
-            ease: 'power3.out',
-          },
-          0.08
-        )
-      }
-
-      masterTl
-        // Initial eyebrow & prompt details reveal
-        .to(
-          initialUiRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            ease: 'power2.out',
-          },
-          0.1
-        )
-        // Then fade out initial cues as zoom accelerates
-        .to(
-          initialUiRef.current,
-          {
+            scale: 8.5,
+            y: -30,
             opacity: 0,
-            y: -25,
-            duration: 0.2,
-            ease: 'power2.in',
+            duration: 0.35,
+            ease: 'power3.in',
           },
-          0.4
+          0.5
         )
 
-        // 4. Atmospheric Volumetric Fog Layers Sweep Across
+        // 3. Volumetric Fog Layer Transitions (Foreground, Midground, Deep)
+        // Foreground fog bank sweeps across lower third
         .to(
           fogForeRef.current,
           {
-            xPercent: -35,
+            xPercent: -25,
             opacity: 0.88,
             duration: 0.45,
             ease: 'none',
@@ -312,20 +276,21 @@ export function HeroCinematic({
         .to(
           fogForeRef.current,
           {
-            xPercent: -60,
-            opacity: 0.2,
+            xPercent: -50,
+            opacity: 0.25,
             duration: 0.45,
             ease: 'power2.out',
           },
           0.45
         )
 
+        // Midground fog bank crosses center with realistic density
         .to(
           fogMidRef.current,
           {
-            xPercent: 20,
+            xPercent: 15,
             scale: 1.35,
-            opacity: 0.95,
+            opacity: 0.92,
             duration: 0.5,
             ease: 'none',
           },
@@ -334,7 +299,7 @@ export function HeroCinematic({
         .to(
           fogMidRef.current,
           {
-            xPercent: 45,
+            xPercent: 42,
             opacity: 0.2,
             duration: 0.4,
             ease: 'power2.out',
@@ -342,10 +307,11 @@ export function HeroCinematic({
           0.55
         )
 
+        // Deep fog layer gently tracks
         .to(
           fogDeepRef.current,
           {
-            xPercent: -20,
+            xPercent: -15,
             opacity: 0.75,
             duration: 0.5,
             ease: 'none',
@@ -362,20 +328,7 @@ export function HeroCinematic({
           0.5
         )
 
-        // 5. Masked Typography Zooms into Full Aperture
-        .to(
-          maskStageRef.current,
-          {
-            scale: 7.5,
-            y: -30,
-            opacity: 0,
-            duration: 0.45,
-            ease: 'power2.in',
-          },
-          0.38
-        )
-
-        // 6. Full-Bleed Architectural Photograph Seamlessly Cross-Fades In
+        // STAGE 3: Full-Bleed Photograph Cross-Fade & Settle
         .to(
           revealedImgRef.current,
           {
@@ -384,10 +337,10 @@ export function HeroCinematic({
             duration: 0.45,
             ease: 'power2.out',
           },
-          0.42
+          0.45
         )
 
-        // 7. Stage 4: Editorial Details & Monograph Card Reveal
+        // STAGE 4: Final Editorial Card Monograph Reveal
         .to(
           editorialCardRef.current,
           {
@@ -432,18 +385,7 @@ export function HeroCinematic({
           aria-hidden="true"
         />
 
-        {/* Stage 0/1: PURE INITIAL IMAGE MASK (Only image shown first!) */}
-        <div ref={portalMaskRef} className="scroll-hero-portal-mask">
-          <div
-            className="portal-mask-image"
-            style={{ backgroundImage: `url(${imageUrl})` }}
-            role="img"
-            aria-label="Pure architectural image mask"
-          />
-          <div className="portal-mask-glow" />
-        </div>
-
-        {/* Stage 2: Oversized Typography with Image Masking (Site Name & Texts Reveal on Scroll) */}
+        {/* Layer 3: Oversized Typography with Image Masking */}
         <div ref={maskStageRef} className="scroll-hero-mask-stage">
           <div className="scroll-hero-masked-headline">
             <span
@@ -480,26 +422,7 @@ export function HeroCinematic({
           aria-hidden="true"
         />
 
-        {/* Pure Initial Minimal Scroll Cue (Visible at scroll 0) */}
-        <div
-          ref={scrollCueRef}
-          className="scroll-indicator-wrap"
-          style={{
-            position: 'absolute',
-            bottom: '7vh',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 22,
-          }}
-          aria-hidden="true"
-        >
-          <div className="scroll-indicator-mouse">
-            <div className="scroll-indicator-dot" />
-          </div>
-          <span style={{ letterSpacing: '0.28em' }}>Scroll to reveal</span>
-        </div>
-
-        {/* Editorial Prompts (Reveals on Scroll) */}
+        {/* Stage 1: Initial Editorial UI Prompts */}
         <div ref={initialUiRef} className="scroll-hero-initial-ui">
           <div className="scroll-hero-top-eyebrow">
             <span className="dot">●</span>
@@ -508,6 +431,13 @@ export function HeroCinematic({
 
           <div className="scroll-hero-bottom-bar">
             <p className="scroll-hero-description">{description}</p>
+
+            <div className="scroll-indicator-wrap" aria-hidden="true">
+              <div className="scroll-indicator-mouse">
+                <div className="scroll-indicator-dot" />
+              </div>
+              <span>Scroll to reveal</span>
+            </div>
 
             <a
               className="circle-link"
@@ -519,7 +449,7 @@ export function HeroCinematic({
           </div>
         </div>
 
-        {/* Stage 4: Final Editorial Monograph Card with Full Details */}
+        {/* Stage 4: Final Editorial Monograph Card */}
         <div ref={editorialCardRef} className="scroll-hero-editorial-card">
           <div className="editorial-card-kicker">
             ( 01 ) MONOGRAPH · MONOLITHIC HORIZON
@@ -546,7 +476,7 @@ export function HeroCinematic({
 
         {/* HUD Corner Index & Stage Progress */}
         <div className="scroll-hero-hud-progress" aria-hidden="true">
-          <span ref={hudTextRef}>STAGE 01 // IMAGE MASK</span>
+          <span ref={hudTextRef}>STAGE 01 // TYPOGRAPHY MASK</span>
           <div className="hud-progress-track">
             <div ref={hudFillRef} className="hud-progress-fill" />
           </div>
