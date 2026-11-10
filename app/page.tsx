@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
-import { ReactBitsBackground } from '@/components/react-bits-background'
 import { TiltProjectCard } from '@/components/tilt-project-card'
 import { BrandLogo } from '@/components/brand-logo'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
@@ -39,8 +38,6 @@ export default function Page() {
       {/* Full-Screen Architectural Navigation Overlay */}
       <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-      <ReactBitsBackground />
-
       {/* Fixed Site Header */}
       <header className="site-header">
         <BrandLogo href="#top" />
@@ -63,7 +60,7 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Cinematic Hero Entrance */}
+      {/* Architectural Storytelling Cinematic Hero */}
       <HeroCinematic
         eyebrow="Independent architecture studio · Portugal / Worldwide"
         titleLine1="Spaces with"
@@ -72,6 +69,8 @@ export default function Page() {
         indexText="01 / 04"
         imageUrl="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90"
         targetSectionId="#work"
+        studioName="S_DE_SIGN"
+        studioSubtitle="ARCHITECTURE & SPATIAL PRACTICE"
       />
 
       {/* Studio Section */}

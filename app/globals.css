@@ -7,9 +7,7 @@
 html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--ivory); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
 a { color: inherit; text-decoration: none; }
-.site-shell { overflow: hidden; position: relative; isolation: isolate; }
-.reactbits-background { position: fixed; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; opacity: .92; mix-blend-mode: screen; }
-.site-shell > *:not(.reactbits-background) { z-index: 1; }
+.site-shell { position: relative; isolation: isolate; }
 .animated-section { position: relative; overflow: hidden; }
 .animated-section > *:not(.section-ambient) { position: relative; z-index: 1; }
 .section-ambient { position: absolute; pointer-events: none; z-index: 0; opacity: .7; }
@@ -36,7 +34,7 @@ a { color: inherit; text-decoration: none; }
 @keyframes rise-in { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes title-reveal { from { opacity: 0; transform: translateY(34px) scale(.985); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: translateY(0) scale(1); clip-path: inset(0 0 0 0); } }
 @keyframes soft-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 50% { box-shadow: 0 0 0 10px rgba(255,255,255,.06); } }
-@media (prefers-reduced-motion: reduce) { .reactbits-background, .intro-copy, .statement-copy, .contact-layout, .project-card, .service-row { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-copy, .statement-copy, .contact-layout, .project-card, .service-row { animation: none; } }
 .site-header { position: fixed; z-index: 10; top: 0; left: 0; width: 100%; height: 76px; padding: 0 4.8vw; display: flex; align-items: center; justify-content: space-between; color: #f5f1e9; background: linear-gradient(180deg, rgba(18,18,16,.65), transparent); backdrop-filter: blur(8px); text-shadow: 0 1px 18px rgba(0,0,0,.42); }
 .site-shell > .site-header { z-index: 10; }
 .site-shell > .hero > .hero-content, .site-shell > .hero > .hero-index { z-index: 4; }
@@ -802,44 +800,224 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 }
 
 /* ==========================================================================
-   Hero Cinematic Entrance Styles
+   Architectural Storytelling Hero Styles (Scroll-Driven 8 Stages)
    ========================================================================== */
-.cinematic-hero {
+.story-hero-wrapper {
   position: relative;
+  width: 100%;
+}
+.story-hero-pinned {
+  position: relative;
+  width: 100%;
   height: 100svh;
   min-height: 650px;
   overflow: hidden;
   color: #fbf9f4;
   text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
-.cinematic-hero-image {
+.story-hero-bg {
   position: absolute;
-  inset: -8%;
+  inset: -6%;
   background-size: cover;
   background-position: center;
-  will-change: transform, opacity;
+  will-change: transform;
   z-index: 1;
 }
-.cinematic-hero-overlay {
+.story-light-sweep {
+  position: absolute;
+  inset: -40%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.28) 48%,
+    rgba(241, 207, 158, 0.42) 52%,
+    transparent 68%
+  );
+  mix-blend-mode: overlay;
+  will-change: transform, opacity;
+}
+.story-hero-overlay {
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(90deg, rgba(16, 16, 14, 0.78) 0%, rgba(16, 16, 14, 0.5) 55%, rgba(16, 16, 14, 0.25) 100%),
-    linear-gradient(0deg, rgba(16, 16, 14, 0.65) 0%, transparent 55%);
   z-index: 2;
+  pointer-events: none;
+  background: 
+    linear-gradient(90deg, rgba(16, 16, 14, 0.85) 0%, rgba(16, 16, 14, 0.52) 50%, rgba(16, 16, 14, 0.28) 100%),
+    linear-gradient(0deg, rgba(16, 16, 14, 0.72) 0%, transparent 60%);
+  will-change: opacity;
 }
-.cinematic-hero-content {
-  position: relative;
+
+/* Architectural Blueprint & Geometry SVG */
+.story-blueprint-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 3;
+  pointer-events: none;
+  color: var(--bronze-light, #f1cf9e);
+  will-change: opacity;
+}
+.blueprint-draw {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  will-change: stroke-dashoffset, opacity;
+}
+.grid-line {
+  stroke: rgba(241, 238, 231, 0.35);
+  stroke-dasharray: 4 4;
+}
+.datum-line {
+  stroke: rgba(241, 207, 158, 0.75);
+}
+.structural-box {
+  stroke: rgba(241, 238, 231, 0.85);
+  stroke-width: 1.4;
+}
+.overhang-projection {
+  stroke: rgba(241, 207, 158, 0.5);
+  stroke-dasharray: 3 3;
+}
+.mullion {
+  stroke: rgba(241, 238, 231, 0.45);
+}
+.compass-circle {
+  stroke: rgba(241, 207, 158, 0.32);
+  stroke-dasharray: 2 4;
+}
+.arch-path {
+  stroke: rgba(241, 207, 158, 0.95);
+  stroke-width: 1.6;
+}
+.arch-keystone {
+  fill: var(--bronze-light);
+  stroke: none;
+}
+.arch-baseline {
+  stroke: rgba(241, 207, 158, 0.6);
+}
+.axis-bubble {
+  stroke: rgba(241, 207, 158, 0.75);
+  fill: rgba(18, 18, 16, 0.55);
+}
+.dimension-line {
+  stroke: rgba(241, 207, 158, 0.65);
+}
+.dimension-tick {
+  stroke: rgba(241, 207, 158, 0.9);
+}
+.blueprint-text {
+  font-family: var(--font-mono), 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  fill: #f4eee2;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+}
+.axis-label {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--bronze-light);
+}
+.datum-label {
+  text-anchor: end;
+  font-size: 8.5px;
+  fill: var(--bronze-light);
+}
+.dimension-text {
+  text-anchor: middle;
+  font-size: 8.5px;
+  fill: var(--bronze-light);
+}
+.spec-badge {
+  font-size: 9px;
+  opacity: 0.8;
+}
+.spec-badge.text-right {
+  text-anchor: end;
+}
+
+/* Stage 6: Oversized Studio Branding Typography Reveal */
+.story-brand-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5vw;
+  text-align: center;
+  will-change: transform, opacity;
+}
+.brand-datum-ruler {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 24px;
+  opacity: 0.75;
+}
+.ruler-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(241, 207, 158, 0.6), transparent);
+}
+.ruler-badge {
+  font-family: var(--font-mono), monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bronze-light);
+}
+.story-brand-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(68px, 11vw, 175px);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.65);
+  background: linear-gradient(135deg, #ffffff 0%, #f4ede3 55%, #cbb18a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.story-brand-subtitle {
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(9px, 1.1vw, 13px);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #eedcc6;
+  margin-top: 20px;
+  opacity: 0.88;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* Stage 7: Supporting Hero Content */
+.story-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
   padding: 22vh 9.5vw 8vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
   box-sizing: border-box;
+  pointer-events: auto;
+  will-change: opacity;
 }
 .cinematic-hero-title {
   max-width: 850px;
@@ -902,7 +1080,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   letter-spacing: 0.1em;
   color: #f7f4ed;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-  z-index: 3;
+  z-index: 5;
 }
 
 
