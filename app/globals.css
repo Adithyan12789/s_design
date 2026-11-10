@@ -1035,21 +1035,23 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 .scroll-hero-revealed-image {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   background-size: cover;
   background-position: center center;
   opacity: 0;
+  clip-path: inset(18% 12% 18% 12% round 14px);
   transform-origin: center center;
-  will-change: transform, opacity;
+  will-change: transform, opacity, clip-path, filter;
+  filter: brightness(0.72) contrast(1.18) saturate(0.88);
 }
 
 .scroll-hero-revealed-overlay {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   background: 
-    radial-gradient(circle at center, rgba(16, 16, 14, 0.15) 0%, rgba(16, 16, 14, 0.72) 100%),
-    linear-gradient(0deg, rgba(16, 16, 14, 0.8) 0%, transparent 60%);
+    radial-gradient(circle at center, rgba(16, 16, 14, 0.1) 0%, rgba(16, 16, 14, 0.65) 100%),
+    linear-gradient(0deg, rgba(16, 16, 14, 0.75) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -1076,8 +1078,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   align-items: center;
   justify-content: center;
   width: 100%;
-  line-height: 0.84;
+  line-height: 0.86;
   user-select: none;
+  position: relative;
 }
 
 .masked-line {
@@ -1087,19 +1090,20 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   text-transform: uppercase;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  background-size: cover;
+  background-size: 100vw 100svh;
   background-position: center center;
   -webkit-background-clip: text;
   background-clip: text;
   will-change: transform, letter-spacing;
-  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.65));
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.7));
 }
 
 .masked-line--primary {
   font-size: clamp(68px, 14vw, 210px);
   letter-spacing: -0.04em;
   margin-bottom: 0.05em;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .masked-line--secondary {
@@ -1110,31 +1114,59 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   font-family: 'Times New Roman', Georgia, serif;
 }
 
-/* Atmospheric Volumetric Fog Layers */
+/* Atmospheric Volumetric Fog Layers - Multi-Depth System */
 .fog-layer {
   position: absolute;
-  inset: -25% -35%;
-  background-size: cover;
-  background-repeat: repeat-x;
-  background-position: center;
   pointer-events: none;
   will-change: transform, opacity;
   mix-blend-mode: screen;
 }
 
-.fog-layer--deep {
-  z-index: 4;
+/* Deep Ambient Haze */
+.fog-layer--haze {
+  inset: -20%;
+  width: 140%;
+  height: 140%;
+  background-size: cover;
+  background-position: center;
+  z-index: 2;
   opacity: 0.25;
 }
 
-.fog-layer--mid {
-  z-index: 8;
-  opacity: 0.35;
+/* Midground Billowing Cumulus Bank */
+.fog-layer--cumulus {
+  top: 15%;
+  left: -25%;
+  width: 150%;
+  height: 75%;
+  background-size: cover;
+  background-position: center;
+  z-index: 7;
+  opacity: 0.2;
 }
 
-.fog-layer--fore {
-  z-index: 12;
-  opacity: 0.45;
+/* High Altitude Wispy Drift */
+.fog-layer--wisps {
+  top: 5%;
+  left: -15%;
+  width: 135%;
+  height: 55%;
+  background-size: cover;
+  background-position: center;
+  z-index: 8;
+  opacity: 0.25;
+}
+
+/* Low Mountain Ground Mist */
+.fog-layer--ground {
+  bottom: -10%;
+  left: -20%;
+  width: 140%;
+  height: 58%;
+  background-size: cover;
+  background-position: center bottom;
+  z-index: 9;
+  opacity: 0.35;
 }
 
 /* Atmospheric Canvas Particle Mist */
