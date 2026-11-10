@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
-import { ReactBitsBackground } from '@/components/react-bits-background'
 import { TiltProjectCard } from '@/components/tilt-project-card'
 import { BrandLogo } from '@/components/brand-logo'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
@@ -38,8 +37,6 @@ export default function Page() {
     <main className="site-shell">
       {/* Full-Screen Architectural Navigation Overlay */}
       <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
-
-      <ReactBitsBackground />
 
       {/* Fixed Site Header */}
       <header className="site-header">
