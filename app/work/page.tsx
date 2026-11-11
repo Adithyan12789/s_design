@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowUpRight } from 'lucide-react'
+import { WorkHorizontalShowcase } from '@/components/work-horizontal-showcase'
 import { WorkGalleryView } from '@/components/work-gallery-view'
 import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
-import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { projects } from '@/lib/projects'
 
@@ -16,51 +16,37 @@ export const metadata: Metadata = {
 export default function WorkPage() {
   return (
     <main className="work-archive-page">
-      {/* Top Header with Architectural Navigation */}
-      <SiteHeaderNav showBackLink backHref="/#work" backLabel="Back to home" />
+      {/* Top Header with Charcoal Gallery Navigation */}
+      <SiteHeaderNav
+        showBackLink
+        backHref="/#work"
+        backLabel="Back to home"
+        theme="charcoal"
+        className="work-fixed-header"
+      />
 
-      {/* Hero Introduction Banner */}
-      <section className="work-hero-banner">
-        <div className="section-kicker">
-          ( PORTFOLIO / 2021 — 2024 ) <span>ARCHITECTURAL ARCHIVE</span>
-        </div>
-        <div className="work-hero-content">
-          <StaggeredHeading
-            tag="h1"
-            animateOnInit
-            lines={[
-              { text: 'Selected works &' },
-              { text: 'considered spaces.', isAccent: true },
-            ]}
-          />
+      {/* Cinematic Scroll-Driven Horizontal Parallax Exhibition */}
+      <WorkHorizontalShowcase projects={projects} />
 
-          <div className="work-hero-aside">
-            <ScrollReveal delay={0.2}>
-              <p>
-                Each project begins with a deep reading of its landscape, light, and material heritage.
-                Browse our complete archive of built residences, retreats, and cultural pavilions.
-              </p>
-              <div className="work-hero-metrics">
-                <div className="metric-box">
-                  <span className="metric-number">0{projects.length}</span>
-                  <span className="metric-label">Commissions</span>
-                </div>
-                <div className="metric-box">
-                  <span className="metric-number">04</span>
-                  <span className="metric-label">Countries</span>
-                </div>
-                <div className="metric-box">
-                  <span className="metric-number">100%</span>
-                  <span className="metric-label">Bespoke Design</span>
-                </div>
-              </div>
-            </ScrollReveal>
+      {/* Next Section: Complete Filterable Architectural Index */}
+      <section className="work-directory-section" id="archive-index">
+        <div className="work-directory-intro">
+          <div className="section-kicker">
+            ( COMPLETE INDEX / 0{projects.length} COMMISSIONS ) <span>FILTER &amp; EXPLORE</span>
           </div>
+          <ScrollReveal>
+            <div className="work-directory-heading-row">
+              <h2>
+                Built &amp; ongoing <em>commissions.</em>
+              </h2>
+              <p>
+                Filter the complete architectural archive by typology, search locations and materials,
+                or inspect detailed technical specifications for each project.
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
-      </section>
 
-      {/* Interactive Gallery with Filters & Quick View */}
-      <section className="work-gallery-section">
         <WorkGalleryView projects={projects} />
       </section>
 
@@ -70,7 +56,10 @@ export default function WorkPage() {
           <div>
             <div className="section-kicker">( INITIATE A PROJECT )</div>
             <h2>Have a site or idea in mind?</h2>
-            <p>We work with discerning clients globally on new builds, renovations, and interior architecture.</p>
+            <p>
+              We work with discerning clients globally on new builds, renovations, and interior
+              architecture.
+            </p>
           </div>
           <div className="cta-strip-actions">
             <Link href="/#contact" className="submit-button">
@@ -82,8 +71,8 @@ export default function WorkPage() {
       </section>
 
       {/* Footer */}
-      <footer className="detail-footer">
-        <BrandLogo href="/#top" size="sm" variant="dark" />
+      <footer className="detail-footer work-charcoal-footer">
+        <BrandLogo href="/#top" size="sm" variant="glass" />
         <div className="footer-links">
           <Link href="/">Home</Link>
           <Link href="/work">All Works</Link>

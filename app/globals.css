@@ -1083,5 +1083,707 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   z-index: 5;
 }
 
+/* ==========================================================================
+   Work / Projects Page — Charcoal Cinematic Horizontal Parallax Exhibition
+   ========================================================================== */
+
+.work-archive-page {
+  min-height: 100vh;
+  background: #121110;
+  color: #f4efe6;
+  overflow-x: clip;
+}
+
+/* Charcoal Header Variant (Only for /work) */
+.detail-header.detail-header--charcoal {
+  background: rgba(18, 17, 16, 0.78);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+  color: #f4efe6;
+}
+.detail-header--charcoal.work-fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 76px;
+  padding: 0 4.8vw;
+  z-index: 30;
+}
+.detail-header--charcoal .back-link,
+.detail-header--charcoal .nav-cta {
+  color: #f4efe6;
+}
+.detail-header--charcoal .back-link:hover,
+.detail-header--charcoal .nav-cta:hover {
+  color: var(--bronze-light);
+}
+
+/* Pinned Horizontal Exhibition Stage */
+.work-exhibition-section {
+  position: relative;
+  width: 100%;
+  background: radial-gradient(circle at 50% 42%, #1d1b18 0%, #121110 72%);
+}
+.work-exhibition-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 660px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 76px;
+  box-sizing: border-box;
+}
+
+/* Subtle Architectural Hairline Grid */
+.exhibition-bg-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.grid-v-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(244, 239, 230, 0.045);
+}
+.grid-v-line.left { left: 9.5vw; }
+.grid-v-line.center { left: 50%; background: rgba(241, 207, 158, 0.06); }
+.grid-v-line.right { right: 9.5vw; }
+.grid-h-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(244, 239, 230, 0.045);
+}
+.grid-h-line.top { top: 122px; }
+.grid-h-line.bottom { bottom: 175px; }
+
+/* Top Exhibition Bar */
+.exhibition-top-bar {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 4.8vw;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.72);
+}
+.exhibition-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.kicker-divider { opacity: 0.4; }
+.kicker-sub { color: var(--bronze-light); }
+
+.exhibition-top-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.exhibition-scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(244, 239, 230, 0.55);
+}
+.scroll-cue-arrow {
+  animation: cue-float 2.2s ease-in-out infinite;
+  color: var(--bronze-light);
+}
+@keyframes cue-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.exhibition-index-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.exhibition-index-btn {
+  border: 1px solid rgba(244, 239, 230, 0.14);
+  background: transparent;
+  color: rgba(244, 239, 230, 0.55);
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 5px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.exhibition-index-btn:hover {
+  border-color: rgba(241, 207, 158, 0.5);
+  color: #ffffff;
+}
+.exhibition-index-btn.is-active {
+  background: var(--bronze-light);
+  border-color: var(--bronze-light);
+  color: #161513;
+  font-weight: 600;
+}
+
+/* Horizontal Gallery Track */
+.exhibition-viewport {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  z-index: 3;
+  overflow: visible;
+  padding-bottom: 115px;
+}
+.exhibition-track {
+  display: flex;
+  align-items: center;
+  gap: 10vw;
+  /* Center Slide 0 in viewport on initial SSR render */
+  padding-left: calc(50vw - clamp(185px, 21vw, 310px));
+  padding-right: calc(50vw - clamp(185px, 21vw, 310px));
+  will-change: transform;
+}
+
+.exhibition-slide {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(370px, 42vw, 620px);
+  will-change: transform, opacity;
+  transition: filter 0.35s ease;
+}
+.slide-number-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--bronze-light);
+}
+.slide-number-badge .slide-line {
+  width: 36px;
+  height: 1px;
+  background: rgba(241, 207, 158, 0.45);
+}
+
+.exhibition-primary-link {
+  display: block;
+  position: relative;
+  width: 100%;
+  text-decoration: none;
+}
+
+/* Varied Editorial Proportions Across Slides */
+.exhibition-slide.aspect-editorial-wide .exhibition-frame-mask {
+  aspect-ratio: 16 / 10;
+}
+.exhibition-slide.aspect-editorial-tall .exhibition-frame-mask {
+  aspect-ratio: 5 / 4;
+}
+.exhibition-slide.aspect-editorial-square .exhibition-frame-mask {
+  aspect-ratio: 4 / 3;
+}
+.exhibition-slide.aspect-editorial-cinema .exhibition-frame-mask {
+  aspect-ratio: 16 / 9;
+}
+
+.exhibition-frame-mask {
+  position: relative;
+  width: 100%;
+  max-height: 48vh;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #1b1917;
+  box-shadow: 0 32px 72px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(244, 239, 230, 0.1);
+}
+.exhibition-frame-img {
+  position: absolute;
+  inset: -4% -10%;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
+}
+.exhibition-primary-link:hover .exhibition-frame-img {
+  transform: scale(1.045);
+  filter: contrast(1.04) brightness(1.04);
+}
+.exhibition-frame-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(18,17,16,0.08) 0%, rgba(18,17,16,0) 45%, rgba(18,17,16,0.42) 100%);
+  pointer-events: none;
+}
+.exhibition-hover-pill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%) scale(0.92);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: rgba(244, 239, 230, 0.94);
+  color: #161513;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4);
+}
+.exhibition-primary-link:hover .exhibition-hover-pill {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Secondary Offset Architectural Detail Frame */
+.exhibition-secondary-frame {
+  position: absolute;
+  width: clamp(140px, 14vw, 220px);
+  z-index: 4;
+  pointer-events: none;
+  will-change: transform;
+}
+.exhibition-secondary-frame.pos-bottom-right {
+  right: -4.5vw;
+  bottom: -36px;
+}
+.exhibition-secondary-frame.pos-top-right {
+  right: -4vw;
+  top: -28px;
+}
+.exhibition-secondary-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(244, 239, 230, 0.18);
+}
+.secondary-frame-caption {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.55);
+}
+
+.exhibition-mobile-details {
+  display: none;
+}
+
+/* Synchronized Bottom Editorial Typography HUD */
+.exhibition-bottom-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  padding: 36px 4.8vw 28px;
+  background: linear-gradient(0deg, rgba(16, 15, 13, 0.96) 0%, rgba(16, 15, 13, 0.84) 62%, transparent 100%);
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 5vw;
+  align-items: end;
+  pointer-events: none;
+}
+.hud-project-identity,
+.hud-project-narrative {
+  pointer-events: auto;
+}
+.hud-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.65);
+  margin-bottom: 10px;
+}
+.hud-index {
+  color: var(--bronze-light);
+  font-weight: 600;
+}
+.hud-category {
+  color: var(--bronze-light);
+}
+.hud-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(241, 207, 158, 0.5);
+}
+.hud-project-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(42px, 5.4vw, 84px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: #fbf9f4;
+  margin: 0;
+}
+
+.hud-description {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(244, 239, 230, 0.74);
+  margin: 0 0 18px;
+  max-width: 480px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.exhibition-explore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #f4efe6;
+  color: #161513;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.exhibition-explore-btn:hover {
+  background: var(--bronze-light);
+  transform: translateY(-2px);
+}
+.hud-specs-note {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.48);
+}
+
+/* Continuous Scroll Progress Rail */
+.exhibition-progress-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(244, 239, 230, 0.1);
+  z-index: 8;
+}
+.exhibition-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--bronze), var(--bronze-light));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Next Section: Charcoal Directory & Filterable Archive (Scoped strictly to /work) */
+.work-directory-section {
+  background: #161513;
+  border-top: 1px solid rgba(244, 239, 230, 0.1);
+  padding: 110px 0 40px;
+}
+.work-directory-intro {
+  padding: 0 9.5vw 36px;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.08);
+}
+.work-directory-intro .section-kicker {
+  color: var(--bronze-light);
+}
+.work-directory-intro .section-kicker span {
+  color: rgba(244, 239, 230, 0.52);
+}
+.work-directory-heading-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5vw;
+  align-items: end;
+  margin-top: 28px;
+}
+.work-directory-heading-row h2 {
+  font: 400 clamp(38px, 4.8vw, 70px) Georgia, serif;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: #f4efe6;
+  margin: 0;
+}
+.work-directory-heading-row h2 em {
+  color: var(--bronze-light);
+}
+.work-directory-heading-row p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(244, 239, 230, 0.65);
+  margin: 0;
+  max-width: 440px;
+}
+
+/* Charcoal Theme Overrides Strictly Scoped Inside .work-archive-page */
+.work-archive-page .work-filter-pill {
+  background: rgba(244, 239, 230, 0.06);
+  color: rgba(244, 239, 230, 0.68);
+  border-color: rgba(244, 239, 230, 0.08);
+}
+.work-archive-page .work-filter-pill:hover {
+  background: rgba(244, 239, 230, 0.12);
+  color: #ffffff;
+}
+.work-archive-page .work-filter-pill.is-active {
+  background: var(--bronze-light);
+  color: #161513;
+  border-color: var(--bronze-light);
+}
+.work-archive-page .work-search-input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(244, 239, 230, 0.16);
+  color: #f4efe6;
+}
+.work-archive-page .work-search-input::placeholder {
+  color: rgba(244, 239, 230, 0.42);
+}
+.work-archive-page .work-search-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--bronze-light);
+}
+.work-archive-page .search-icon,
+.work-archive-page .search-clear-btn {
+  color: rgba(244, 239, 230, 0.55);
+}
+.work-archive-page .view-mode-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(244, 239, 230, 0.15);
+}
+.work-archive-page .view-mode-btn {
+  color: rgba(244, 239, 230, 0.55);
+}
+.work-archive-page .view-mode-btn.is-active {
+  background: var(--bronze-light);
+  color: #161513;
+}
+.work-archive-page .work-status-bar {
+  color: rgba(244, 239, 230, 0.5);
+}
+.work-archive-page .project-info {
+  border-bottom-color: rgba(244, 239, 230, 0.12);
+}
+.work-archive-page .project-info h3 {
+  color: #f4efe6;
+}
+.work-archive-page .project-info span,
+.work-archive-page .project-info p,
+.work-archive-page .project-quick-specs {
+  color: rgba(244, 239, 230, 0.6);
+}
+.work-archive-page .tilt-project-depth {
+  background: linear-gradient(135deg, rgba(241, 207, 158, 0.18), rgba(0, 0, 0, 0.45));
+}
+.work-archive-page .work-editorial-list {
+  border-top-color: rgba(244, 239, 230, 0.12);
+}
+.work-archive-page .editorial-row {
+  border-bottom-color: rgba(244, 239, 230, 0.1);
+}
+.work-archive-page .editorial-row:hover {
+  background: rgba(244, 239, 230, 0.03);
+}
+.work-archive-page .editorial-title-link h2 {
+  color: #f4efe6;
+}
+.work-archive-page .editorial-row:hover .editorial-title-link h2 {
+  color: var(--bronze-light);
+}
+.work-archive-page .editorial-row-meta,
+.work-archive-page .editorial-desc,
+.work-archive-page .editorial-tags {
+  color: rgba(244, 239, 230, 0.6);
+}
+.work-archive-page .editorial-preview-btn {
+  border-color: rgba(244, 239, 230, 0.2);
+  color: rgba(244, 239, 230, 0.7);
+}
+.work-archive-page .editorial-preview-btn:hover {
+  background: var(--bronze-light);
+  color: #161513;
+  border-color: var(--bronze-light);
+}
+.work-archive-page .editorial-arrow-link {
+  color: #f4efe6;
+}
+.work-archive-page .work-cta-strip {
+  background: #1b1a17;
+  border-top: 1px solid rgba(244, 239, 230, 0.1);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+  color: #f4efe6;
+}
+.work-archive-page .work-cta-strip .section-kicker {
+  color: var(--bronze-light);
+}
+.work-archive-page .work-cta-strip p {
+  color: rgba(244, 239, 230, 0.65);
+}
+.work-archive-page .work-charcoal-footer {
+  background: #121110;
+  color: #f4efe6;
+  border-top: 1px solid rgba(244, 239, 230, 0.1);
+}
+
+/* Tablet Breakpoint (768px - 1023px) */
+@media (max-width: 1023px) {
+  .exhibition-track {
+    gap: 8vw;
+    padding-left: calc(50vw - 28vw);
+    padding-right: calc(50vw - 28vw);
+  }
+  .exhibition-slide {
+    width: 56vw;
+  }
+  .exhibition-secondary-frame {
+    width: 150px;
+  }
+  .exhibition-bottom-hud {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 28px 4.8vw 24px;
+  }
+  .hud-description {
+    -webkit-line-clamp: 2;
+    margin-bottom: 12px;
+  }
+  .work-directory-heading-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Mobile Breakpoint (< 768px) — Refined Vertical Editorial Alternative */
+@media (max-width: 767px) {
+  .detail-header--charcoal.work-fixed-header {
+    height: 70px;
+    padding: 0 5vw;
+  }
+  .detail-header--charcoal .nav-cta {
+    display: none;
+  }
+  .work-exhibition-stage {
+    height: auto;
+    min-height: 0;
+    padding-top: 86px;
+    padding-bottom: 48px;
+    overflow: visible;
+  }
+  .exhibition-bg-grid,
+  .exhibition-scroll-cue,
+  .exhibition-index-nav,
+  .exhibition-bottom-hud,
+  .exhibition-progress-rail,
+  .exhibition-hover-pill {
+    display: none;
+  }
+  .exhibition-top-bar {
+    padding: 12px 6vw 28px;
+  }
+  .exhibition-viewport {
+    padding-bottom: 0;
+  }
+  .exhibition-track {
+    flex-direction: column;
+    gap: 64px;
+    padding: 0 6vw;
+    width: 100%;
+    transform: none !important;
+  }
+  .exhibition-slide {
+    width: 100%;
+    transform: none !important;
+    opacity: 1;
+  }
+  .exhibition-slide .exhibition-frame-mask {
+    aspect-ratio: 4 / 3 !important;
+    max-height: none;
+  }
+  .exhibition-frame-img {
+    inset: 0;
+    transform: none !important;
+  }
+  .exhibition-secondary-frame {
+    display: none;
+  }
+  .exhibition-mobile-details {
+    display: block;
+    margin-top: 20px;
+  }
+  .exhibition-mobile-details .mobile-meta {
+    display: block;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bronze-light);
+    margin-bottom: 8px;
+  }
+  .exhibition-mobile-details h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: 38px;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    color: #fbf9f4;
+    margin: 0 0 10px;
+  }
+  .exhibition-mobile-details p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(244, 239, 230, 0.72);
+    margin: 0 0 18px;
+  }
+  .work-directory-section {
+    padding: 72px 0 30px;
+  }
+  .work-directory-intro {
+    padding: 0 6vw 28px;
+  }
+}
+
+.work-archive-page .work-empty-state h3 {
+  color: #f4efe6;
+}
+.work-archive-page .work-empty-state p {
+  color: rgba(244, 239, 230, 0.65);
+}
+.work-archive-page .work-empty-state .submit-button {
+  margin: 0 auto;
+}
+
 
 

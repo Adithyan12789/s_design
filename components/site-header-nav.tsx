@@ -12,6 +12,7 @@ type SiteHeaderNavProps = {
   backLabel?: string
   showBackLink?: boolean
   className?: string
+  theme?: 'light' | 'charcoal'
 }
 
 export function SiteHeaderNav({
@@ -19,15 +20,17 @@ export function SiteHeaderNav({
   backLabel = 'Back to home',
   showBackLink = false,
   className = '',
+  theme = 'light',
 }: SiteHeaderNavProps) {
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const isCharcoal = theme === 'charcoal'
 
   return (
     <>
       <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-      <header className={`detail-header ${className}`}>
-        <BrandLogo href="/#top" variant="dark" />
+      <header className={`detail-header ${isCharcoal ? 'detail-header--charcoal' : ''} ${className}`}>
+        <BrandLogo href="/#top" variant={isCharcoal ? 'glass' : 'dark'} />
 
         <div className="flex items-center gap-6">
           {showBackLink && (
