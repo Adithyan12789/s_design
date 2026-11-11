@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { CinematicReviews } from '@/components/cinematic-reviews'
 import { WorkHorizontalShowcase } from '@/components/work-horizontal-showcase'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
@@ -19,7 +20,31 @@ const services = [
   'Visualization & consultation',
 ]
 
-const SECTION_IDS = ['selected-work', 'studio', 'services', 'contact'] as const
+const reviews = [
+  {
+    id: 'almeida',
+    client: 'Henrique & Sofia Almeida',
+    quote:
+      'They captured the quietness we had imagined for years — every room feels calm, balanced, and deeply intentional.',
+    rating: 5,
+  },
+  {
+    id: 'takahashi',
+    client: 'Kenji Takahashi',
+    quote:
+      'Rare restraint and extraordinary care in every material detail. Our space still surprises us in morning light.',
+    rating: 5,
+  },
+  {
+    id: 'meier-keller',
+    client: 'Elena Meier-Keller',
+    quote:
+      'From the earliest conversation to completion, their clarity and precision made the entire journey effortless.',
+    rating: 5,
+  },
+]
+
+const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'contact'] as const
 
 export default function Page() {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -138,31 +163,7 @@ export default function Page() {
         studioSubtitle="ARCHITECTURE & SPATIAL PRACTICE"
       />
 
-      {/* PAGE 2 — Selected Work (Cinematic Horizontal Parallax Gallery) */}
-      <WorkHorizontalShowcase id="selected-work" projects={projects} />
-
-      {/* PAGE 3 — Initiate a Project */}
-      <section className="work-cta-strip" id="initiate-project">
-        <div className="cta-strip-inner">
-          <ScrollReveal className="cta-strip-copy">
-            <div className="section-kicker">( INITIATE A PROJECT )</div>
-            <h2>INITIATE A PROJECT</h2>
-            <p className="cta-strip-subtitle">Have a site or idea in mind?</p>
-            <p>
-              We work with discerning clients globally on new builds, renovations, and interior
-              architecture.
-            </p>
-          </ScrollReveal>
-          <ScrollReveal delay={0.14} className="cta-strip-actions">
-            <a href="#contact" className="submit-button">
-              <span>Begin a conversation</span>
-              <ArrowUpRight size={18} />
-            </a>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Studio Section */}
+      {/* Studio Section (Top of Selected Work) */}
       <section className="intro section-pad animated-section studio-section" id="studio">
         <div className="section-ambient ambient-orbit" aria-hidden="true" />
         <div className="section-kicker">( 01 ) <span>Studio note</span></div>
@@ -182,6 +183,30 @@ export default function Page() {
             </p>
             <a className="text-link" href="#contact">
               More about the studio <ArrowUpRight size={16} />
+            </a>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* PAGE 2 — Selected Work (Cinematic Horizontal Parallax Gallery) */}
+      <WorkHorizontalShowcase id="selected-work" projects={projects} />
+
+      {/* PAGE 3 — Initiate a Project */}
+      <section className="work-cta-strip" id="initiate-project">
+        <div className="cta-strip-inner">
+          <ScrollReveal className="cta-strip-copy">
+            <div className="section-kicker">( INITIATE A PROJECT )</div>
+            <h2>INITIATE A PROJECT</h2>
+            <p className="cta-strip-subtitle">Have a site or idea in mind?</p>
+            <p>
+              We work with discerning clients globally on new builds, renovations, and interior
+              architecture.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.14} className="cta-strip-actions">
+            <a href="#contact" className="submit-button">
+              <span>Begin a conversation</span>
+              <ArrowUpRight size={18} />
             </a>
           </ScrollReveal>
         </div>
@@ -240,9 +265,12 @@ export default function Page() {
         </ScrollReveal>
       </section>
 
+      {/* Reviews Section */}
+      <CinematicReviews id="reviews" reviews={reviews} />
+
       {/* Contact Section */}
       <section className="contact section-pad" id="contact">
-        <div className="section-kicker">( 05 ) <span>Begin a project</span></div>
+        <div className="section-kicker">( 06 ) <span>Begin a project</span></div>
         <div className="contact-layout">
           <div>
             <StaggeredHeading

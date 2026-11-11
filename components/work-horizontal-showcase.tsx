@@ -29,6 +29,8 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
   const stageRef = useRef<HTMLDivElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
   const slideRefs = useRef<(HTMLDivElement | null)[]>([])
+  const slideBadgeRefs = useRef<(HTMLDivElement | null)[]>([])
+  const primaryLinkRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const primaryImgRefs = useRef<(HTMLDivElement | null)[]>([])
   const secondaryFrameRefs = useRef<(HTMLDivElement | null)[]>([])
   const progressBarRef = useRef<HTMLDivElement | null>(null)
@@ -71,9 +73,10 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
 
     const mm = gsap.matchMedia()
 
-    mm.add('(min-width: 768px)', () => {
+    const setupHorizontalExhibition = (activeScale: number, innerZoomScale: number) => {
       const ctx = gsap.context(() => {
         const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[]
+        const primaryLinks = primaryLinkRefs.current.filter(Boolean) as HTMLAnchorElement[]
         if (slides.length === 0) return
 
         // Measure so Project 0 starts centered and last project ends centered
@@ -85,8 +88,8 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
           return Math.max(0, lastCenter - firstCenter)
         }
 
-        // Initialize slides' initial scale/opacity emphasis cleanly
-        const updateSlideEmphasis = () => {
+        // Update inner image parallax, secondary frame depth & active focus metadata
+        const updateParallaxAndActive = () => {
           const viewportCenter = window.innerWidth / 2
           let closestIdx = 0
           let minDist = Infinity
@@ -100,16 +103,6 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
               minDist = dist
               closestIdx = i
             }
-
-            // Normalized distance (0 at exact center, 1+ at edges)
-            const norm = Math.min(1.2, dist / (window.innerWidth * 0.55))
-            const scale = 1 - norm * 0.1
-            const opacity = Math.max(0.32, 1 - norm * 0.58)
-
-            gsap.set(slide, {
-              scale,
-              opacity,
-            })
 
             // Inner photograph parallax within frame mask
             const primaryImg = primaryImgRefs.current[i]
@@ -134,12 +127,41 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
           setActiveIndex((prev) => (prev !== closestIdx ? closestIdx : prev))
         }
 
-        // Initial emphasis state before first scroll
-        updateSlideEmphasis()
+        const totalSteps = Math.max(0, slides.length - 1)
+        const timelineDuration = Math.max(1, totalSteps)
+        const badgeLiftY = activeScale > 1.15 ? -28 : -16
 
-        const travelTween = gsap.to(track, {
-          x: () => -computeTravel(),
-          ease: 'none',
+        // Set initial emphasis state (Project 0 begins large & focused; others at scale 1)
+        primaryLinks.forEach((linkEl, i) => {
+          const isFirst = i === 0
+          const slideEl = slides[i]
+          const imgEl = primaryImgRefs.current[i]
+          const badgeEl = slideBadgeRefs.current[i]
+
+          gsap.set(linkEl, {
+            scale: isFirst ? activeScale : 1,
+            transformOrigin: 'center center',
+          })
+          gsap.set(slideEl, {
+            opacity: isFirst ? 1 : 0.48,
+            zIndex: isFirst ? 6 : 2,
+          })
+          if (imgEl) {
+            gsap.set(imgEl, {
+              scale: isFirst ? innerZoomScale : 1,
+              transformOrigin: 'center center',
+            })
+          }
+          if (badgeEl) {
+            gsap.set(badgeEl, {
+              y: isFirst ? badgeLiftY : 0,
+            })
+          }
+        })
+
+        updateParallaxAndActive()
+
+        const masterTl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             pin: stage,
@@ -154,16 +176,103 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${self.progress})`
               }
-              updateSlideEmphasis()
+              updateParallaxAndActive()
             },
             onRefresh: () => {
-              updateSlideEmphasis()
+              updateParallaxAndActive()
             },
           },
         })
 
-        if (travelTween.scrollTrigger) {
-          triggerInstanceRef.current = travelTween.scrollTrigger
+        // Continuous horizontal gallery track travel synchronized with ScrollTrigger progress
+        masterTl.to(
+          track,
+          {
+            x: () => -computeTravel(),
+            ease: 'none',
+            duration: timelineDuration,
+          },
+          0
+        )
+
+        // Synchronized camera-focus handoff: outgoing shrinks 1.2 -> 1 while incoming zooms 1 -> 1.2
+        for (let i = 0; i < totalSteps; i++) {
+          const prevLink = primaryLinks[i]
+          const nextLink = primaryLinks[i + 1]
+          const prevSlide = slides[i]
+          const nextSlide = slides[i + 1]
+          const prevImg = primaryImgRefs.current[i]
+          const nextImg = primaryImgRefs.current[i + 1]
+          const prevBadge = slideBadgeRefs.current[i]
+          const nextBadge = slideBadgeRefs.current[i + 1]
+
+          if (prevLink) {
+            masterTl.fromTo(
+              prevLink,
+              { scale: activeScale },
+              { scale: 1, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+          if (nextLink) {
+            masterTl.fromTo(
+              nextLink,
+              { scale: 1 },
+              { scale: activeScale, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+
+          masterTl.fromTo(
+            prevSlide,
+            { opacity: 1, zIndex: 6 },
+            { opacity: 0.48, zIndex: 2, ease: 'power2.inOut', duration: 1, immediateRender: false },
+            i
+          )
+          masterTl.fromTo(
+            nextSlide,
+            { opacity: 0.48, zIndex: 2 },
+            { opacity: 1, zIndex: 6, ease: 'power2.inOut', duration: 1, immediateRender: false },
+            i
+          )
+
+          if (prevImg) {
+            masterTl.fromTo(
+              prevImg,
+              { scale: innerZoomScale },
+              { scale: 1, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+          if (nextImg) {
+            masterTl.fromTo(
+              nextImg,
+              { scale: 1 },
+              { scale: innerZoomScale, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+
+          if (prevBadge) {
+            masterTl.fromTo(
+              prevBadge,
+              { y: badgeLiftY },
+              { y: 0, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+          if (nextBadge) {
+            masterTl.fromTo(
+              nextBadge,
+              { y: 0 },
+              { y: badgeLiftY, ease: 'power2.inOut', duration: 1, immediateRender: false },
+              i
+            )
+          }
+        }
+
+        if (masterTl.scrollTrigger) {
+          triggerInstanceRef.current = masterTl.scrollTrigger
         }
       }, section)
 
@@ -171,16 +280,25 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
         triggerInstanceRef.current = null
         ctx.revert()
       }
-    })
+    }
 
-    // Mobile vertical architectural reveal
+    // Desktop: pronounced 1.2x active focus zoom
+    mm.add('(min-width: 1024px)', () => setupHorizontalExhibition(1.2, 1.06))
+
+    // Tablet: balanced 1.12x zoom intensity to prevent neighbor collisions
+    mm.add('(min-width: 768px) and (max-width: 1023px)', () => setupHorizontalExhibition(1.12, 1.04))
+
+    // Mobile: vertical editorial layout with gentle scroll-driven center focus zoom
     mm.add('(max-width: 767px)', () => {
       const ctx = gsap.context(() => {
         const slides = slideRefs.current.filter(Boolean) as HTMLDivElement[]
-        slides.forEach((slide) => {
+        slides.forEach((slide, i) => {
+          const linkEl = primaryLinkRefs.current[i]
+          const imgEl = primaryImgRefs.current[i]
+
           gsap.fromTo(
             slide,
-            { opacity: 0.4, y: 28 },
+            { opacity: 0.45, y: 24 },
             {
               opacity: 1,
               y: 0,
@@ -194,6 +312,26 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
               },
             }
           )
+
+          if (linkEl) {
+            gsap.set(linkEl, { scale: 1, transformOrigin: 'center center' })
+            const focusTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: linkEl,
+                start: 'top 85%',
+                end: 'bottom 15%',
+                scrub: 0.8,
+              },
+            })
+            focusTl
+              .to(linkEl, { scale: 1.04, ease: 'power2.inOut', duration: 0.5 })
+              .to(linkEl, { scale: 1, ease: 'power2.inOut', duration: 0.5 })
+            if (imgEl) {
+              focusTl
+                .to(imgEl, { scale: 1.06, ease: 'power2.inOut', duration: 0.5 }, 0)
+                .to(imgEl, { scale: 1, ease: 'power2.inOut', duration: 0.5 }, 0.5)
+            }
+          }
         })
       }, section)
 
@@ -279,7 +417,12 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
                   className={`exhibition-slide ${aspectClass} ${index === activeIndex ? 'is-focused' : ''}`}
                 >
                   {/* Floating Slide Index Tag */}
-                  <div className="slide-number-badge">
+                  <div
+                    ref={(el) => {
+                      slideBadgeRefs.current[index] = el
+                    }}
+                    className="slide-number-badge"
+                  >
                     <span>0{index + 1}</span>
                     <span className="slide-line" />
                     <span>{project.year}</span>
@@ -287,6 +430,9 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
 
                   {/* Primary Dominant Architectural Frame */}
                   <Link
+                    ref={(el) => {
+                      primaryLinkRefs.current[index] = el
+                    }}
                     href={`/work/${project.slug}`}
                     className="exhibition-primary-link"
                     aria-label={`Explore ${project.title} in ${project.location}`}
