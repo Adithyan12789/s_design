@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
-import { TiltProjectCard } from '@/components/tilt-project-card'
+import { ArrowUpRight } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import { WorkHorizontalShowcase } from '@/components/work-horizontal-showcase'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ParallaxImage } from '@/components/motion/parallax-image'
@@ -20,9 +19,12 @@ const services = [
   'Visualization & consultation',
 ]
 
+const SECTION_IDS = ['selected-work', 'studio', 'services', 'contact'] as const
+
 export default function Page() {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [activeSection, setActiveSection] = useState<string>('')
 
   useEffect(() => {
     const updatePointer = (event: PointerEvent) => {
@@ -33,10 +35,49 @@ export default function Page() {
     return () => window.removeEventListener('pointermove', updatePointer)
   }, [])
 
+  // Track active navigation state while scrolling through sections
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const markerY = window.innerHeight * 0.35
+      let current = ''
+
+      for (const id of SECTION_IDS) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        const rect = el.getBoundingClientRect()
+        if (rect.top <= markerY && rect.bottom >= 80) {
+          current = id
+        }
+      }
+
+      setActiveSection(current)
+    }
+
+    const onHashEvent = (event: Event) => {
+      const detail = (event as CustomEvent<{ hash?: string }>).detail
+      if (detail?.hash) {
+        setActiveSection(detail.hash.replace(/^#/, ''))
+      }
+    }
+
+    updateActiveSection()
+    window.addEventListener('scroll', updateActiveSection, { passive: true })
+    window.addEventListener('site:hashchange', onHashEvent)
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection)
+      window.removeEventListener('site:hashchange', onHashEvent)
+    }
+  }, [])
+
   return (
     <main className="site-shell">
       {/* Full-Screen Architectural Navigation Overlay */}
-      <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+      <FullNavOverlay
+        isOpen={isNavOpen}
+        onClose={() => setIsNavOpen(false)}
+        activeSection={activeSection}
+      />
 
       {/* Fixed Site Header */}
       <header className="site-header">
@@ -44,10 +85,34 @@ export default function Page() {
 
         <div className="header-actions">
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/work">Work</Link>
-            <a href="#studio">Studio</a>
-            <a href="#services">Services</a>
-            <a href="#contact">Contact</a>
+            <a
+              href="#selected-work"
+              className={activeSection === 'selected-work' ? 'is-active' : undefined}
+              aria-current={activeSection === 'selected-work' ? 'location' : undefined}
+            >
+              Work
+            </a>
+            <a
+              href="#studio"
+              className={activeSection === 'studio' ? 'is-active' : undefined}
+              aria-current={activeSection === 'studio' ? 'location' : undefined}
+            >
+              Studio
+            </a>
+            <a
+              href="#services"
+              className={activeSection === 'services' ? 'is-active' : undefined}
+              aria-current={activeSection === 'services' ? 'location' : undefined}
+            >
+              Services
+            </a>
+            <a
+              href="#contact"
+              className={activeSection === 'contact' ? 'is-active' : undefined}
+              aria-current={activeSection === 'contact' ? 'location' : undefined}
+            >
+              Contact
+            </a>
             <a className="nav-cta" href="#contact">
               Start a project <ArrowUpRight size={15} />
             </a>
@@ -60,7 +125,7 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Architectural Storytelling Cinematic Hero */}
+      {/* PAGE 1 — Architectural Storytelling Cinematic Hero */}
       <HeroCinematic
         eyebrow="Independent architecture studio · Portugal / Worldwide"
         titleLine1="Spaces with"
@@ -68,10 +133,34 @@ export default function Page() {
         description="We shape considered places for living, working and gathering — grounded in material, light and context."
         indexText="01 / 04"
         imageUrl="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90"
-        targetSectionId="#work"
+        targetSectionId="#selected-work"
         studioName="S_DE_SIGN"
         studioSubtitle="ARCHITECTURE & SPATIAL PRACTICE"
       />
+
+      {/* PAGE 2 — Selected Work (Cinematic Horizontal Parallax Gallery) */}
+      <WorkHorizontalShowcase id="selected-work" projects={projects} />
+
+      {/* PAGE 3 — Initiate a Project */}
+      <section className="work-cta-strip" id="initiate-project">
+        <div className="cta-strip-inner">
+          <ScrollReveal className="cta-strip-copy">
+            <div className="section-kicker">( INITIATE A PROJECT )</div>
+            <h2>INITIATE A PROJECT</h2>
+            <p className="cta-strip-subtitle">Have a site or idea in mind?</p>
+            <p>
+              We work with discerning clients globally on new builds, renovations, and interior
+              architecture.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={0.14} className="cta-strip-actions">
+            <a href="#contact" className="submit-button">
+              <span>Begin a conversation</span>
+              <ArrowUpRight size={18} />
+            </a>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* Studio Section */}
       <section className="intro section-pad animated-section studio-section" id="studio">
@@ -95,23 +184,6 @@ export default function Page() {
               More about the studio <ArrowUpRight size={16} />
             </a>
           </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Selected Work Section */}
-      <section className="work section-pad animated-section work-section" id="work">
-        <div className="section-ambient ambient-grid" aria-hidden="true" />
-        <div className="section-heading">
-          <div className="section-kicker">( 02 ) <span>Selected work</span></div>
-          <Link className="text-link" href="/work">
-            View full archive ({projects.length}) <ArrowUpRight size={16} />
-          </Link>
-        </div>
-
-        <div className="project-grid">
-          {projects.map((project, index) => (
-            <TiltProjectCard key={project.title} {...project} index={index} />
-          ))}
         </div>
       </section>
 
@@ -217,7 +289,7 @@ export default function Page() {
       <footer className="site-footer">
         <BrandLogo href="#top" size="sm" />
         <div className="footer-links">
-          <Link href="/work">Work</Link>
+          <a href="#selected-work">Work</a>
           <a href="#studio">Studio</a>
           <a href="#contact">Contact</a>
         </div>

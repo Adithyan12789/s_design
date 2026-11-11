@@ -9,18 +9,21 @@ import { BrandLogo } from '@/components/brand-logo'
 type FullNavOverlayProps = {
   isOpen: boolean
   onClose: () => void
+  activeSection?: string
 }
 
 const NAV_ITEMS = [
   {
     index: '01',
+    id: 'selected-work',
     title: 'Work',
-    href: '/work',
+    href: '/#selected-work',
     subtitle: 'Selected Architectural Commissions',
     image: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80',
   },
   {
     index: '02',
+    id: 'studio',
     title: 'Studio',
     href: '/#studio',
     subtitle: 'Philosophy, Materiality & Craft',
@@ -28,6 +31,7 @@ const NAV_ITEMS = [
   },
   {
     index: '03',
+    id: 'services',
     title: 'Services',
     href: '/#services',
     subtitle: 'Architecture, Interiors & Objects',
@@ -35,6 +39,7 @@ const NAV_ITEMS = [
   },
   {
     index: '04',
+    id: 'contact',
     title: 'Contact',
     href: '/#contact',
     subtitle: 'Initiate a Conversation',
@@ -42,7 +47,7 @@ const NAV_ITEMS = [
   },
 ]
 
-export function FullNavOverlay({ isOpen, onClose }: FullNavOverlayProps) {
+export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverlayProps) {
   const [mounted, setMounted] = useState(false)
   const [activeItem, setActiveItem] = useState(0)
   const [timeString, setTimeString] = useState('')
@@ -126,16 +131,22 @@ export function FullNavOverlay({ isOpen, onClose }: FullNavOverlayProps) {
           <nav className="nav-overlay-links">
             {NAV_ITEMS.map((item, idx) => {
               const isHovered = activeItem === idx
+              const isCurrent = activeSection === item.id
               return (
                 <div
                   key={item.title}
-                  className={`nav-link-row group ${isHovered ? 'is-active-row' : ''}`}
+                  className={`nav-link-row group ${isHovered ? 'is-active-row' : ''} ${isCurrent ? 'is-current' : ''}`}
                   onMouseEnter={() => setActiveItem(idx)}
                 >
                   <Link
                     href={item.href}
-                    onClick={onClose}
+                    onClick={() => {
+                      document.documentElement.classList.remove('nav-locked')
+                      window.dispatchEvent(new CustomEvent('lenis:start'))
+                      onClose()
+                    }}
                     className="nav-item-anchor"
+                    aria-current={isCurrent ? 'location' : undefined}
                   >
                     <span className="nav-item-index">{item.index}</span>
                     <span className="nav-item-title-wrap">

@@ -16,7 +16,7 @@ type SiteHeaderNavProps = {
 }
 
 export function SiteHeaderNav({
-  backHref = '/#work',
+  backHref = '/#selected-work',
   backLabel = 'Back to home',
   showBackLink = false,
   className = '',
@@ -27,7 +27,11 @@ export function SiteHeaderNav({
 
   return (
     <>
-      <FullNavOverlay isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+      <FullNavOverlay
+        isOpen={isNavOpen}
+        onClose={() => setIsNavOpen(false)}
+        activeSection="selected-work"
+      />
 
       <header className={`detail-header ${isCharcoal ? 'detail-header--charcoal' : ''} ${className}`}>
         <BrandLogo href="/#top" variant={isCharcoal ? 'glass' : 'dark'} />

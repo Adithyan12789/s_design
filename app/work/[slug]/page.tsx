@@ -37,7 +37,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   return (
     <main className="project-detail-page">
       {/* Top Header with Full Navigation Overlay */}
-      <SiteHeaderNav showBackLink backHref="/work" backLabel="All Works" />
+      <SiteHeaderNav showBackLink backHref="/#selected-work" backLabel="Selected Work" />
 
       {/* Hero Section */}
       <section className="detail-hero">
@@ -160,7 +160,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 <span>View {nextProject.title}</span>
                 <ArrowRight size={17} />
               </Link>
-              <Link href="/work" className="text-link">
+              <Link href="/#selected-work" className="text-link">
                 View entire collection <ArrowUpRight size={16} />
               </Link>
             </div>

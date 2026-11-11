@@ -11,6 +11,7 @@ import type { Project } from '@/lib/projects'
 gsap.registerPlugin(ScrollTrigger)
 
 type WorkHorizontalShowcaseProps = {
+  id?: string
   projects: Project[]
 }
 
@@ -23,7 +24,7 @@ const SLIDE_ASPECTS = [
   'aspect-editorial-wide',
 ] as const
 
-export function WorkHorizontalShowcase({ projects }: WorkHorizontalShowcaseProps) {
+export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkHorizontalShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const stageRef = useRef<HTMLDivElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
@@ -199,7 +200,13 @@ export function WorkHorizontalShowcase({ projects }: WorkHorizontalShowcaseProps
       return () => ctx.revert()
     })
 
+    const refreshFrame = requestAnimationFrame(() => {
+      ScrollTrigger.sort()
+      ScrollTrigger.refresh()
+    })
+
     return () => {
+      cancelAnimationFrame(refreshFrame)
       mm.revert()
     }
   }, [projects])
@@ -208,9 +215,10 @@ export function WorkHorizontalShowcase({ projects }: WorkHorizontalShowcaseProps
 
   return (
     <section
+      id={id}
       ref={sectionRef}
       className="work-exhibition-section"
-      aria-label="Architectural portfolio horizontal exhibition"
+      aria-label="Selected architectural works horizontal exhibition"
     >
       <div ref={stageRef} className="work-exhibition-stage">
         {/* Subtle Architectural Hairline Grid Backdrop */}
@@ -358,7 +366,7 @@ export function WorkHorizontalShowcase({ projects }: WorkHorizontalShowcaseProps
                   <span>{activeProject.year}</span>
                 </div>
 
-                <h1 className="hud-project-title">{activeProject.title}</h1>
+                <h2 className="hud-project-title">{activeProject.title}</h2>
               </motion.div>
             </AnimatePresence>
           </div>
