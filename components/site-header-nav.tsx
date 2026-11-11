@@ -20,7 +20,7 @@ export function SiteHeaderNav({
   backLabel = 'Back to home',
   showBackLink = false,
   className = '',
-  theme = 'light',
+  theme = 'charcoal',
 }: SiteHeaderNavProps) {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const isCharcoal = theme === 'charcoal'

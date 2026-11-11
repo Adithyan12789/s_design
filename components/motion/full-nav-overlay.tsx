@@ -107,7 +107,7 @@ export function FullNavOverlay({ isOpen, onClose }: FullNavOverlayProps) {
       <div className="nav-overlay-container">
         {/* Top Header Bar */}
         <div className="nav-overlay-header">
-          <BrandLogo href="/#top" variant="dark" />
+          <BrandLogo href="/#top" variant="glass" />
           <button
             className="nav-overlay-close-btn"
             onClick={onClose}
