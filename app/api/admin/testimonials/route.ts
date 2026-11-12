@@ -20,10 +20,11 @@ export async function POST(request: Request) {
 
   const body = await request.json()
   const clientName = String(body.clientName || '').trim()
-  const quote = String(body.quote || '').trim()
-  if (!clientName || !quote) {
+  const projectName = String(body.projectName || '').trim()
+  const projectDescription = String(body.projectDescription ?? body.quote ?? '').trim()
+  if (!clientName || !projectDescription) {
     return NextResponse.json(
-      { error: 'Client name and review quote are required.' },
+      { error: 'Client name and short project description are required.' },
       { status: 400 }
     )
   }
@@ -35,11 +36,18 @@ export async function POST(request: Request) {
   const doc = {
     id: `rev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     clientName,
+    projectName,
+    projectDescription,
     designation: String(body.designation || ''),
-    quote,
+    headline: String(body.headline || ''),
+    quote: projectDescription,
     clientPhoto: String(body.clientPhoto || ''),
+    videoUrl: String(body.videoUrl || ''),
+    posterImage: String(body.posterImage || ''),
+    backgroundImage: String(body.backgroundImage || ''),
     rating,
     projectId: body.projectId ? String(body.projectId) : null,
+    featured: Boolean(body.featured),
     displayOrder: typeof body.displayOrder === 'number' ? body.displayOrder : count,
     status: body.status === 'draft' ? 'draft' : 'published',
     createdAt: now,
@@ -78,10 +86,11 @@ export async function PATCH(request: Request) {
 
   const id = String(body.id || '').trim()
   const clientName = String(body.clientName || '').trim()
-  const quote = String(body.quote || '').trim()
-  if (!id || !clientName || !quote) {
+  const projectName = String(body.projectName || '').trim()
+  const projectDescription = String(body.projectDescription ?? body.quote ?? '').trim()
+  if (!id || !clientName || !projectDescription) {
     return NextResponse.json(
-      { error: 'Testimonial id, client name, and quote are required.' },
+      { error: 'Testimonial id, client name, and short project description are required.' },
       { status: 400 }
     )
   }
@@ -94,11 +103,18 @@ export async function PATCH(request: Request) {
     {
       $set: {
         clientName,
+        projectName,
+        projectDescription,
         designation: String(body.designation || ''),
-        quote,
+        headline: String(body.headline || ''),
+        quote: projectDescription,
         clientPhoto: String(body.clientPhoto || ''),
+        videoUrl: String(body.videoUrl || ''),
+        posterImage: String(body.posterImage || ''),
+        backgroundImage: String(body.backgroundImage || ''),
         rating,
         projectId: body.projectId ? String(body.projectId) : null,
+        featured: Boolean(body.featured),
         status: body.status === 'draft' ? 'draft' : 'published',
         updatedAt: now,
       },

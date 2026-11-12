@@ -80,11 +80,18 @@ export type CmsStudioInfo = {
 export type CmsTestimonial = {
   id: string
   clientName: string
+  projectName?: string
+  projectDescription?: string
   designation: string
+  headline: string
   quote: string
   clientPhoto: string
+  videoUrl: string
+  posterImage: string
+  backgroundImage: string
   rating: number
   projectId: string | null
+  featured: boolean
   displayOrder: number
   status: ProjectStatus
 }

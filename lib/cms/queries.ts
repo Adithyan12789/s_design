@@ -54,7 +54,9 @@ export async function getPublicSiteData(): Promise<PublicSiteData> {
       db.collection('studio').findOne({ _id: 'default' as unknown as never }),
       db
         .collection('testimonials')
-        .find({ status: 'published' })
+        .find({
+          $or: [{ status: 'published' }, { isPublished: true, status: { $ne: 'draft' } }],
+        })
         .sort({ displayOrder: 1 })
         .toArray(),
       db.collection('websiteSettings').findOne({ _id: 'default' as unknown as never }),

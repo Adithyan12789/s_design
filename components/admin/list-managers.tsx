@@ -316,20 +316,48 @@ export function TestimonialsManager({
 }) {
   const [editing, setEditing] = useState<CmsTestimonial | null>(null)
   const [saving, setSaving] = useState(false)
+  const [uploadingVideo, setUploadingVideo] = useState(false)
 
   function openNew() {
     setEditing({
       id: '',
       clientName: '',
+      projectName: '',
+      projectDescription: '',
       designation: '',
+      headline: '',
       quote: '',
       clientPhoto: '',
+      videoUrl: '',
+      posterImage: '',
+      backgroundImage: '',
       rating: 5,
       projectId: null,
+      featured: false,
       displayOrder: testimonials.length,
       status: 'published',
     })
     onDirtyChange(true)
+  }
+
+  async function handleVideoUpload(files: FileList | null) {
+    if (!files || files.length === 0 || !editing) return
+    setUploadingVideo(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', files[0])
+      fd.append('altText', `${editing.clientName || 'Client'} testimonial video`)
+      const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Video upload failed')
+      const url = data.asset?.publicUrl || data.asset?.public_url || ''
+      setEditing((prev) => (prev ? { ...prev, videoUrl: url } : null))
+      onNotify('Testimonial video uploaded.')
+    } catch (err) {
+      onNotify(err instanceof Error ? err.message : 'Video upload failed', 'error')
+    } finally {
+      setUploadingVideo(false)
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -427,17 +455,7 @@ export function TestimonialsManager({
               />
             </div>
             <div>
-              <label className="admin-label">Designation / Role (Optional)</label>
-              <input
-                type="text"
-                value={editing.designation}
-                onChange={(e) => setEditing({ ...editing, designation: e.target.value })}
-                placeholder="e.g. Private Residence Owner"
-                className="admin-input"
-              />
-            </div>
-            <div>
-              <label className="admin-label">Star Rating (1 - 5)</label>
+              <label className="admin-label">Star Rating (1 - 5) *</label>
               <select
                 value={editing.rating}
                 onChange={(e) => setEditing({ ...editing, rating: Number(e.target.value) })}
@@ -445,16 +463,37 @@ export function TestimonialsManager({
               >
                 {[5, 4, 3, 2, 1].map((n) => (
                   <option key={n} value={n}>
-                    {n} Stars
+                    {n} {n === 1 ? 'Star' : 'Stars'}
                   </option>
                 ))}
               </select>
             </div>
             <div>
+              <label className="admin-label">Project Name *</label>
+              <input
+                required
+                type="text"
+                value={editing.projectName || ''}
+                onChange={(e) => setEditing({ ...editing, projectName: e.target.value })}
+                placeholder="e.g. Casa Loma Residence"
+                className="admin-input"
+              />
+            </div>
+            <div>
               <label className="admin-label">Linked Project (Optional)</label>
               <select
                 value={editing.projectId || ''}
-                onChange={(e) => setEditing({ ...editing, projectId: e.target.value || null })}
+                onChange={(e) => {
+                  const nextProjectId = e.target.value || null
+                  const matched = projects.find((p) => p.id === nextProjectId)
+                  setEditing({
+                    ...editing,
+                    projectId: nextProjectId,
+                    projectName: editing.projectName || matched?.title || '',
+                    projectDescription:
+                      editing.projectDescription || editing.quote || matched?.shortDescription || '',
+                  })
+                }}
                 className="admin-select"
               >
                 <option value="">None</option>
@@ -481,23 +520,82 @@ export function TestimonialsManager({
           </div>
 
           <div>
-            <label className="admin-label">Review Quote *</label>
+            <label className="admin-label">Short Project Description (1 - 2 Sentences) *</label>
             <textarea
               required
               rows={3}
-              value={editing.quote}
-              onChange={(e) => setEditing({ ...editing, quote: e.target.value })}
+              value={editing.projectDescription ?? editing.quote ?? ''}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  projectDescription: e.target.value,
+                  quote: e.target.value,
+                })
+              }
+              placeholder="Brief architectural concept, design, or project outcome..."
               className="admin-textarea"
             />
           </div>
 
+          <div className="pt-2 border-t border-[#e6dfd3] space-y-3">
+            <label className="admin-label">Testimonial Video (MP4 / WebM / MOV)</label>
+            <div className="flex flex-col sm:flex-row gap-3 items-start">
+              <input
+                type="text"
+                value={editing.videoUrl || ''}
+                onChange={(e) => setEditing({ ...editing, videoUrl: e.target.value })}
+                placeholder="/uploads/... or https://..."
+                className="admin-input flex-1"
+              />
+              <label className="admin-btn-secondary text-xs cursor-pointer shrink-0">
+                {uploadingVideo ? 'Uploading Video...' : 'Upload Video'}
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/ogg"
+                  className="hidden"
+                  disabled={uploadingVideo}
+                  onChange={(e) => handleVideoUpload(e.target.files)}
+                />
+              </label>
+              {editing.videoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setEditing({ ...editing, videoUrl: '' })}
+                  className="admin-btn-danger text-xs"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            {editing.videoUrl && (
+              <video
+                src={editing.videoUrl}
+                poster={editing.posterImage || undefined}
+                controls
+                preload="metadata"
+                className="w-full max-w-sm rounded-lg border border-[#dfd7c9] bg-black"
+              />
+            )}
+          </div>
+
           <ImageField
-            label="Client Photo (Optional)"
-            value={editing.clientPhoto}
-            onChange={(url) => setEditing({ ...editing, clientPhoto: url })}
+            label="Video Poster Image"
+            value={editing.posterImage || ''}
+            onChange={(url) => setEditing({ ...editing, posterImage: url })}
             onOpenPicker={() =>
               onPickImage((url) =>
-                setEditing((prev) => (prev ? { ...prev, clientPhoto: url } : null))
+                setEditing((prev) => (prev ? { ...prev, posterImage: url } : null))
+              )
+            }
+          />
+
+          <ImageField
+            label="Architectural Background Image (Right Side)"
+            value={editing.backgroundImage || ''}
+            onChange={(url) => setEditing({ ...editing, backgroundImage: url })}
+            onOpenPicker={() =>
+              onPickImage((url) =>
+                setEditing((prev) => (prev ? { ...prev, backgroundImage: url } : null))
               )
             }
           />

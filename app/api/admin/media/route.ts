@@ -107,7 +107,18 @@ export async function DELETE(request: Request) {
         .project({ title: 1 })
         .toArray(),
       db.collection('services').find({ imageUrl: url }).project({ title: 1 }).toArray(),
-      db.collection('testimonials').find({ clientPhoto: url }).project({ clientName: 1 }).toArray(),
+      db
+        .collection('testimonials')
+        .find({
+          $or: [
+            { clientPhoto: url },
+            { videoUrl: url },
+            { posterImage: url },
+            { backgroundImage: url },
+          ],
+        })
+        .project({ clientName: 1 })
+        .toArray(),
       db.collection('navigation').find({ previewImage: url }).project({ label: 1 }).toArray(),
       db.collection('websiteSettings').findOne({
         _id: 'default' as unknown as never,

@@ -121,36 +121,66 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
   {
     id: 'almeida',
     clientName: 'Henrique & Sofia Almeida',
+    projectName: 'Casa Loma Residence',
+    projectDescription:
+      'A serene hillside courtyard home shaped in limewashed plaster, oak, and filtered daylight.',
     designation: 'Private Homeowners',
+    headline: 'A home shaped by stillness and warm light.',
     quote:
-      'They captured the quietness we had imagined for years — every room feels calm, balanced, and deeply intentional.',
+      'A serene hillside courtyard home shaped in limewashed plaster, oak, and filtered daylight.',
     clientPhoto: '',
+    videoUrl: '',
+    posterImage:
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=85',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
     rating: 5,
-    projectId: null,
+    projectId: 'casa-loma',
+    featured: true,
     displayOrder: 0,
     status: 'published',
   },
   {
     id: 'takahashi',
     clientName: 'Kenji Takahashi',
+    projectName: 'Atelier Marais',
+    projectDescription:
+      'An intimate timber-and-stone gallery residence balancing quiet proportion with natural shadow.',
     designation: 'Commission Patron',
+    headline: 'Material restraint that surprises every morning.',
     quote:
-      'Rare restraint and extraordinary care in every material detail. Our space still surprises us in morning light.',
+      'An intimate timber-and-stone gallery residence balancing quiet proportion with natural shadow.',
     clientPhoto: '',
+    videoUrl: '',
+    posterImage:
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=85',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=85',
     rating: 5,
-    projectId: null,
+    projectId: 'atelier-marais',
+    featured: true,
     displayOrder: 1,
     status: 'published',
   },
   {
     id: 'meier-keller',
     clientName: 'Elena Meier-Keller',
+    projectName: 'The Mineral House',
+    projectDescription:
+      'A monolithic travertine sanctuary designed around framed landscape views and tactile stillness.',
     designation: 'Foundation Director',
+    headline: 'Clarity and precision from first sketch to handoff.',
     quote:
-      'From the earliest conversation to completion, their clarity and precision made the entire journey effortless.',
+      'A monolithic travertine sanctuary designed around framed landscape views and tactile stillness.',
     clientPhoto: '',
+    videoUrl: '',
+    posterImage:
+      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85',
     rating: 5,
-    projectId: null,
+    projectId: 'the-mineral-house',
+    featured: false,
     displayOrder: 2,
     status: 'published',
   },

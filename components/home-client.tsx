@@ -44,12 +44,27 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const visibleNav = navigation.filter((n) => n.visible && !n.isCta)
   const ctaNav = navigation.find((n) => n.visible && n.isCta)
 
-  const mappedReviews = testimonials.map((t) => ({
-    id: t.id,
-    client: t.clientName,
-    quote: t.quote,
-    rating: t.rating,
-  }))
+  const mappedReviews = testimonials.map((t) => {
+    const linkedProject = t.projectId
+      ? projects.find((p) => p.id === t.projectId || p.slug === t.projectId)
+      : undefined
+    const poster =
+      t.posterImage ||
+      (t as { videoPoster?: string }).videoPoster ||
+      t.clientPhoto ||
+      linkedProject?.mainImage ||
+      undefined
+    return {
+      id: t.id,
+      client: t.clientName,
+      rating: t.rating,
+      projectName: t.projectName || linkedProject?.title || '',
+      projectDescription: t.projectDescription || t.quote || linkedProject?.shortDescription || '',
+      videoUrl: t.videoUrl || undefined,
+      posterImage: poster,
+      backgroundImage: t.backgroundImage || linkedProject?.mainImage || poster,
+    }
+  })
 
   useEffect(() => {
     const updatePointer = (event: PointerEvent) => {

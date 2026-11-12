@@ -16,7 +16,14 @@ export const ALLOWED_IMAGE_MIMES = new Set([
   'image/vnd.microsoft.icon',
 ])
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024 // 10 MB
+export const ALLOWED_VIDEO_MIMES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'video/ogg',
+])
+
+const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024 // 100 MB (supports HD video + images)
 
 function ensureUploadDirSync() {
   if (!fsSync.existsSync(UPLOAD_DIR)) {
@@ -48,10 +55,10 @@ const uploadMiddleware = multer({
     fileSize: MAX_FILE_SIZE_BYTES,
   },
   fileFilter: (_req, file, cb) => {
-    if (!ALLOWED_IMAGE_MIMES.has(file.mimetype)) {
+    if (!ALLOWED_IMAGE_MIMES.has(file.mimetype) && !ALLOWED_VIDEO_MIMES.has(file.mimetype)) {
       cb(
         new Error(
-          `Unsupported file type "${file.mimetype}". Allowed: JPG, PNG, WebP, AVIF, SVG, ICO.`
+          `Unsupported file type "${file.mimetype}". Allowed: JPG, PNG, WebP, AVIF, SVG, ICO, MP4, WebM, MOV.`
         )
       )
       return
