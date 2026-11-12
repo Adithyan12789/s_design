@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ArrowRight, ArrowUpRight, MapPin, Calendar, Maximize2, Layers, Compass } from 'lucide-react'
-import { ProjectImage3D } from '@/components/project-image-3d'
+import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import { ProjectGalleryInteractive } from '@/components/project-gallery-interactive'
 import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
@@ -39,15 +38,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* Top Header with Full Navigation Overlay */}
       <SiteHeaderNav showBackLink backHref="/#selected-work" backLabel="Selected Work" />
 
-      {/* Hero Section */}
+      {/* Hero Section: Two-Column Architectural Case Study Layout */}
       <section className="detail-hero">
-        <ProjectImage3D
-          src={project.image}
-          alt={`${project.title} project exterior`}
-          className="detail-hero-image"
-          priority
-        />
-        <div className="detail-hero-overlay" />
+        <div className="detail-hero-media">
+          <img
+            src={project.image}
+            alt={`${project.title} — ${project.location}`}
+            className="detail-hero-photo"
+            loading="eager"
+          />
+        </div>
+
         <div className="detail-hero-copy">
           <div className="detail-hero-index">
             <span>PROJECT / {project.year}</span>
@@ -60,8 +61,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             lines={[{ text: project.title }]}
           />
           <p className="detail-hero-meta">{project.meta}</p>
-          <div className="detail-hero-scroll">
-            Scroll to explore <span>↓</span>
+          <p className="detail-hero-desc">{project.description}</p>
+          <div className="detail-hero-actions">
+            <div className="detail-hero-scroll">
+              Scroll to explore <span>↓</span>
+            </div>
+            <Link href="/#contact" className="text-link detail-hero-cta">
+              Start a conversation <ArrowUpRight size={15} />
+            </Link>
           </div>
         </div>
       </section>
@@ -91,49 +98,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      {/* At a Glance: Key Specifications */}
-      <section className="detail-facts section-pad">
-        <div className="section-kicker">
-          ( 02 ) <span>Key Specifications</span>
-        </div>
-        <ScrollReveal variant="stagger-children" stagger={0.06}>
-          <div className="detail-facts-grid">
-            <div className="spec-card">
-              <MapPin className="spec-icon" size={18} />
-              <span>Location</span>
-              <strong>{project.location}</strong>
-            </div>
-            <div className="spec-card">
-              <Calendar className="spec-icon" size={18} />
-              <span>Completed</span>
-              <strong>{project.year}</strong>
-            </div>
-            <div className="spec-card">
-              <Maximize2 className="spec-icon" size={18} />
-              <span>Scale / Area</span>
-              <strong>{project.area}</strong>
-            </div>
-            <div className="spec-card">
-              <Layers className="spec-icon" size={18} />
-              <span>Typology</span>
-              <strong>{project.type}</strong>
-            </div>
-            {project.details.map((detail, dIdx) => (
-              <div key={detail} className="spec-card">
-                <Compass className="spec-icon" size={18} />
-                <span>Detail 0{dIdx + 1}</span>
-                <strong>{detail}</strong>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
-      </section>
-
       {/* Interactive Gallery */}
       <section className="detail-gallery section-pad">
         <div className="section-heading">
           <div className="section-kicker">
-            ( 03 ) <span>In Context &amp; Details</span>
+            ( 02 ) <span>In Context &amp; Details</span>
           </div>
           <span className="section-note">Click any plate for high-resolution inspection</span>
         </div>
