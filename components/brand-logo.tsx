@@ -9,6 +9,10 @@ type BrandLogoProps = {
   variant?: 'light' | 'dark' | 'glass'
   showSubtitle?: boolean
   className?: string
+  studioName?: string
+  studioSubtitle?: string
+  lightLogoUrl?: string
+  darkLogoUrl?: string
 }
 
 export function BrandLogo({
@@ -17,6 +21,10 @@ export function BrandLogo({
   variant = 'glass',
   showSubtitle = true,
   className = '',
+  studioName = 'S_DE_SIGN',
+  studioSubtitle = 'ARCHITECTURE / STUDIO',
+  lightLogoUrl = '/s-design-emblem-white.png',
+  darkLogoUrl = '/s-design-emblem-clean.png',
 }: BrandLogoProps) {
   const sizeClasses = {
     sm: 'brand-logo--sm',
@@ -26,15 +34,15 @@ export function BrandLogo({
 
   const emblemSrc =
     variant === 'dark'
-      ? '/s-design-emblem-clean.png'
-      : '/s-design-emblem-white.png'
+      ? darkLogoUrl || '/s-design-emblem-clean.png'
+      : lightLogoUrl || '/s-design-emblem-white.png'
 
   const content = (
     <div className={`brand-logo-lockup ${sizeClasses[size]} brand-logo--${variant} ${className}`}>
       <div className="brand-logo-emblem" aria-hidden="true">
         <Image
           src={emblemSrc}
-          alt="S_Designs Architectural Logo"
+          alt={`${studioName} Architectural Logo`}
           width={32}
           height={32}
           className="brand-logo-image"
@@ -43,8 +51,8 @@ export function BrandLogo({
         <span className="brand-logo-emblem-glow" />
       </div>
       <div className="brand-logo-text">
-        <span className="brand-logo-name">S_DE_SIGN</span>
-        {showSubtitle && <span className="brand-logo-sub">ARCHITECTURE / STUDIO</span>}
+        <span className="brand-logo-name">{studioName}</span>
+        {showSubtitle && <span className="brand-logo-sub">{studioSubtitle}</span>}
       </div>
     </div>
   )
@@ -52,7 +60,7 @@ export function BrandLogo({
   if (!href) return content
 
   return (
-    <Link href={href} className="brand-logo-link" aria-label="S_Designs home">
+    <Link href={href} className="brand-logo-link" aria-label={`${studioName} home`}>
       {content}
     </Link>
   )

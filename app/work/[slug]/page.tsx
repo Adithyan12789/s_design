@@ -6,44 +6,61 @@ import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ScrollReveal } from '@/components/motion/scroll-reveal'
-import { projects } from '@/lib/projects'
+import { getPublishedProjectBySlug, getPublicSiteData } from '@/lib/cms/queries'
 
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const project = projects.find((item) => item.slug === slug)
+  const [{ project }, siteData] = await Promise.all([
+    getPublishedProjectBySlug(slug),
+    getPublicSiteData(),
+  ])
   return project
-    ? { title: `${project.title} — S_Designs Architecture`, description: project.description }
-    : { title: 'Project — S_Designs' }
+    ? {
+        title: project.seoTitle || `${project.title} — ${siteData.settings.studioName} Architecture`,
+        description: project.seoDescription || project.shortDescription || project.fullDescription,
+      }
+    : { title: `Project — ${siteData.settings.studioName}` }
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const index = projects.findIndex((item) => item.slug === slug)
-  if (index === -1) notFound()
-  const project = projects[index]
+  const [{ project, allProjects }, siteData] = await Promise.all([
+    getPublishedProjectBySlug(slug),
+    getPublicSiteData(),
+  ])
+  if (!project || allProjects.length === 0) notFound()
 
-  const nextIndex = (index + 1) % projects.length
-  const prevIndex = (index - 1 + projects.length) % projects.length
-  const nextProject = projects[nextIndex]
-  const prevProject = projects[prevIndex]
+  const index = allProjects.findIndex((item) => item.slug === project.slug)
+  const safeIndex = index === -1 ? 0 : index
+  const nextIndex = (safeIndex + 1) % allProjects.length
+  const prevIndex = (safeIndex - 1 + allProjects.length) % allProjects.length
+  const nextProject = allProjects[nextIndex]
+  const prevProject = allProjects[prevIndex]
 
-  const allGalleryImages = [project.image, ...project.gallery]
+  const allGalleryImages = [
+    project.mainImage,
+    ...project.galleryImages.map((img) => img.url).filter(Boolean),
+  ].filter(Boolean)
 
   return (
     <main className="project-detail-page">
       {/* Top Header with Full Navigation Overlay */}
-      <SiteHeaderNav showBackLink backHref="/#selected-work" backLabel="Selected Work" />
+      <SiteHeaderNav
+        showBackLink
+        backHref="/#selected-work"
+        backLabel="Selected Work"
+        navItems={siteData.navigation}
+        settings={siteData.settings}
+      />
 
       {/* Hero Section: Two-Column Architectural Case Study Layout */}
       <section className="detail-hero">
         <div className="detail-hero-media">
           <img
-            src={project.image}
-            alt={`${project.title} — ${project.location}`}
+            src={project.mainImage}
+            alt={project.mainImageAlt || `${project.title} — ${project.location}`}
             className="detail-hero-photo"
             loading="eager"
           />
@@ -52,7 +69,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="detail-hero-copy">
           <div className="detail-hero-index">
             <span>PROJECT / {project.year}</span>
-            <span>CASE STUDY 0{index + 1} OF 0{projects.length}</span>
+            <span>
+              CASE STUDY {String(safeIndex + 1).padStart(2, '0')} OF{' '}
+              {String(allProjects.length).padStart(2, '0')}
+            </span>
           </div>
           <p className="eyebrow">{project.category} · {project.location}</p>
           <StaggeredHeading
@@ -61,7 +81,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             lines={[{ text: project.title }]}
           />
           <p className="detail-hero-meta">{project.meta}</p>
-          <p className="detail-hero-desc">{project.description}</p>
+          <p className="detail-hero-desc">{project.fullDescription || project.shortDescription}</p>
           <div className="detail-hero-actions">
             <div className="detail-hero-scroll">
               Scroll to explore <span>↓</span>
@@ -88,7 +108,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           />
           <div className="detail-intro-copy-block">
             <ScrollReveal delay={0.15}>
-              <p className="lead-paragraph">{project.description}</p>
+              <p className="lead-paragraph">{project.fullDescription || project.shortDescription}</p>
               <p className="sub-paragraph">
                 Every detail was developed through physical mockups and light studies on site,
                 ensuring a seamless dialogue between built geometry and the surrounding landscape.
@@ -117,11 +137,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="next-project-banner">
           <div
             className="next-project-bg"
-            style={{ backgroundImage: `url(${nextProject.image})` }}
+            style={{ backgroundImage: `url(${nextProject.mainImage})` }}
           />
           <div className="next-project-overlay" />
           <div className="next-project-content">
-            <span className="next-tag">Next Project · 0{nextIndex + 1}</span>
+            <span className="next-tag">Next Project · {String(nextIndex + 1).padStart(2, '0')}</span>
             <h2>{nextProject.title}</h2>
             <p>{nextProject.location} — {nextProject.type}</p>
             <div className="next-actions">
@@ -139,7 +159,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       {/* Detail Footer */}
       <footer className="detail-footer">
-        <BrandLogo href="/#top" size="sm" variant="glass" />
+        <BrandLogo
+          href="/#top"
+          size="sm"
+          variant="glass"
+          studioName={siteData.settings.studioName}
+          studioSubtitle={siteData.settings.studioSubtitle}
+          lightLogoUrl={siteData.settings.lightLogoUrl}
+          darkLogoUrl={siteData.settings.darkLogoUrl}
+        />
         <div className="project-pager-nav">
           <Link href={`/work/${prevProject.slug}`} className="pager-link">
             <ArrowLeft size={14} /> Previous: {prevProject.title}

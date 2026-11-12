@@ -5,14 +5,17 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { ArrowUpRight, X } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
+import type { CmsNavItem, CmsWebsiteSettings } from '@/lib/cms/types'
 
 type FullNavOverlayProps = {
   isOpen: boolean
   onClose: () => void
   activeSection?: string
+  navItems?: CmsNavItem[]
+  settings?: Partial<CmsWebsiteSettings>
 }
 
-const NAV_ITEMS = [
+const DEFAULT_NAV_ITEMS = [
   {
     index: '01',
     id: 'selected-work',
@@ -47,7 +50,26 @@ const NAV_ITEMS = [
   },
 ]
 
-export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverlayProps) {
+export function FullNavOverlay({
+  isOpen,
+  onClose,
+  activeSection,
+  navItems,
+  settings,
+}: FullNavOverlayProps) {
+  const items =
+    navItems && navItems.length > 0
+      ? navItems
+          .filter((n) => n.visible)
+          .map((n, idx) => ({
+            index: String(idx + 1).padStart(2, '0'),
+            id: n.href.replace('/#', '').replace('#', '') || n.label.toLowerCase(),
+            title: n.label,
+            href: n.href,
+            subtitle: n.subtitle || 'Studio Section',
+            image: n.previewImage || DEFAULT_NAV_ITEMS[idx % DEFAULT_NAV_ITEMS.length].image,
+          }))
+      : DEFAULT_NAV_ITEMS
   const [mounted, setMounted] = useState(false)
   const [activeItem, setActiveItem] = useState(0)
   const [timeString, setTimeString] = useState('')
@@ -112,7 +134,14 @@ export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverla
       <div className="nav-overlay-container">
         {/* Top Header Bar */}
         <div className="nav-overlay-header">
-          <BrandLogo href="/#top" variant="glass" />
+          <BrandLogo
+            href="/#top"
+            variant="glass"
+            studioName={settings?.studioName}
+            studioSubtitle={settings?.studioSubtitle}
+            lightLogoUrl={settings?.lightLogoUrl}
+            darkLogoUrl={settings?.darkLogoUrl}
+          />
           <button
             className="nav-overlay-close-btn"
             onClick={onClose}
@@ -129,7 +158,7 @@ export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverla
         {/* Center Grid: Navigation Links & Architectural Preview */}
         <div className="nav-overlay-body">
           <nav className="nav-overlay-links">
-            {NAV_ITEMS.map((item, idx) => {
+            {items.map((item, idx) => {
               const isHovered = activeItem === idx
               const isCurrent = activeSection === item.id
               return (
@@ -165,12 +194,12 @@ export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverla
             <div className="preview-image-frame">
               <div
                 className="preview-image-bg"
-                style={{ backgroundImage: `url(${NAV_ITEMS[activeItem]?.image})` }}
+                style={{ backgroundImage: `url(${items[activeItem]?.image})` }}
               />
               <div className="preview-image-overlay" />
               <div className="preview-caption">
                 <span className="preview-kicker">FEATURED COMMISSION</span>
-                <h4>{NAV_ITEMS[activeItem]?.subtitle}</h4>
+                <h4>{items[activeItem]?.subtitle}</h4>
               </div>
             </div>
           </div>
@@ -180,13 +209,18 @@ export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverla
         <div className="nav-overlay-footer">
           <div className="footer-meta-col">
             <span className="meta-label">INQUIRIES</span>
-            <a href="mailto:hello@sdesigns.studio" className="meta-value">
-              hello@sdesigns.studio
+            <a
+              href={`mailto:${settings?.email || 'hello@sdesigns.studio'}`}
+              className="meta-value"
+            >
+              {settings?.email || 'hello@sdesigns.studio'}
             </a>
           </div>
           <div className="footer-meta-col">
             <span className="meta-label">STUDIO LOCATION</span>
-            <span className="meta-value">Lisbon, Portugal — Worldwide</span>
+            <span className="meta-value">
+              {settings?.officeAddress || 'Lisbon, Portugal — Worldwide'}
+            </span>
           </div>
           <div className="footer-meta-col">
             <span className="meta-label">LOCAL TIME</span>
@@ -197,9 +231,23 @@ export function FullNavOverlay({ isOpen, onClose, activeSection }: FullNavOverla
           <div className="footer-meta-col socials">
             <span className="meta-label">DISPATCHES</span>
             <div className="social-links">
-              <a href="#top" aria-label="Instagram">Instagram</a>
+              <a
+                href={settings?.instagramUrl || '#top'}
+                target={settings?.instagramUrl ? '_blank' : undefined}
+                rel={settings?.instagramUrl ? 'noopener noreferrer' : undefined}
+                aria-label="Instagram"
+              >
+                Instagram
+              </a>
               <span className="dot">/</span>
-              <a href="#top" aria-label="LinkedIn">LinkedIn</a>
+              <a
+                href={settings?.linkedinUrl || '#top'}
+                target={settings?.linkedinUrl ? '_blank' : undefined}
+                rel={settings?.linkedinUrl ? 'noopener noreferrer' : undefined}
+                aria-label="LinkedIn"
+              >
+                LinkedIn
+              </a>
             </div>
           </div>
         </div>
