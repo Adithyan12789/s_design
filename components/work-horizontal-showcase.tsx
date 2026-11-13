@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight, ArrowDown, Compass } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Project } from '@/lib/projects'
@@ -129,7 +128,7 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
 
         const totalSteps = Math.max(0, slides.length - 1)
         const timelineDuration = Math.max(1, totalSteps)
-        const badgeLiftY = activeScale > 1.15 ? -28 : -16
+        const badgeLiftY = activeScale > 1.08 ? -18 : -12
 
         // Set initial emphasis state (Project 0 begins large & focused; others at scale 1)
         primaryLinks.forEach((linkEl, i) => {
@@ -282,11 +281,11 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
       }
     }
 
-    // Desktop: pronounced 1.2x active focus zoom
-    mm.add('(min-width: 1024px)', () => setupHorizontalExhibition(1.2, 1.06))
+    // Desktop: balanced 1.1x active focus zoom for grand imagery
+    mm.add('(min-width: 1024px)', () => setupHorizontalExhibition(1.1, 1.04))
 
-    // Tablet: balanced 1.12x zoom intensity to prevent neighbor collisions
-    mm.add('(min-width: 768px) and (max-width: 1023px)', () => setupHorizontalExhibition(1.12, 1.04))
+    // Tablet: balanced 1.08x zoom intensity to prevent neighbor collisions
+    mm.add('(min-width: 768px) and (max-width: 1023px)', () => setupHorizontalExhibition(1.08, 1.03))
 
     // Mobile: vertical editorial layout with gentle scroll-driven center focus zoom
     mm.add('(max-width: 767px)', () => {
@@ -348,8 +347,6 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
       mm.revert()
     }
   }, [projects])
-
-  const activeProject = projects[activeIndex] || projects[0]
 
   return (
     <section
@@ -416,132 +413,73 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
                   }}
                   className={`exhibition-slide ${aspectClass} ${index === activeIndex ? 'is-focused' : ''}`}
                 >
-                  {/* Floating Slide Index Tag */}
+                  {/* Work Name Above Image (Left-Aligned) */}
                   <div
                     ref={(el) => {
                       slideBadgeRefs.current[index] = el
                     }}
-                    className="slide-number-badge"
+                    className="slide-header-group"
                   >
-                    <span>0{index + 1}</span>
-                    <span className="slide-line" />
-                    <span>{project.year}</span>
-                  </div>
-
-                  {/* Primary Dominant Architectural Frame */}
-                  <Link
-                    ref={(el) => {
-                      primaryLinkRefs.current[index] = el
-                    }}
-                    href={`/work/${project.slug}`}
-                    className="exhibition-primary-link"
-                    aria-label={`Explore ${project.title} in ${project.location}`}
-                  >
-                    <div className="exhibition-frame-mask">
-                      <div
-                        ref={(el) => {
-                          primaryImgRefs.current[index] = el
-                        }}
-                        className="exhibition-frame-img"
-                        style={{ backgroundImage: `url(${project.image})` }}
-                      />
-                      <div className="exhibition-frame-vignette" />
-                      <div className="exhibition-hover-pill">
-                        <span>Open Case Study</span>
-                        <ArrowUpRight size={14} />
-                      </div>
-                    </div>
-                  </Link>
-
-                  {/* Secondary Offset Architectural Detail Photograph */}
-                  <div
-                    ref={(el) => {
-                      secondaryFrameRefs.current[index] = el
-                    }}
-                    className={`exhibition-secondary-frame ${isEven ? 'pos-bottom-right' : 'pos-top-right'}`}
-                    aria-hidden="true"
-                  >
-                    <div
-                      className="exhibition-secondary-img"
-                      style={{ backgroundImage: `url(${secondaryImage})` }}
-                    />
-                    <span className="secondary-frame-caption">
-                      {project.area} · {project.category}
-                    </span>
-                  </div>
-
-                  {/* Mobile-Only Card Details (Hidden on Desktop where bottom HUD updates) */}
-                  <div className="exhibition-mobile-details">
-                    <span className="mobile-meta">
-                      0{index + 1} / 0{projects.length} — {project.location} · {project.category}
-                    </span>
-                    <h2>{project.title}</h2>
-                    <p>{project.description}</p>
-                    <Link href={`/work/${project.slug}`} className="exhibition-explore-btn">
-                      <span>Explore Project</span>
-                      <ArrowUpRight size={15} />
+                    <Link
+                      href={`/work/${project.slug}`}
+                      className="slide-title-link"
+                      aria-label={`View ${project.title}`}
+                    >
+                      <h2 className="slide-project-title">{project.title}</h2>
                     </Link>
                   </div>
+
+                  {/* Media Stage: Main Image & Secondary Offset Photograph */}
+                  <div className="slide-media-stage">
+                    {/* Primary Dominant Architectural Frame */}
+                    <Link
+                      ref={(el) => {
+                        primaryLinkRefs.current[index] = el
+                      }}
+                      href={`/work/${project.slug}`}
+                      className="exhibition-primary-link"
+                      aria-label={`Explore ${project.title} in ${project.location}`}
+                    >
+                      <div className="exhibition-frame-mask">
+                        <div
+                          ref={(el) => {
+                            primaryImgRefs.current[index] = el
+                          }}
+                          className="exhibition-frame-img"
+                          style={{ backgroundImage: `url(${project.image})` }}
+                        />
+                        <div className="exhibition-frame-vignette" />
+                        <div className="exhibition-hover-pill">
+                          <span>Open Case Study</span>
+                          <ArrowUpRight size={14} />
+                        </div>
+                      </div>
+                    </Link>
+
+                    {/* Secondary Offset Architectural Detail Photograph */}
+                    <div
+                      ref={(el) => {
+                        secondaryFrameRefs.current[index] = el
+                      }}
+                      className={`exhibition-secondary-frame ${isEven ? 'pos-bottom-right' : 'pos-top-right'}`}
+                      aria-hidden="true"
+                    >
+                      <div
+                        className="exhibition-secondary-img"
+                        style={{ backgroundImage: `url(${secondaryImage})` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Short Work Description Below Image with Big Gap */}
+                  {project.description && (
+                    <div className="slide-description-wrap">
+                      <p className="slide-project-description">{project.description}</p>
+                    </div>
+                  )}
                 </article>
               )
             })}
-          </div>
-        </div>
-
-        {/* Synchronized Active Project Typography & Editorial HUD (Desktop/Tablet) */}
-        <div className="exhibition-bottom-hud">
-          <div className="hud-project-identity">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeProject.slug}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -14 }}
-                transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
-                className="hud-motion-wrap"
-              >
-                <div className="hud-meta-row">
-                  <span className="hud-index">
-                    0{activeIndex + 1} / 0{projects.length}
-                  </span>
-                  <span className="hud-dot" />
-                  <span>{activeProject.location}</span>
-                  <span className="hud-dot" />
-                  <span className="hud-category">{activeProject.category}</span>
-                  <span className="hud-dot" />
-                  <span>{activeProject.year}</span>
-                </div>
-
-                <h2 className="hud-project-title">{activeProject.title}</h2>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="hud-project-narrative">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeProject.slug}-desc`}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.34, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
-                className="hud-narrative-inner"
-              >
-                <p className="hud-description">{activeProject.description}</p>
-                <div className="hud-actions">
-                  <Link
-                    href={`/work/${activeProject.slug}`}
-                    className="exhibition-explore-btn"
-                  >
-                    <span>Explore Project</span>
-                    <ArrowUpRight size={16} />
-                  </Link>
-                  <span className="hud-specs-note">
-                    {activeProject.area} · {activeProject.type}
-                  </span>
-                </div>
-              </motion.div>
-            </AnimatePresence>
           </div>
         </div>
 

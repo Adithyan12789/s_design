@@ -121,7 +121,7 @@ em { color: var(--bronze); font-style: italic; }
 
 /* Three-Layer Editorial Video Testimonial Frame */
 .reviews-editorial-frame {
-  --reviews-video-w: clamp(250px, 24vw, 350px);
+  --reviews-video-w: clamp(230px, 21.5vw, 320px);
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
@@ -343,8 +343,8 @@ em { color: var(--bronze); font-style: italic; }
 }
 
 .reviews-play-ring {
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 1px solid rgba(244, 239, 230, 0.65);
   background: rgba(20, 19, 17, 0.55);
@@ -455,7 +455,7 @@ em { color: var(--bronze); font-style: italic; }
   }
 
   .reviews-video-card {
-    max-width: 440px;
+    max-width: 360px;
     margin: 0 auto;
     aspect-ratio: 4 / 5;
   }
@@ -482,6 +482,10 @@ em { color: var(--bronze); font-style: italic; }
 
   .reviews-video-stage {
     padding: 0 20px 24px;
+  }
+
+  .reviews-video-card {
+    max-width: 310px;
   }
 
   .reviews-right-backdrop {
@@ -1724,41 +1728,76 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   align-items: center;
   z-index: 3;
   overflow: visible;
-  padding-top: 18px;
-  padding-bottom: 136px;
+  padding-top: 16px;
+  padding-bottom: 24px;
 }
 .exhibition-track {
   display: flex;
   align-items: center;
-  gap: 11.5vw;
+  gap: clamp(120px, 16vw, 240px);
   /* Center Slide 0 in viewport on initial SSR render */
-  padding-left: calc(50vw - min(clamp(160px, 17vw, 260px), 26vh));
-  padding-right: calc(50vw - min(clamp(160px, 17vw, 260px), 26vh));
+  padding-left: calc(50vw - min(clamp(270px, 29vw, 460px), 33vh));
+  padding-right: calc(50vw - min(clamp(270px, 29vw, 460px), 33vh));
   will-change: transform;
 }
 
 .exhibition-slide {
   position: relative;
   flex-shrink: 0;
-  width: min(clamp(320px, 34vw, 520px), 52vh);
+  width: min(clamp(540px, 58vw, 920px), 66vh);
   will-change: opacity;
   transition: filter 0.35s ease;
 }
-.slide-number-badge {
+.slide-header-group {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   margin-bottom: 14px;
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--bronze-light);
   will-change: transform;
 }
-.slide-number-badge .slide-line {
-  width: 36px;
-  height: 1px;
-  background: rgba(241, 207, 158, 0.45);
+.slide-title-link {
+  text-decoration: none;
+  display: inline-block;
+  text-align: left;
+}
+.slide-title-link:hover .slide-project-title {
+  color: var(--bronze-light);
+}
+.slide-project-title {
+  margin: 0;
+  text-align: left;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(19px, 1.7vw, 25px);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: #fbf9f4;
+  transition: color 0.25s ease;
+}
+
+.slide-media-stage {
+  position: relative;
+  width: 100%;
+}
+
+.slide-description-wrap {
+  margin-top: clamp(32px, 4vw, 56px);
+  width: 100%;
+  text-align: left;
+}
+.slide-project-description {
+  margin: 0;
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: rgba(244, 239, 230, 0.72);
+  max-width: 480px;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .exhibition-primary-link {
@@ -1875,108 +1914,6 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(244, 239, 230, 0.55);
-}
-
-.exhibition-mobile-details {
-  display: none;
-}
-
-/* Synchronized Bottom Editorial Typography HUD */
-.exhibition-bottom-hud {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 6;
-  padding: 36px 4.8vw 28px;
-  background: linear-gradient(0deg, rgba(16, 15, 13, 0.96) 0%, rgba(16, 15, 13, 0.84) 62%, transparent 100%);
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 5vw;
-  align-items: end;
-  pointer-events: none;
-}
-.hud-project-identity,
-.hud-project-narrative {
-  pointer-events: auto;
-}
-.hud-meta-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(244, 239, 230, 0.65);
-  margin-bottom: 10px;
-}
-.hud-index {
-  color: var(--bronze-light);
-  font-weight: 600;
-}
-.hud-category {
-  color: var(--bronze-light);
-}
-.hud-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(241, 207, 158, 0.5);
-}
-.hud-project-title {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 400;
-  font-size: clamp(42px, 5.4vw, 84px);
-  line-height: 0.92;
-  letter-spacing: -0.04em;
-  color: #fbf9f4;
-  margin: 0;
-}
-
-.hud-description {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: rgba(244, 239, 230, 0.74);
-  margin: 0 0 18px;
-  max-width: 480px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.hud-actions {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-.exhibition-explore-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 22px;
-  border-radius: 999px;
-  background: #f4efe6;
-  color: #161513;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background 0.25s ease, transform 0.25s ease;
-}
-.exhibition-explore-btn:hover {
-  background: var(--bronze-light);
-  transform: translateY(-2px);
-}
-.hud-specs-note {
-  font-family: var(--font-mono), monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(244, 239, 230, 0.48);
 }
 
 /* Continuous Scroll Progress Rail */
@@ -2150,24 +2087,18 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 /* Tablet Breakpoint (768px - 1023px) */
 @media (max-width: 1023px) {
   .exhibition-track {
-    gap: 10vw;
-    padding-left: calc(50vw - min(25vw, 23vh));
-    padding-right: calc(50vw - min(25vw, 23vh));
+    gap: 14vw;
+    padding-left: calc(50vw - min(36vw, 29vh));
+    padding-right: calc(50vw - min(36vw, 29vh));
   }
   .exhibition-slide {
-    width: min(50vw, 46vh);
+    width: min(72vw, 58vh);
+  }
+  .slide-description-wrap {
+    margin-top: 32px;
   }
   .exhibition-secondary-frame {
-    width: 150px;
-  }
-  .exhibition-bottom-hud {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 28px 4.8vw 24px;
-  }
-  .hud-description {
-    -webkit-line-clamp: 2;
-    margin-bottom: 12px;
+    width: 170px;
   }
   .work-directory-heading-row {
     grid-template-columns: 1fr;
@@ -2194,7 +2125,6 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   .exhibition-bg-grid,
   .exhibition-scroll-cue,
   .exhibition-index-nav,
-  .exhibition-bottom-hud,
   .exhibition-progress-rail,
   .exhibition-hover-pill {
     display: none;
@@ -2207,7 +2137,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .exhibition-track {
     flex-direction: column;
-    gap: 64px;
+    gap: clamp(72px, 12vw, 110px);
     padding: 0 6vw;
     width: 100%;
     transform: none !important;
@@ -2227,33 +2157,13 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   .exhibition-secondary-frame {
     display: none;
   }
-  .exhibition-mobile-details {
-    display: block;
-    margin-top: 20px;
+  .slide-description-wrap {
+    margin-top: 24px;
   }
-  .exhibition-mobile-details .mobile-meta {
-    display: block;
-    font-family: var(--font-mono), monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--bronze-light);
-    margin-bottom: 8px;
-  }
-  .exhibition-mobile-details h2 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-weight: 400;
-    font-size: 38px;
-    line-height: 0.96;
-    letter-spacing: -0.03em;
-    color: #fbf9f4;
-    margin: 0 0 10px;
-  }
-  .exhibition-mobile-details p {
+  .slide-project-description {
+    max-width: 100%;
     font-size: 14px;
-    line-height: 1.55;
-    color: rgba(244, 239, 230, 0.72);
-    margin: 0 0 18px;
+    -webkit-line-clamp: 4;
   }
   .work-directory-section {
     padding: 72px 0 30px;
