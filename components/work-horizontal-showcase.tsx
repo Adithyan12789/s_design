@@ -12,6 +12,8 @@ gsap.registerPlugin(ScrollTrigger)
 type WorkHorizontalShowcaseProps = {
   id?: string
   projects: Project[]
+  kicker?: string
+  heading?: string
 }
 
 const SLIDE_ASPECTS = [
@@ -23,7 +25,12 @@ const SLIDE_ASPECTS = [
   'aspect-editorial-wide',
 ] as const
 
-export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkHorizontalShowcaseProps) {
+export function WorkHorizontalShowcase({
+  id = 'selected-work',
+  projects,
+  kicker = 'SELECTED WORKS ARCHIVE',
+  heading = '2021 — 2024',
+}: WorkHorizontalShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const stageRef = useRef<HTMLDivElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
@@ -369,9 +376,13 @@ export function WorkHorizontalShowcase({ id = 'selected-work', projects }: WorkH
         <div className="exhibition-top-bar">
           <div className="exhibition-kicker">
             <Compass size={13} className="text-[var(--bronze-light)]" />
-            <span>SELECTED WORKS ARCHIVE</span>
-            <span className="kicker-divider">/</span>
-            <span className="kicker-sub">2021 — 2024</span>
+            <span>{kicker}</span>
+            {heading && (
+              <>
+                <span className="kicker-divider">/</span>
+                <span className="kicker-sub">{heading}</span>
+              </>
+            )}
           </div>
 
           <div className="exhibition-top-right">

@@ -176,7 +176,23 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       {/* Studio Section (Top of Selected Work) */}
       <section className="intro section-pad animated-section studio-section" id="studio">
         <div className="section-ambient ambient-orbit" aria-hidden="true" />
-        <div className="section-kicker">( 01 ) <span>{studioInfo.kicker || 'Studio note'}</span></div>
+
+        <div className="intro-left-column">
+          <div className="section-kicker">
+            ( 01 ) <span>{studioInfo.kicker || 'Studio note'}</span>
+          </div>
+          <ParallaxImage
+            src={
+              studioInfo.studioImage ||
+              studioInfo.studioImages?.[0] ||
+              'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85'
+            }
+            alt="S_Designs Studio architecture and materiality"
+            className="intro-parallax-stage"
+            enableClipReveal
+            parallaxSpeed={10}
+          />
+        </div>
 
         <div className="intro-copy">
           <StaggeredHeading
@@ -197,7 +213,12 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       </section>
 
       {/* PAGE 2 — Selected Work (Cinematic Horizontal Parallax Gallery) */}
-      <WorkHorizontalShowcase id="selected-work" projects={showcaseProjects} />
+      <WorkHorizontalShowcase
+        id="selected-work"
+        projects={showcaseProjects}
+        kicker={homepage.selectedWorkKicker}
+        heading={homepage.selectedWorkHeading}
+      />
 
       {/* PAGE 3 — Initiate a Project */}
       <section className="work-cta-strip" id="initiate-project">
@@ -269,7 +290,13 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       </section>
 
       {/* Reviews Section */}
-      <CinematicReviews id="reviews" reviews={mappedReviews} />
+      <CinematicReviews
+        id="reviews"
+        reviews={mappedReviews}
+        kicker={homepage.reviewsKicker}
+        heading1={homepage.reviewsHeading1}
+        heading2={homepage.reviewsHeading2}
+      />
 
       {/* Contact Section */}
       <section className="contact section-pad" id="contact">

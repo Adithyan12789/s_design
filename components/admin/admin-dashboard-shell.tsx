@@ -21,6 +21,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
+  Type,
+  Sliders,
 } from 'lucide-react'
 import type {
   CmsProject,
@@ -40,6 +42,7 @@ import { ServicesManager, TestimonialsManager, NavigationManager } from './list-
 import {
   StudioManager,
   BrandingManager,
+  TypographyManager,
   ContactManager,
   HomepageManager,
   SeoManager,
@@ -49,10 +52,18 @@ import {
 
 type SectionId =
   | 'dashboard'
+  | 'typography'
   | 'projects'
   | 'services'
   | 'studio'
   | 'testimonials'
+  | 'contact'
+  | 'branding'
+  | 'homepage'
+  | 'navigation'
+  | 'seo'
+  | 'media'
+  | 'settings'
   | 'contact'
   | 'branding'
   | 'homepage'
@@ -84,6 +95,7 @@ interface AdminDashboardShellProps {
 
 const NAV_ITEMS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'typography', label: 'Typography & Sizing', icon: Type },
   { id: 'projects', label: 'Projects', icon: Building2 },
   { id: 'services', label: 'Services', icon: Compass },
   { id: 'studio', label: 'About Studio', icon: Info },
@@ -372,6 +384,15 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === 'typography' && (
+            <TypographyManager
+              settings={settings}
+              onChange={setSettings}
+              onNotify={notify}
+              onDirtyChange={setIsDirty}
+            />
           )}
 
           {activeTab === 'projects' && (

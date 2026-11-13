@@ -22,11 +22,20 @@ export interface ReviewItem {
 interface CinematicReviewsProps {
   id?: string
   reviews: ReviewItem[]
+  kicker?: string
+  heading1?: string
+  heading2?: string
 }
 
 const AUTO_PLAY_MS = 7000
 
-export function CinematicReviews({ id = 'reviews', reviews }: CinematicReviewsProps) {
+export function CinematicReviews({
+  id = 'reviews',
+  reviews,
+  kicker = 'Client reviews',
+  heading1 = 'Client',
+  heading2 = 'reviews',
+}: CinematicReviewsProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const frameRef = useRef<HTMLDivElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -177,10 +186,10 @@ export function CinematicReviews({ id = 'reviews', reviews }: CinematicReviewsPr
       <div className="container reviews-container">
         <header className="reviews-section-header">
           <div className="section-kicker">
-            ( 05 ) <span>Client reviews</span>
+            ( 05 ) <span>{kicker}</span>
           </div>
           <h2>
-            Client <em>reviews</em>
+            {heading1} <em>{heading2}</em>
           </h2>
         </header>
 

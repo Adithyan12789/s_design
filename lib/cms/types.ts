@@ -73,6 +73,7 @@ export type CmsStudioInfo = {
   mission: string
   history: string
   studioImages: string[]
+  studioImage?: string
   teamMembers: StudioTeamMember[]
   extraSections: StudioExtraSection[]
 }
@@ -96,6 +97,30 @@ export type CmsTestimonial = {
   status: ProjectStatus
 }
 
+export type CmsTypographySettings = {
+  display: string
+  body: string
+  heroTitleSize?: string
+  heroSubtitleSize?: string
+  studioHeadingSize?: string
+  studioBodySize?: string
+  workTitleSize?: string
+  workDescSize?: string
+  workDescGap?: string
+  workSlideGap?: string
+  workImageScale?: string
+  approachHeadingSize?: string
+  approachBodySize?: string
+  servicesTitleSize?: string
+  reviewsHeadingSize?: string
+  reviewsClientHeadingSize?: string
+  reviewsDescSize?: string
+  reviewsCenterCardScale?: string
+  contactHeadingSize?: string
+  contactBodySize?: string
+  kickerSize?: string
+}
+
 export type CmsWebsiteSettings = {
   studioName: string
   studioSubtitle: string
@@ -113,10 +138,7 @@ export type CmsWebsiteSettings = {
     bronze: string
     bronzeLight: string
   }
-  typography: {
-    display: string
-    body: string
-  }
+  typography: CmsTypographySettings
   email: string
   phone: string
   whatsapp: string

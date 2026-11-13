@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Save, Plus, Trash2, Upload, Search, Loader2, ShieldCheck } from 'lucide-react'
+import { Save, Plus, Trash2, Upload, Search, Loader2, ShieldCheck, Sliders, Type } from 'lucide-react'
 import type {
   CmsStudioInfo,
   CmsWebsiteSettings,
+  CmsTypographySettings,
   CmsHomepageContent,
   CmsSeoSetting,
   CmsMediaAsset,
@@ -112,6 +113,19 @@ export function StudioManager({
             value={form.introText}
             onChange={(e) => updateField('introText', e.target.value)}
             className="admin-textarea"
+          />
+        </div>
+
+        <div>
+          <ImageField
+            label="Studio Note Image (Left Side)"
+            value={form.studioImage || ''}
+            onChange={(url) => updateField('studioImage', url)}
+            onOpenPicker={() =>
+              onPickImage((url) => {
+                updateField('studioImage', url)
+              })
+            }
           />
         </div>
 
@@ -412,6 +426,563 @@ export function BrandingManager({
   )
 }
 
+function SizingControl({
+  label,
+  sublabel,
+  value,
+  defaultValue,
+  min,
+  max,
+  step = 1,
+  unit = 'px',
+  onChange,
+}: {
+  label: string
+  sublabel?: string
+  value?: string
+  defaultValue: string
+  min: number
+  max: number
+  step?: number
+  unit?: string
+  onChange: (val: string) => void
+}) {
+  const currentVal = value || defaultValue
+  const numeric = parseFloat(currentVal)
+  const sliderVal = Number.isFinite(numeric) ? Math.min(Math.max(numeric, min), max) : min
+
+  return (
+    <div className="bg-[#faf8f5] p-3.5 rounded-lg border border-[#e6dfd3] flex flex-col justify-between gap-2.5">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <label className="text-xs font-semibold text-[#1c1a17] leading-tight block">{label}</label>
+          {sublabel && (
+            <span className="text-[11px] text-[#7c7367] leading-tight block mt-0.5">
+              {sublabel}
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange(defaultValue)}
+          className="text-[10px] text-[#b68d54] hover:underline shrink-0"
+          title="Reset to default"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={sliderVal}
+          onChange={(e) =>
+            onChange(unit === '' ? String(e.target.value) : `${e.target.value}${unit}`)
+          }
+          className="flex-1 accent-[#b68d54] cursor-pointer h-1.5 bg-[#dfd7c9] rounded-lg"
+        />
+        <input
+          type="text"
+          value={currentVal}
+          onChange={(e) => onChange(e.target.value)}
+          className="admin-input text-xs w-28 text-center font-mono py-1 px-1.5"
+          placeholder={defaultValue}
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ===========================
+   TYPOGRAPHY & SIZING MANAGER
+   =========================== */
+export function TypographyManager({
+  settings,
+  onChange,
+  onNotify,
+  onDirtyChange,
+}: Omit<CommonProps, 'onPickImage'> & {
+  settings: CmsWebsiteSettings
+  onChange: (val: CmsWebsiteSettings) => void
+}) {
+  const [form, setForm] = useState<CmsWebsiteSettings>(settings)
+  const [saving, setSaving] = useState(false)
+
+  const typo = form.typography || {}
+
+  function updateTypo<K extends keyof CmsTypographySettings>(key: K, value: string) {
+    const nextTypo = { ...form.typography, [key]: value }
+    setForm((prev) => ({ ...prev, typography: nextTypo }))
+    onDirtyChange(true)
+  }
+
+  function applyPreset(preset: 'default' | 'compact' | 'bold') {
+    let nextTypo: CmsTypographySettings
+    if (preset === 'default') {
+      nextTypo = {
+        ...form.typography,
+        heroTitleSize: 'clamp(62px, 9.5vw, 145px)',
+        heroSubtitleSize: '14px',
+        studioHeadingSize: 'clamp(42px, 5.3vw, 78px)',
+        studioBodySize: '14px',
+        workTitleSize: 'clamp(25px, 2.4vw, 36px)',
+        workDescSize: 'clamp(13px, 1.05vw, 15px)',
+        workDescGap: '44px',
+        workSlideGap: 'calc(50vw - 380px)',
+        workImageScale: '1',
+        approachHeadingSize: 'clamp(54px, 6.2vw, 96px)',
+        approachBodySize: '14px',
+        servicesTitleSize: 'clamp(25px, 3.3vw, 46px)',
+        reviewsHeadingSize: 'clamp(36px, 4.8vw, 68px)',
+        reviewsClientHeadingSize: 'clamp(28px, 3.8vw, 54px)',
+        reviewsDescSize: '14.5px',
+        reviewsCenterCardScale: '1',
+        contactHeadingSize: 'clamp(62px, 8vw, 118px)',
+        contactBodySize: '14px',
+        kickerSize: '10px',
+      }
+    } else if (preset === 'compact') {
+      nextTypo = {
+        ...form.typography,
+        heroTitleSize: 'clamp(48px, 7vw, 108px)',
+        heroSubtitleSize: '13px',
+        studioHeadingSize: 'clamp(34px, 4.2vw, 60px)',
+        studioBodySize: '13px',
+        workTitleSize: 'clamp(20px, 1.9vw, 28px)',
+        workDescSize: '13px',
+        workDescGap: '32px',
+        workSlideGap: 'calc(50vw - 420px)',
+        workImageScale: '0.9',
+        approachHeadingSize: 'clamp(42px, 5vw, 76px)',
+        approachBodySize: '13px',
+        servicesTitleSize: 'clamp(22px, 2.8vw, 38px)',
+        reviewsHeadingSize: 'clamp(30px, 4vw, 54px)',
+        reviewsClientHeadingSize: 'clamp(24px, 3vw, 42px)',
+        reviewsDescSize: '13px',
+        reviewsCenterCardScale: '0.88',
+        contactHeadingSize: 'clamp(50px, 6.5vw, 92px)',
+        contactBodySize: '13px',
+        kickerSize: '9px',
+      }
+    } else {
+      nextTypo = {
+        ...form.typography,
+        heroTitleSize: 'clamp(72px, 11vw, 168px)',
+        heroSubtitleSize: '16px',
+        studioHeadingSize: 'clamp(50px, 6.4vw, 92px)',
+        studioBodySize: '15.5px',
+        workTitleSize: 'clamp(30px, 3vw, 46px)',
+        workDescSize: '15.5px',
+        workDescGap: '58px',
+        workSlideGap: 'calc(50vw - 320px)',
+        workImageScale: '1.1',
+        approachHeadingSize: 'clamp(64px, 7.5vw, 115px)',
+        approachBodySize: '15.5px',
+        servicesTitleSize: 'clamp(30px, 3.8vw, 54px)',
+        reviewsHeadingSize: 'clamp(44px, 5.8vw, 84px)',
+        reviewsClientHeadingSize: 'clamp(34px, 4.6vw, 64px)',
+        reviewsDescSize: '16px',
+        reviewsCenterCardScale: '1.12',
+        contactHeadingSize: 'clamp(74px, 9.5vw, 138px)',
+        contactBodySize: '15.5px',
+        kickerSize: '11px',
+      }
+    }
+    setForm((prev) => ({ ...prev, typography: nextTypo }))
+    onDirtyChange(true)
+    onNotify(`Applied ${preset} typography preset. Click Save to persist.`)
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to save typography settings')
+      onChange(form)
+      onDirtyChange(false)
+      onNotify('Typography and section sizing settings saved.')
+    } catch (err) {
+      onNotify(err instanceof Error ? err.message : 'Save failed', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSave} className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="admin-serif text-3xl text-[#1c1a17]">Typography &amp; Sizing Engine</h2>
+          <p className="text-xs text-[#7c7367] mt-0.5">
+            Full granular control over typography, font sizes, work image scale, section gaps, and review card dimensions across the site.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button type="submit" disabled={saving} className="admin-btn-primary">
+            <Save className="w-4 h-4" />
+            {saving ? 'Saving...' : 'Save Typography'}
+          </button>
+        </div>
+      </div>
+
+      {/* Quick Presets Bar */}
+      <div className="admin-card p-4 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-[#faf8f5] to-[#f4eee4] border border-[#dfd7c9]">
+        <div>
+          <span className="text-xs font-semibold text-[#1c1a17] uppercase tracking-wider">
+            Quick Presets:
+          </span>
+          <span className="text-xs text-[#7c7367] ml-2">
+            Instantly apply balanced typographic scales
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => applyPreset('compact')}
+            className="px-3 py-1.5 text-xs rounded border border-[#dfd7c9] bg-white text-[#1c1a17] hover:bg-[#ede7dc] transition-colors"
+          >
+            Compact Minimal
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('default')}
+            className="px-3 py-1.5 text-xs rounded border border-[#b68d54] bg-[#b68d54]/10 text-[#7a5a2d] font-medium hover:bg-[#b68d54]/20 transition-colors"
+          >
+            Editorial Luxury (Default)
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('bold')}
+            className="px-3 py-1.5 text-xs rounded border border-[#dfd7c9] bg-white text-[#1c1a17] hover:bg-[#ede7dc] transition-colors"
+          >
+            Large / Bold
+          </button>
+        </div>
+      </div>
+
+      {/* SECTION 1: GLOBAL TYPOGRAPHY & FONTS */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Type className="w-4 h-4 text-[#b68d54]" />
+          Global Typography &amp; Font Families
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="admin-label">Serif Display Font (Headings)</label>
+            <input
+              type="text"
+              value={typo.display || "Georgia, 'Times New Roman', serif"}
+              onChange={(e) => updateTypo('display', e.target.value)}
+              className="admin-input text-xs"
+              placeholder="Georgia, serif"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Sans Body Font (Paragraphs)</label>
+            <input
+              type="text"
+              value={typo.body || 'Arial, Helvetica, sans-serif'}
+              onChange={(e) => updateTypo('body', e.target.value)}
+              className="admin-input text-xs"
+              placeholder="Arial, sans-serif"
+            />
+          </div>
+          <div>
+            <SizingControl
+              label="Global Kicker / Index Size"
+              sublabel="e.g. ( 01 ) Studio note, ( 03 ) Our approach"
+              value={typo.kickerSize}
+              defaultValue="10px"
+              min={8}
+              max={16}
+              step={0.5}
+              unit="px"
+              onChange={(val) => updateTypo('kickerSize', val)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 2: HERO SECTION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          Hero Section Typography
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SizingControl
+            label="Hero Main Title Size"
+            sublabel="'Spaces with quiet presence'"
+            value={typo.heroTitleSize}
+            defaultValue="clamp(62px, 9.5vw, 145px)"
+            min={48}
+            max={160}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('heroTitleSize', val)}
+          />
+          <SizingControl
+            label="Hero Subtitle / Description Size"
+            sublabel="Paragraph at bottom left of hero"
+            value={typo.heroSubtitleSize}
+            defaultValue="14px"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('heroSubtitleSize', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 3: ( 01 ) STUDIO NOTE */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 01 ) Studio Note Typography
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SizingControl
+            label="Studio Heading Font Size"
+            sublabel="Editorial title on right side"
+            value={typo.studioHeadingSize}
+            defaultValue="clamp(42px, 5.3vw, 78px)"
+            min={32}
+            max={96}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('studioHeadingSize', val)}
+          />
+          <SizingControl
+            label="Studio Description Text Size"
+            sublabel="Paragraph below heading"
+            value={typo.studioBodySize}
+            defaultValue="14px"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('studioBodySize', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 4: ( 02 ) SELECTED WORKS HORIZONTAL EXHIBITION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 02 ) Selected Works Exhibition (Card Sizing &amp; Spacing)
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <SizingControl
+            label="Work Name / Title Size"
+            sublabel="Work title displayed on top of image"
+            value={typo.workTitleSize}
+            defaultValue="clamp(25px, 2.4vw, 36px)"
+            min={18}
+            max={56}
+            step={1}
+            unit="px"
+            onChange={(val) => updateTypo('workTitleSize', val)}
+          />
+          <SizingControl
+            label="Work Description Size"
+            sublabel="Short summary displayed below image"
+            value={typo.workDescSize}
+            defaultValue="clamp(13px, 1.05vw, 15px)"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('workDescSize', val)}
+          />
+          <SizingControl
+            label="Gap: Image to Description"
+            sublabel="Vertical space between image &amp; description"
+            value={typo.workDescGap}
+            defaultValue="clamp(32px, 4vw, 56px)"
+            min={16}
+            max={90}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('workDescGap', val)}
+          />
+          <SizingControl
+            label="Gap Between Works"
+            sublabel="Horizontal spacing between cards"
+            value={typo.workSlideGap}
+            defaultValue="calc(50vw - 380px)"
+            min={20}
+            max={180}
+            step={4}
+            unit="px"
+            onChange={(val) => updateTypo('workSlideGap', val)}
+          />
+          <SizingControl
+            label="Work Image Scale Factor"
+            sublabel="Overall card multiplier (e.g. 1.0 = standard, 1.1 = larger)"
+            value={typo.workImageScale}
+            defaultValue="1"
+            min={0.7}
+            max={1.35}
+            step={0.05}
+            unit=""
+            onChange={(val) => updateTypo('workImageScale', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 5: ( 03 ) OUR APPROACH */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 03 ) Our Approach Section
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SizingControl
+            label="Approach Heading Size"
+            sublabel="'Less, but better'"
+            value={typo.approachHeadingSize}
+            defaultValue="clamp(54px, 6.2vw, 96px)"
+            min={36}
+            max={110}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('approachHeadingSize', val)}
+          />
+          <SizingControl
+            label="Approach Description Size"
+            sublabel="Paragraph text"
+            value={typo.approachBodySize}
+            defaultValue="14px"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('approachBodySize', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 6: ( 04 ) SERVICES SECTION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 04 ) Services Section Typography
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SizingControl
+            label="Service Title Size"
+            sublabel="Row titles (e.g. Residential architecture)"
+            value={typo.servicesTitleSize}
+            defaultValue="clamp(25px, 3.3vw, 46px)"
+            min={20}
+            max={56}
+            step={1}
+            unit="px"
+            onChange={(val) => updateTypo('servicesTitleSize', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 7: ( 05 ) CLIENT REVIEWS */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 05 ) Client Reviews Section (Card &amp; Typography)
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <SizingControl
+            label="Section Heading Size"
+            sublabel="'Client reviews'"
+            value={typo.reviewsHeadingSize}
+            defaultValue="clamp(36px, 4.8vw, 68px)"
+            min={24}
+            max={80}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('reviewsHeadingSize', val)}
+          />
+          <SizingControl
+            label="Client Name Size"
+            sublabel="Client name on left card"
+            value={typo.reviewsClientHeadingSize}
+            defaultValue="clamp(28px, 3.8vw, 54px)"
+            min={18}
+            max={64}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('reviewsClientHeadingSize', val)}
+          />
+          <SizingControl
+            label="Review Description Size"
+            sublabel="Project summary / quote paragraph"
+            value={typo.reviewsDescSize}
+            defaultValue="14.5px"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('reviewsDescSize', val)}
+          />
+          <SizingControl
+            label="Center Video Card Scale"
+            sublabel="Middle floating testimonial card size"
+            value={typo.reviewsCenterCardScale}
+            defaultValue="1"
+            min={0.7}
+            max={1.3}
+            step={0.02}
+            unit=""
+            onChange={(val) => updateTypo('reviewsCenterCardScale', val)}
+          />
+        </div>
+      </div>
+
+      {/* SECTION 8: ( 06 ) CONTACT SECTION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 06 ) Contact Section Typography
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SizingControl
+            label="Contact Heading Size"
+            sublabel="'Have a place in mind?'"
+            value={typo.contactHeadingSize}
+            defaultValue="clamp(62px, 8vw, 118px)"
+            min={40}
+            max={130}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('contactHeadingSize', val)}
+          />
+          <SizingControl
+            label="Contact Description &amp; Details Size"
+            sublabel="Intro copy &amp; email/address lines"
+            value={typo.contactBodySize}
+            defaultValue="14px"
+            min={11}
+            max={22}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('contactBodySize', val)}
+          />
+        </div>
+      </div>
+    </form>
+  )
+}
+
 /* ===========================
    CONTACT INFORMATION MANAGER
    =========================== */
@@ -633,6 +1204,7 @@ export function HomepageManager({
         </button>
       </div>
 
+      {/* HERO SECTION */}
       <div className="admin-card p-6 space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
           Hero Section
@@ -665,6 +1237,36 @@ export function HomepageManager({
               className="admin-input"
             />
           </div>
+          <div>
+            <label className="admin-label">Studio Name Watermark</label>
+            <input
+              type="text"
+              value={form.heroStudioName}
+              onChange={(e) => updateField('heroStudioName', e.target.value)}
+              className="admin-input"
+              placeholder="S_DE_SIGN"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Studio Subtitle</label>
+            <input
+              type="text"
+              value={form.heroStudioSubtitle}
+              onChange={(e) => updateField('heroStudioSubtitle', e.target.value)}
+              className="admin-input"
+              placeholder="ARCHITECTURE & SPATIAL PRACTICE"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Index Counter Text</label>
+            <input
+              type="text"
+              value={form.heroIndexText}
+              onChange={(e) => updateField('heroIndexText', e.target.value)}
+              className="admin-input"
+              placeholder="01 / 04"
+            />
+          </div>
         </div>
         <div>
           <label className="admin-label">Hero Description</label>
@@ -683,31 +1285,147 @@ export function HomepageManager({
         />
       </div>
 
+      {/* SELECTED WORKS ARCHIVE HEADER */}
       <div className="admin-card p-6 space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
-          Initiate a Project CTA &amp; Contact Section
+          Selected Works Exhibition Header
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="admin-label">Initiate Heading</label>
+            <label className="admin-label">Section Kicker / Title</label>
+            <input
+              type="text"
+              value={form.selectedWorkKicker}
+              onChange={(e) => updateField('selectedWorkKicker', e.target.value)}
+              className="admin-input"
+              placeholder="SELECTED WORKS ARCHIVE"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Subheading / Years</label>
+            <input
+              type="text"
+              value={form.selectedWorkHeading}
+              onChange={(e) => updateField('selectedWorkHeading', e.target.value)}
+              className="admin-input"
+              placeholder="2021 — 2024"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ( 03 ) OUR APPROACH */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
+          ( 03 ) Our Approach Section
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="admin-label">Section Kicker</label>
+            <input
+              type="text"
+              value={form.approachKicker}
+              onChange={(e) => updateField('approachKicker', e.target.value)}
+              className="admin-input"
+              placeholder="Our approach"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Heading Line 1</label>
+            <input
+              type="text"
+              value={form.approachHeading1}
+              onChange={(e) => updateField('approachHeading1', e.target.value)}
+              className="admin-input"
+              placeholder="Less, but"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Heading Line 2 (Accent)</label>
+            <input
+              type="text"
+              value={form.approachHeading2}
+              onChange={(e) => updateField('approachHeading2', e.target.value)}
+              className="admin-input"
+              placeholder="better."
+            />
+          </div>
+        </div>
+        <div>
+          <label className="admin-label">Approach Description</label>
+          <textarea
+            rows={3}
+            value={form.approachDescription}
+            onChange={(e) => updateField('approachDescription', e.target.value)}
+            className="admin-textarea"
+          />
+        </div>
+        <ImageField
+          label="Approach Portrait Left-Side Image"
+          value={form.approachImageUrl}
+          onChange={(url) => updateField('approachImageUrl', url)}
+          onOpenPicker={() => onPickImage((url) => updateField('approachImageUrl', url))}
+        />
+      </div>
+
+      {/* INITIATE A PROJECT STRIP */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
+          Initiate a Project Banner
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="admin-label">Kicker</label>
+            <input
+              type="text"
+              value={form.initiateKicker}
+              onChange={(e) => updateField('initiateKicker', e.target.value)}
+              className="admin-input"
+              placeholder="( INITIATE A PROJECT )"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Heading</label>
             <input
               type="text"
               value={form.initiateHeading}
               onChange={(e) => updateField('initiateHeading', e.target.value)}
               className="admin-input"
+              placeholder="INITIATE A PROJECT"
             />
           </div>
           <div>
-            <label className="admin-label">Initiate Button Label</label>
+            <label className="admin-label">Subtitle</label>
+            <input
+              type="text"
+              value={form.initiateSubtitle}
+              onChange={(e) => updateField('initiateSubtitle', e.target.value)}
+              className="admin-input"
+              placeholder="Have a site or idea in mind?"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Button Label</label>
             <input
               type="text"
               value={form.initiateCtaLabel}
               onChange={(e) => updateField('initiateCtaLabel', e.target.value)}
               className="admin-input"
+              placeholder="Begin a conversation"
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="admin-label">Initiate Description</label>
+            <label className="admin-label">Button Href (e.g. #contact)</label>
+            <input
+              type="text"
+              value={form.initiateCtaHref}
+              onChange={(e) => updateField('initiateCtaHref', e.target.value)}
+              className="admin-input"
+              placeholder="#contact"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="admin-label">Description</label>
             <textarea
               rows={2}
               value={form.initiateDescription}
@@ -715,50 +1433,15 @@ export function HomepageManager({
               className="admin-textarea"
             />
           </div>
-          <div>
-            <label className="admin-label">Contact Heading Line 1</label>
-            <input
-              type="text"
-              value={form.contactHeading1}
-              onChange={(e) => updateField('contactHeading1', e.target.value)}
-              className="admin-input"
-            />
-          </div>
-          <div>
-            <label className="admin-label">Contact Heading Line 2</label>
-            <input
-              type="text"
-              value={form.contactHeading2}
-              onChange={(e) => updateField('contactHeading2', e.target.value)}
-              className="admin-input"
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="admin-label">Contact Description</label>
-            <textarea
-              rows={2}
-              value={form.contactDescription}
-              onChange={(e) => updateField('contactDescription', e.target.value)}
-              className="admin-textarea"
-            />
-          </div>
         </div>
       </div>
 
+      {/* SERVICES & REVIEWS SECTION HEADERS */}
       <div className="admin-card p-6 space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
-          Approach &amp; Section Headings
+          Services &amp; Reviews Headers
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="admin-label">Selected Work Kicker</label>
-            <input
-              type="text"
-              value={form.selectedWorkKicker}
-              onChange={(e) => updateField('selectedWorkKicker', e.target.value)}
-              className="admin-input"
-            />
-          </div>
           <div>
             <label className="admin-label">Services Kicker</label>
             <input
@@ -766,6 +1449,17 @@ export function HomepageManager({
               value={form.servicesKicker}
               onChange={(e) => updateField('servicesKicker', e.target.value)}
               className="admin-input"
+              placeholder="What we do"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Services Subtitle Note</label>
+            <input
+              type="text"
+              value={form.servicesNote}
+              onChange={(e) => updateField('servicesNote', e.target.value)}
+              className="admin-input"
+              placeholder="From first sketch to final detail."
             />
           </div>
           <div>
@@ -775,24 +1469,78 @@ export function HomepageManager({
               value={form.reviewsKicker}
               onChange={(e) => updateField('reviewsKicker', e.target.value)}
               className="admin-input"
+              placeholder="Client reviews"
             />
           </div>
           <div>
-            <label className="admin-label">Reviews Heading 1</label>
+            <label className="admin-label">Reviews Heading Line 1</label>
             <input
               type="text"
               value={form.reviewsHeading1}
               onChange={(e) => updateField('reviewsHeading1', e.target.value)}
               className="admin-input"
+              placeholder="Quiet"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="admin-label">Reviews Heading Line 2 (Accent)</label>
+            <input
+              type="text"
+              value={form.reviewsHeading2}
+              onChange={(e) => updateField('reviewsHeading2', e.target.value)}
+              className="admin-input"
+              placeholder="appreciation."
             />
           </div>
         </div>
-        <ImageField
-          label="Approach Section Image"
-          value={form.approachImageUrl}
-          onChange={(url) => updateField('approachImageUrl', url)}
-          onOpenPicker={() => onPickImage((url) => updateField('approachImageUrl', url))}
-        />
+      </div>
+
+      {/* CONTACT SECTION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
+          Contact Section
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="admin-label">Contact Kicker</label>
+            <input
+              type="text"
+              value={form.contactKicker}
+              onChange={(e) => updateField('contactKicker', e.target.value)}
+              className="admin-input"
+              placeholder="Begin a project"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Heading Line 1</label>
+            <input
+              type="text"
+              value={form.contactHeading1}
+              onChange={(e) => updateField('contactHeading1', e.target.value)}
+              className="admin-input"
+              placeholder="Have a place"
+            />
+          </div>
+          <div>
+            <label className="admin-label">Heading Line 2 (Accent)</label>
+            <input
+              type="text"
+              value={form.contactHeading2}
+              onChange={(e) => updateField('contactHeading2', e.target.value)}
+              className="admin-input"
+              placeholder="in mind?"
+            />
+          </div>
+          <div className="sm:col-span-3">
+            <label className="admin-label">Contact Description</label>
+            <textarea
+              rows={2}
+              value={form.contactDescription}
+              onChange={(e) => updateField('contactDescription', e.target.value)}
+              className="admin-textarea"
+            />
+          </div>
+        </div>
       </div>
     </form>
   )

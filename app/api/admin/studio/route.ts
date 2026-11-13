@@ -31,6 +31,9 @@ export async function PATCH(request: Request) {
     mission: String(body.mission ?? ''),
     history: String(body.history ?? ''),
     studioImages: Array.isArray(body.studioImages) ? body.studioImages.map(String) : [],
+    studioImage: String(
+      body.studioImage || (Array.isArray(body.studioImages) && body.studioImages[0]) || ''
+    ),
     teamMembers: Array.isArray(body.teamMembers) ? body.teamMembers : [],
     extraSections: Array.isArray(body.extraSections) ? body.extraSections : [],
     updatedAt: now,
