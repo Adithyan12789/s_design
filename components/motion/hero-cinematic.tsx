@@ -15,6 +15,9 @@ type HeroCinematicProps = {
   description?: string
   indexText?: string
   imageUrl?: string
+  mediaType?: 'image' | 'video'
+  videoUrl?: string
+  posterUrl?: string
   targetSectionId?: string
   studioName?: string
   studioSubtitle?: string
@@ -27,6 +30,9 @@ export function HeroCinematic({
   description = 'We shape considered places for living, working and gathering — grounded in material, light and context.',
   indexText = '01 / 04',
   imageUrl = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90',
+  mediaType = 'image',
+  videoUrl,
+  posterUrl,
   targetSectionId = '#studio',
   studioName = 'S_DE_SIGN',
   studioSubtitle = 'ARCHITECTURE & SPATIAL PRACTICE',
@@ -346,17 +352,53 @@ export function HeroCinematic({
   const line1Words = titleLine1.split(' ')
   const line2Words = titleLine2.split(' ')
 
+  const isVideoUrlPattern = (url?: string) =>
+    Boolean(url && (/\.(mp4|webm|mov|ogg|m4v|mkv)($|\?)/i.test(url) || url.includes('/video/upload/')))
+
+  const activeVideoUrl =
+    (mediaType === 'video' && videoUrl) ||
+    videoUrl ||
+    (imageUrl && isVideoUrlPattern(imageUrl) ? imageUrl : undefined)
+
+  const isVideo =
+    Boolean(activeVideoUrl) &&
+    (mediaType === 'video' || Boolean(videoUrl) || isVideoUrlPattern(activeVideoUrl))
+
+  const posterImage =
+    posterUrl ||
+    (imageUrl && !isVideoUrlPattern(imageUrl) ? imageUrl : undefined)
+
   return (
     <div ref={wrapperRef} className="story-hero-wrapper" id="top">
       <section ref={pinnedRef} className="story-hero-pinned">
-        {/* Full-bleed Architectural Photograph (Clean on Stage 1) */}
+        {/* Full-bleed Architectural Photograph or Video (Clean on Stage 1) */}
         <div
           ref={imageRef}
-          className="story-hero-bg"
-          style={{ backgroundImage: `url(${imageUrl})` }}
+          className="story-hero-bg overflow-hidden"
+          style={!isVideo || !activeVideoUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
           role="img"
           aria-label="Contemporary minimalist architectural concrete residence"
-        />
+        >
+          {isVideo && activeVideoUrl && (
+            <video
+              key={activeVideoUrl}
+              ref={(el) => {
+                if (el) {
+                  el.muted = true
+                  el.play().catch(() => {})
+                }
+              }}
+              src={activeVideoUrl}
+              poster={posterImage}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="w-full h-full object-cover pointer-events-none"
+            />
+          )}
+        </div>
 
         {/* Natural Architectural Sunlight Sweep Layer */}
         <div ref={lightSweepRef} className="story-light-sweep" aria-hidden="true" />

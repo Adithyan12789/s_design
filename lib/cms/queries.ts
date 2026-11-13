@@ -191,9 +191,14 @@ export async function logAdminActivity(
 }
 
 export function revalidatePublicSite(slug?: string) {
-  revalidatePath('/')
-  revalidatePath('/work')
-  if (slug) {
-    revalidatePath(`/work/${slug}`)
+  try {
+    revalidatePath('/', 'page')
+    revalidatePath('/', 'layout')
+    revalidatePath('/work', 'page')
+    if (slug) {
+      revalidatePath(`/work/${slug}`, 'page')
+    }
+  } catch (err) {
+    console.warn('[CMS] Revalidation note:', err instanceof Error ? err.message : err)
   }
 }

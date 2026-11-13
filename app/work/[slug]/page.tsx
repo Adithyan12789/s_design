@@ -58,12 +58,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* Hero Section: Two-Column Architectural Case Study Layout */}
       <section className="detail-hero">
         <div className="detail-hero-media">
-          <img
-            src={project.mainImage}
-            alt={project.mainImageAlt || `${project.title} — ${project.location}`}
-            className="detail-hero-photo"
-            loading="eager"
-          />
+          {project.mainMediaType === 'video' && project.mainVideoUrl ? (
+            <video
+              src={project.mainVideoUrl}
+              poster={project.mainPosterUrl || project.mainImage || undefined}
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="detail-hero-photo w-full h-full object-cover"
+              aria-label={project.mainImageAlt || `${project.title} — ${project.location}`}
+            />
+          ) : (
+            <img
+              src={project.mainImage}
+              alt={project.mainImageAlt || `${project.title} — ${project.location}`}
+              className="detail-hero-photo"
+              loading="eager"
+            />
+          )}
         </div>
 
         <div className="detail-hero-copy">

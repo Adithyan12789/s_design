@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server'
 import { withAdminDb } from '@/lib/cms/api-helpers'
 import { logAdminActivity, revalidatePublicSite } from '@/lib/cms/queries'
 
+export const dynamic = 'force-dynamic'
+
+function isVideoUrl(url: string): boolean {
+  if (!url) return false
+  return Boolean(
+    url.match(/\.(mp4|webm|mov|ogg|m4v|mkv)($|\?)/i) ||
+      url.includes('/video/upload/') ||
+      url.startsWith('data:video/')
+  )
+}
+
 export async function GET() {
   const { db, errorResponse } = await withAdminDb()
   if (errorResponse || !db) return errorResponse!
@@ -20,12 +31,45 @@ export async function PATCH(request: Request) {
   const body = await request.json()
   const now = new Date().toISOString()
 
+  // 1. Resolve Hero Media
+  let heroVideo = String(body.heroVideoUrl ?? '').trim()
+  let heroImg = String(body.heroImageUrl ?? '').trim()
+  let heroType: 'image' | 'video' = body.heroMediaType === 'video' ? 'video' : 'image'
+
+  if (isVideoUrl(heroImg) && !heroVideo) {
+    heroVideo = heroImg
+    heroImg = ''
+    heroType = 'video'
+  } else if (heroVideo) {
+    if (body.heroMediaType === 'video' || !heroImg) {
+      heroType = 'video'
+    }
+  }
+
+  // 2. Resolve Approach Media
+  let approachVideo = String(body.approachVideoUrl ?? '').trim()
+  let approachImg = String(body.approachImageUrl ?? '').trim()
+  let approachType: 'image' | 'video' = body.approachMediaType === 'video' ? 'video' : 'image'
+
+  if (isVideoUrl(approachImg) && !approachVideo) {
+    approachVideo = approachImg
+    approachImg = ''
+    approachType = 'video'
+  } else if (approachVideo) {
+    if (body.approachMediaType === 'video' || !approachImg) {
+      approachType = 'video'
+    }
+  }
+
   const payload = {
     heroEyebrow: String(body.heroEyebrow ?? ''),
     heroTitleLine1: String(body.heroTitleLine1 ?? ''),
     heroTitleLine2: String(body.heroTitleLine2 ?? ''),
     heroDescription: String(body.heroDescription ?? ''),
-    heroImageUrl: String(body.heroImageUrl ?? ''),
+    heroImageUrl: heroImg,
+    heroMediaType: heroType,
+    heroVideoUrl: heroVideo,
+    heroPosterUrl: String(body.heroPosterUrl ?? ''),
     heroIndexText: String(body.heroIndexText ?? '01 / 04'),
     heroStudioName: String(body.heroStudioName ?? 'S_DE_SIGN'),
     heroStudioSubtitle: String(body.heroStudioSubtitle ?? ''),
@@ -35,7 +79,10 @@ export async function PATCH(request: Request) {
     approachHeading1: String(body.approachHeading1 ?? ''),
     approachHeading2: String(body.approachHeading2 ?? ''),
     approachDescription: String(body.approachDescription ?? ''),
-    approachImageUrl: String(body.approachImageUrl ?? ''),
+    approachImageUrl: approachImg,
+    approachMediaType: approachType,
+    approachVideoUrl: approachVideo,
+    approachPosterUrl: String(body.approachPosterUrl ?? ''),
     initiateKicker: String(body.initiateKicker ?? ''),
     initiateHeading: String(body.initiateHeading ?? ''),
     initiateSubtitle: String(body.initiateSubtitle ?? ''),
@@ -54,7 +101,7 @@ export async function PATCH(request: Request) {
     updatedAt: now,
   }
 
-  const result = await db.collection('homepage').findOneAndUpdate(
+  await db.collection('homepage').findOneAndUpdate(
     { _id: 'default' as unknown as never },
     { $set: payload, $setOnInsert: { createdAt: now } },
     { upsert: true, returnDocument: 'after' }
@@ -63,5 +110,5 @@ export async function PATCH(request: Request) {
   await logAdminActivity(actor.email, 'updated', 'homepage', 'Homepage Content')
   revalidatePublicSite()
 
-  return NextResponse.json({ homepage: payload })
+  return NextResponse.json({ homepage: payload, success: true })
 }

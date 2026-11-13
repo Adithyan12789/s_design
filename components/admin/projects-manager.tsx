@@ -13,14 +13,21 @@ import {
   Save,
   X,
   Image as ImageIcon,
+  Video as VideoIcon,
+  Play,
+  Upload,
 } from 'lucide-react'
-import type { CmsProject, CmsProjectImage, CmsMediaAsset } from '@/lib/cms/types'
+import type { CmsProject, CmsProjectGalleryItem, CmsMediaAsset } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
+import { MediaField } from './media-field'
 
 interface ProjectsManagerProps {
   projects: CmsProject[]
   onChange: (projects: CmsProject[]) => void
-  onPickImage: (cb: (url: string, alt?: string) => void) => void
+  onPickImage: (
+    cb: (url: string, alt?: string, asset?: CmsMediaAsset) => void,
+    filter?: 'all' | 'image' | 'video'
+  ) => void
   onNotify: (msg: string, type?: 'success' | 'error') => void
   onDirtyChange: (dirty: boolean) => void
 }
@@ -41,6 +48,9 @@ function emptyProject(order: number): CmsProject {
     fullDescription: '',
     mainImage: '',
     mainImageAlt: '',
+    mainMediaType: 'image',
+    mainVideoUrl: '',
+    mainPosterUrl: '',
     thumbnailImage: '',
     details: [],
     galleryImages: [],
@@ -172,9 +182,14 @@ export function ProjectsManager({
     setDeleteTarget(null)
   }
 
-  function addGalleryImage() {
+  function addGalleryMedia(filter: 'all' | 'image' | 'video' = 'all') {
     if (!editing) return
-    onPickImage((url, alt) => {
+    onPickImage((url, alt, asset) => {
+      const isVid =
+        filter === 'video' ||
+        asset?.type === 'video' ||
+        asset?.mimeType?.startsWith('video/') ||
+        /\.(mp4|webm|mov|ogg|m4v)$/i.test(url)
       setEditing((prev) =>
         prev
           ? {
@@ -182,17 +197,20 @@ export function ProjectsManager({
               galleryImages: [
                 ...prev.galleryImages,
                 {
-                  id: `temp-${Date.now()}`,
+                  id: `temp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
                   projectId: prev.id,
                   url,
                   altText: alt || prev.title,
+                  type: isVid ? 'video' : 'image',
+                  posterUrl: asset?.posterUrl || null,
+                  duration: asset?.duration || null,
                   displayOrder: prev.galleryImages.length,
                 },
               ],
             }
           : null
       )
-    })
+    }, filter)
   }
 
   function moveGalleryImage(index: number, dir: -1 | 1) {
@@ -339,88 +357,230 @@ export function ProjectsManager({
             </div>
 
             <div className="admin-card p-6 space-y-5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
-                  Gallery Images ({editing.galleryImages.length})
-                </h3>
-                <button type="button" onClick={addGalleryImage} className="admin-btn-secondary text-xs">
-                  <Plus className="w-3.5 h-3.5" />
-                  Add Gallery Image
-                </button>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
+                    Mixed Project Gallery ({editing.galleryImages.length})
+                  </h3>
+                  <p className="text-xs text-[#7c7367] mt-0.5">
+                    Combine architectural photos &amp; looping video clips.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => addGalleryMedia('image')}
+                    className="admin-btn-secondary text-xs"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    Add Image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addGalleryMedia('video')}
+                    className="admin-btn-bronze text-xs"
+                  >
+                    <VideoIcon className="w-3.5 h-3.5" />
+                    Add Video
+                  </button>
+                </div>
               </div>
 
               {editing.galleryImages.length === 0 ? (
-                <p className="text-xs text-[#7c7367] py-4 text-center border border-dashed border-[#dfd7c9] rounded-lg">
-                  No gallery images yet. Click &ldquo;Add Gallery Image&rdquo; to upload or select from Media Library.
+                <p className="text-xs text-[#7c7367] py-6 text-center border border-dashed border-[#dfd7c9] rounded-lg">
+                  No gallery items yet. Click &ldquo;Add Image&rdquo; or &ldquo;Add Video&rdquo; to add portfolio media.
                 </p>
               ) : (
-                <div className="space-y-3">
-                  {editing.galleryImages.map((img, idx) => (
-                    <div
-                      key={img.id}
-                      className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-lg border border-[#e6dfd3] bg-[#faf8f5]"
-                    >
-                      <img
-                        src={img.url}
-                        alt={img.altText || 'Gallery'}
-                        className="w-24 h-16 rounded object-cover bg-[#ede8de] shrink-0"
-                      />
-                      <div className="flex-1 w-full space-y-1.5">
-                        <input
-                          type="text"
-                          value={img.url}
-                          onChange={(e) => {
-                            const next = [...editing.galleryImages]
-                            next[idx] = { ...img, url: e.target.value }
-                            setEditing({ ...editing, galleryImages: next })
-                          }}
-                          className="admin-input text-xs py-1.5"
-                          placeholder="Image URL"
-                        />
-                        <input
-                          type="text"
-                          value={img.altText}
-                          onChange={(e) => {
-                            const next = [...editing.galleryImages]
-                            next[idx] = { ...img, altText: e.target.value }
-                            setEditing({ ...editing, galleryImages: next })
-                          }}
-                          className="admin-input text-xs py-1.5"
-                          placeholder="Alt text for accessibility & SEO"
-                        />
+                <div className="space-y-4">
+                  {editing.galleryImages.map((img, idx) => {
+                    const isVid =
+                      img.type === 'video' ||
+                      /\.(mp4|webm|mov|ogg|m4v)$/i.test(img.url)
+                    return (
+                      <div
+                        key={img.id}
+                        className="p-4 rounded-xl border border-[#e6dfd3] bg-[#faf8f5] space-y-3"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-[#8b8174]">
+                              Item #{idx + 1}
+                            </span>
+                            <div className="flex items-center gap-1 p-0.5 bg-[#ede8de] rounded border border-[#dfd7c9]">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = [...editing.galleryImages]
+                                  next[idx] = { ...img, type: 'image' }
+                                  setEditing({ ...editing, galleryImages: next })
+                                }}
+                                className={`px-2 py-0.5 text-[11px] rounded ${
+                                  !isVid ? 'bg-white font-medium text-[#1c1a17] shadow-sm' : 'text-[#7c7367]'
+                                }`}
+                              >
+                                Image
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const next = [...editing.galleryImages]
+                                  next[idx] = { ...img, type: 'video' }
+                                  setEditing({ ...editing, galleryImages: next })
+                                }}
+                                className={`px-2 py-0.5 text-[11px] rounded ${
+                                  isVid ? 'bg-white font-medium text-[#1c1a17] shadow-sm' : 'text-[#7c7367]'
+                                }`}
+                              >
+                                Video
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveGalleryImage(idx, -1)}
+                              disabled={idx === 0}
+                              className="p-1.5 rounded border border-[#dfd7c9] bg-white disabled:opacity-40"
+                              title="Move up"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveGalleryImage(idx, 1)}
+                              disabled={idx === editing.galleryImages.length - 1}
+                              className="p-1.5 rounded border border-[#dfd7c9] bg-white disabled:opacity-40"
+                              title="Move down"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditing({
+                                  ...editing,
+                                  galleryImages: editing.galleryImages.filter((_, i) => i !== idx),
+                                })
+                              }
+                              className="p-1.5 rounded border border-red-200 bg-red-50 text-red-700"
+                              title="Remove item"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 items-start">
+                          <div className="w-32 h-20 rounded-lg border border-[#dfd7c9] bg-[#161513] overflow-hidden shrink-0 flex items-center justify-center relative">
+                            {isVid ? (
+                              <video
+                                src={img.url}
+                                poster={img.posterUrl || undefined}
+                                preload="metadata"
+                                muted
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img
+                                src={img.url}
+                                alt={img.altText || 'Gallery'}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                            {isVid && (
+                              <span className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/80 text-[9px] text-white flex items-center gap-0.5">
+                                <Play className="w-2 h-2 fill-current" />
+                                Video
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex-1 w-full space-y-2">
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={img.url}
+                                onChange={(e) => {
+                                  const next = [...editing.galleryImages]
+                                  next[idx] = { ...img, url: e.target.value }
+                                  setEditing({ ...editing, galleryImages: next })
+                                }}
+                                className="admin-input text-xs flex-1"
+                                placeholder={isVid ? 'Video URL (.mp4, .webm, Cloudinary)' : 'Image URL'}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onPickImage(
+                                    (url, _alt, asset) => {
+                                      const next = [...editing.galleryImages]
+                                      next[idx] = {
+                                        ...img,
+                                        url,
+                                        type: isVid ? 'video' : 'image',
+                                        posterUrl: asset?.posterUrl || img.posterUrl,
+                                      }
+                                      setEditing({ ...editing, galleryImages: next })
+                                    },
+                                    isVid ? 'video' : 'image'
+                                  )
+                                }
+                                className="admin-btn-secondary text-xs shrink-0 py-1"
+                              >
+                                <Upload className="w-3.5 h-3.5" />
+                                Select
+                              </button>
+                            </div>
+
+                            {isVid && (
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={img.posterUrl || ''}
+                                  onChange={(e) => {
+                                    const next = [...editing.galleryImages]
+                                    next[idx] = { ...img, posterUrl: e.target.value }
+                                    setEditing({ ...editing, galleryImages: next })
+                                  }}
+                                  className="admin-input text-xs flex-1"
+                                  placeholder="Poster image URL (shown before playback)..."
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onPickImage(
+                                      (url) => {
+                                        const next = [...editing.galleryImages]
+                                        next[idx] = { ...img, posterUrl: url }
+                                        setEditing({ ...editing, galleryImages: next })
+                                      },
+                                      'image'
+                                    )
+                                  }
+                                  className="admin-btn-secondary text-xs shrink-0 py-1"
+                                >
+                                  Poster
+                                </button>
+                              </div>
+                            )}
+
+                            <input
+                              type="text"
+                              value={img.altText}
+                              onChange={(e) => {
+                                const next = [...editing.galleryImages]
+                                next[idx] = { ...img, altText: e.target.value }
+                                setEditing({ ...editing, galleryImages: next })
+                              }}
+                              className="admin-input text-xs py-1.5"
+                              placeholder="Alt text / description for accessibility & SEO"
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => moveGalleryImage(idx, -1)}
-                          disabled={idx === 0}
-                          className="p-1.5 rounded border border-[#dfd7c9] bg-white disabled:opacity-40"
-                        >
-                          <ArrowUp className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveGalleryImage(idx, 1)}
-                          disabled={idx === editing.galleryImages.length - 1}
-                          className="p-1.5 rounded border border-[#dfd7c9] bg-white disabled:opacity-40"
-                        >
-                          <ArrowDown className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditing({
-                              ...editing,
-                              galleryImages: editing.galleryImages.filter((_, i) => i !== idx),
-                            })
-                          }
-                          className="p-1.5 rounded border border-red-200 bg-red-50 text-red-700"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -470,42 +630,40 @@ export function ProjectsManager({
 
             <div className="admin-card p-6 space-y-4">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
-                Primary Images
+                Primary Presentation Media
               </h3>
-              <ImageField
-                label="Main / Hero Image"
-                value={editing.mainImage}
-                onChange={(url) => setEditing({ ...editing, mainImage: url })}
-                onOpenPicker={() =>
-                  onPickImage((url, alt) =>
-                    setEditing((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            mainImage: url,
-                            mainImageAlt: prev.mainImageAlt || alt || prev.title,
-                          }
-                        : null
-                    )
-                  )
-                }
+              <MediaField
+                label="Project Main Media (Hero)"
+                description="Choose whether the main architectural presentation is a high-resolution photograph or a video."
+                mediaType={editing.mainMediaType || 'image'}
+                imageUrl={editing.mainImage}
+                videoUrl={editing.mainVideoUrl || ''}
+                posterUrl={editing.mainPosterUrl || ''}
+                onMediaTypeChange={(type) => setEditing({ ...editing, mainMediaType: type })}
+                onImageUrlChange={(url) => setEditing({ ...editing, mainImage: url })}
+                onVideoUrlChange={(url) => setEditing({ ...editing, mainVideoUrl: url })}
+                onPosterUrlChange={(url) => setEditing({ ...editing, mainPosterUrl: url })}
+                onOpenPicker={onPickImage}
               />
               <div>
-                <label className="admin-label">Main Image Alt Text</label>
+                <label className="admin-label">Main Media Alt Text / Description</label>
                 <input
                   type="text"
                   value={editing.mainImageAlt}
                   onChange={(e) => setEditing({ ...editing, mainImageAlt: e.target.value })}
                   className="admin-input"
+                  placeholder="Architectural structure, materials, elevation..."
                 />
               </div>
               <ImageField
-                label="Secondary Inset Thumbnail"
+                label="Secondary Inset Thumbnail (Image Only)"
+                description="Compact square preview used across portfolio indexes."
                 value={editing.thumbnailImage}
                 onChange={(url) => setEditing({ ...editing, thumbnailImage: url })}
                 onOpenPicker={() =>
-                  onPickImage((url) =>
-                    setEditing((prev) => (prev ? { ...prev, thumbnailImage: url } : null))
+                  onPickImage(
+                    (url) => setEditing((prev) => (prev ? { ...prev, thumbnailImage: url } : null)),
+                    'image'
                   )
                 }
               />
@@ -599,9 +757,20 @@ export function ProjectsManager({
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-14 h-10 rounded bg-[#ede8de] overflow-hidden shrink-0 flex items-center justify-center">
-                        {p.mainImage ? (
-                          <img src={p.mainImage} alt={p.title} className="w-full h-full object-cover" />
+                      <div className="w-14 h-10 rounded bg-[#ede8de] overflow-hidden shrink-0 flex items-center justify-center relative shadow-sm">
+                        {p.thumbnailImage || p.mainPosterUrl || (p.mainImage && !p.mainImage.match(/\.(mp4|webm|mov|ogg|m4v)($|\?)/i)) ? (
+                          <img
+                            src={p.thumbnailImage || p.mainPosterUrl || p.mainImage}
+                            alt={p.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : p.mainVideoUrl || (p.mainImage && p.mainImage.match(/\.(mp4|webm|mov|ogg|m4v)($|\?)/i)) ? (
+                          <video
+                            src={p.mainVideoUrl || p.mainImage}
+                            muted
+                            preload="metadata"
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <ImageIcon className="w-4 h-4 text-[#9b9081]" />
                         )}
@@ -649,11 +818,11 @@ export function ProjectsManager({
                     </button>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <div className="inline-flex items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => openEditor(p)}
-                        className="admin-btn-secondary text-xs py-1.5 px-2.5"
+                        className="admin-btn-secondary admin-btn-sm"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                         Edit
@@ -661,7 +830,8 @@ export function ProjectsManager({
                       <button
                         type="button"
                         onClick={() => setDeleteTarget(p)}
-                        className="admin-btn-danger text-xs py-1.5 px-2.5"
+                        className="admin-btn-danger admin-btn-sm"
+                        title="Delete project"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

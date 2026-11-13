@@ -34,6 +34,11 @@ export async function PATCH(request: Request) {
     studioImage: String(
       body.studioImage || (Array.isArray(body.studioImages) && body.studioImages[0]) || ''
     ),
+    studioMediaType: (body.studioMediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
+    studioVideoUrl: String(body.studioVideoUrl ?? ''),
+    studioPosterUrl: String(body.studioPosterUrl ?? ''),
+    introVideoUrl: String(body.introVideoUrl ?? ''),
+    introVideoPoster: String(body.introVideoPoster ?? ''),
     teamMembers: Array.isArray(body.teamMembers) ? body.teamMembers : [],
     extraSections: Array.isArray(body.extraSections) ? body.extraSections : [],
     updatedAt: now,

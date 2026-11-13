@@ -1,7 +1,27 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Save, Plus, Trash2, Upload, Search, Loader2, ShieldCheck, Sliders, Type } from 'lucide-react'
+import { useState, useRef, DragEvent } from 'react'
+import {
+  Save,
+  Plus,
+  Trash2,
+  Upload,
+  Search,
+  Loader2,
+  ShieldCheck,
+  Sliders,
+  Type,
+  Video as VideoIcon,
+  Image as ImageIcon,
+  Play,
+  Film,
+  Edit3,
+  X,
+  Check,
+  Copy,
+  RefreshCw,
+  AlertTriangle,
+} from 'lucide-react'
 import type {
   CmsStudioInfo,
   CmsWebsiteSettings,
@@ -11,9 +31,13 @@ import type {
   CmsMediaAsset,
 } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
+import { MediaField } from './media-field'
 
 interface CommonProps {
-  onPickImage: (cb: (url: string, alt?: string) => void) => void
+  onPickImage: (
+    cb: (url: string, alt?: string, asset?: CmsMediaAsset) => void,
+    filter?: 'all' | 'image' | 'video'
+  ) => void
   onNotify: (msg: string, type?: 'success' | 'error') => void
   onDirtyChange: (dirty: boolean) => void
 }
@@ -116,18 +140,30 @@ export function StudioManager({
           />
         </div>
 
-        <div>
-          <ImageField
-            label="Studio Note Image (Left Side)"
-            value={form.studioImage || ''}
-            onChange={(url) => updateField('studioImage', url)}
-            onOpenPicker={() =>
-              onPickImage((url) => {
-                updateField('studioImage', url)
-              })
-            }
-          />
-        </div>
+        <MediaField
+          label="Studio Note Media (Left Side Card)"
+          description="Display either a high-resolution architectural photograph or a looping cinematic video."
+          mediaType={form.studioMediaType || 'image'}
+          imageUrl={form.studioImage || ''}
+          videoUrl={form.studioVideoUrl || ''}
+          posterUrl={form.studioPosterUrl || ''}
+          onMediaTypeChange={(type) => updateField('studioMediaType', type)}
+          onImageUrlChange={(url) => updateField('studioImage', url)}
+          onVideoUrlChange={(url) => updateField('studioVideoUrl', url)}
+          onPosterUrlChange={(url) => updateField('studioPosterUrl', url)}
+          onOpenPicker={onPickImage}
+        />
+
+        <MediaField
+          label="Studio Presentation / Introduction Video"
+          description="Editorial studio introduction video with custom poster thumbnail."
+          mediaType="video"
+          videoUrl={form.introVideoUrl || ''}
+          posterUrl={form.introVideoPoster || ''}
+          onVideoUrlChange={(url) => updateField('introVideoUrl', url)}
+          onPosterUrlChange={(url) => updateField('introVideoPoster', url)}
+          onOpenPicker={onPickImage}
+        />
 
         <div>
           <label className="admin-label">Studio Description</label>
@@ -1163,7 +1199,7 @@ export function HomepageManager({
   const [form, setForm] = useState<CmsHomepageContent>(homepage)
   const [saving, setSaving] = useState(false)
 
-  function updateField<K extends keyof CmsHomepageContent>(key: K, value: string) {
+  function updateField<K extends keyof CmsHomepageContent>(key: K, value: any) {
     setForm((prev) => ({ ...prev, [key]: value }))
     onDirtyChange(true)
   }
@@ -1179,9 +1215,11 @@ export function HomepageManager({
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to save homepage content')
-      onChange(form)
+      const updated = data.homepage || form
+      setForm(updated)
+      onChange(updated)
       onDirtyChange(false)
-      onNotify('Homepage copy and images updated.')
+      onNotify('Homepage content and media updated successfully.')
     } catch (err) {
       onNotify(err instanceof Error ? err.message : 'Save failed', 'error')
     } finally {
@@ -1277,11 +1315,18 @@ export function HomepageManager({
             className="admin-textarea"
           />
         </div>
-        <ImageField
-          label="Hero Background Image"
-          value={form.heroImageUrl}
-          onChange={(url) => updateField('heroImageUrl', url)}
-          onOpenPicker={() => onPickImage((url) => updateField('heroImageUrl', url))}
+        <MediaField
+          label="Hero Background Media"
+          description="High-resolution architecture image or cinematic looping background video. Hero cinematic layout is fully preserved."
+          mediaType={form.heroMediaType || 'image'}
+          imageUrl={form.heroImageUrl || ''}
+          videoUrl={form.heroVideoUrl || ''}
+          posterUrl={form.heroPosterUrl || ''}
+          onMediaTypeChange={(type) => updateField('heroMediaType', type)}
+          onImageUrlChange={(url) => updateField('heroImageUrl', url)}
+          onVideoUrlChange={(url) => updateField('heroVideoUrl', url)}
+          onPosterUrlChange={(url) => updateField('heroPosterUrl', url)}
+          onOpenPicker={onPickImage}
         />
       </div>
 
@@ -1360,11 +1405,18 @@ export function HomepageManager({
             className="admin-textarea"
           />
         </div>
-        <ImageField
-          label="Approach Portrait Left-Side Image"
-          value={form.approachImageUrl}
-          onChange={(url) => updateField('approachImageUrl', url)}
-          onOpenPicker={() => onPickImage((url) => updateField('approachImageUrl', url))}
+        <MediaField
+          label="Approach Left-Side Media"
+          description="Portrait architectural photograph or looping video for the approach showcase."
+          mediaType={form.approachMediaType || 'image'}
+          imageUrl={form.approachImageUrl || ''}
+          videoUrl={form.approachVideoUrl || ''}
+          posterUrl={form.approachPosterUrl || ''}
+          onMediaTypeChange={(type) => updateField('approachMediaType', type)}
+          onImageUrlChange={(url) => updateField('approachImageUrl', url)}
+          onVideoUrlChange={(url) => updateField('approachVideoUrl', url)}
+          onPosterUrlChange={(url) => updateField('approachPosterUrl', url)}
+          onOpenPicker={onPickImage}
         />
       </div>
 
@@ -1732,22 +1784,54 @@ export function MediaLibraryManager({
   onChange: (list: CmsMediaAsset[]) => void
   onNotify: (msg: string, type?: 'success' | 'error') => void
 }) {
+  const [filterTab, setFilterTab] = useState<'all' | 'image' | 'video'>('all')
   const [search, setSearch] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [editingAsset, setEditingAsset] = useState<CmsMediaAsset | null>(null)
+  const [replaceTarget, setReplaceTarget] = useState<CmsMediaAsset | null>(null)
+  const [deleteWarning, setDeleteWarning] = useState<{
+    asset: CmsMediaAsset
+    usages: string[]
+  } | null>(null)
+
   const fileRef = useRef<HTMLInputElement>(null)
+  const replaceFileRef = useRef<HTMLInputElement>(null)
+
+  const isVideoAsset = (m: CmsMediaAsset) => {
+    return (
+      m.type === 'video' ||
+      m.mimeType?.startsWith('video/') ||
+      /\.(mp4|webm|mov|ogg|m4v)$/i.test(m.publicUrl)
+    )
+  }
 
   const filtered = media.filter((m) => {
+    const isVid = isVideoAsset(m)
+    if (filterTab === 'image' && isVid) return false
+    if (filterTab === 'video' && !isVid) return false
+
     const q = search.toLowerCase().trim()
     if (!q) return true
-    return m.fileName.toLowerCase().includes(q) || m.altText.toLowerCase().includes(q)
+    return (
+      m.fileName.toLowerCase().includes(q) ||
+      m.altText.toLowerCase().includes(q) ||
+      m.publicUrl.toLowerCase().includes(q)
+    )
   })
 
-  async function handleUpload(files: FileList | null) {
+  async function handleUpload(files: FileList | File[] | null) {
     if (!files || files.length === 0) return
+    const fileList = Array.from(files)
     setUploading(true)
+    setUploadProgress(`Uploading ${fileList.length} file(s)...`)
+
     try {
       const added: CmsMediaAsset[] = []
-      for (const file of Array.from(files)) {
+      for (let i = 0; i < fileList.length; i++) {
+        const file = fileList[i]
+        setUploadProgress(`Uploading (${i + 1}/${fileList.length}): ${file.name}`)
         const fd = new FormData()
         fd.append('file', file)
         fd.append('altText', file.name.replace(/\.[^.]+$/, ''))
@@ -1765,60 +1849,145 @@ export function MediaLibraryManager({
           width: row.width ?? null,
           height: row.height ?? null,
           altText: row.altText ?? row.alt_text ?? '',
+          type: row.type ?? (row.mimeType?.startsWith('video/') ? 'video' : 'image'),
+          publicId: row.publicId ?? null,
+          posterUrl: row.posterUrl ?? null,
+          duration: row.duration ?? null,
           createdAt: row.createdAt ?? row.created_at,
         })
       }
       onChange([...added, ...media])
-      onNotify(`Uploaded ${added.length} image(s) via Multer.`)
+      onNotify(`Uploaded ${added.length} media asset(s).`)
     } catch (err) {
       onNotify(err instanceof Error ? err.message : 'Upload failed', 'error')
     } finally {
       setUploading(false)
+      setUploadProgress(null)
     }
   }
 
-  async function handleDelete(item: CmsMediaAsset) {
-    const res = await fetch(`/api/admin/media?id=${encodeURIComponent(item.id)}`, {
-      method: 'DELETE',
-    })
-    const data = await res.json().catch(() => ({}))
-    if (res.status === 409) {
-      const proceed = confirm(
-        `This image is currently used in:\n- ${(data.usages || []).join('\n- ')}\n\nDelete anyway?`
-      )
-      if (!proceed) return
-      const forced = await fetch(`/api/admin/media?id=${encodeURIComponent(item.id)}&force=true`, {
-        method: 'DELETE',
-      })
-      if (forced.ok) {
-        onChange(media.filter((m) => m.id !== item.id))
-        onNotify('Media asset deleted.')
+  async function handleReplace(files: FileList | null) {
+    if (!replaceTarget || !files || files.length === 0) return
+    const file = files[0]
+    setUploading(true)
+    setUploadProgress(`Replacing ${replaceTarget.fileName}...`)
+
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('altText', replaceTarget.altText || file.name.replace(/\.[^.]+$/, ''))
+
+      const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Replace upload failed')
+      const row = data.asset
+      const replacement: CmsMediaAsset = {
+        id: row.id,
+        storagePath: row.storagePath ?? row.storage_path,
+        publicUrl: row.publicUrl ?? row.public_url,
+        fileName: row.fileName ?? row.file_name,
+        mimeType: row.mimeType ?? row.mime_type,
+        fileSize: row.fileSize ?? row.file_size,
+        width: row.width ?? null,
+        height: row.height ?? null,
+        altText: row.altText ?? row.alt_text ?? '',
+        type: row.type ?? (row.mimeType?.startsWith('video/') ? 'video' : 'image'),
+        publicId: row.publicId ?? null,
+        posterUrl: row.posterUrl ?? null,
+        duration: row.duration ?? null,
+        createdAt: row.createdAt ?? row.created_at,
       }
+
+      // Delete the previous asset now that it is replaced
+      await fetch(`/api/admin/media?id=${encodeURIComponent(replaceTarget.id)}&force=true`, {
+        method: 'DELETE',
+      }).catch(() => null)
+
+      onChange([replacement, ...media.filter((m) => m.id !== replaceTarget.id)])
+      onNotify(`Replaced asset "${replaceTarget.fileName}".`)
+      setReplaceTarget(null)
+    } catch (err) {
+      onNotify(err instanceof Error ? err.message : 'Replace failed', 'error')
+    } finally {
+      setUploading(false)
+      setUploadProgress(null)
+    }
+  }
+
+  async function handleSaveMetadata(asset: CmsMediaAsset) {
+    try {
+      const res = await fetch('/api/admin/media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: asset.id,
+          fileName: asset.fileName,
+          altText: asset.altText,
+          posterUrl: asset.posterUrl,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to update metadata')
+      onChange(media.map((m) => (m.id === asset.id ? { ...m, ...asset } : m)))
+      onNotify('Media metadata updated.')
+      setEditingAsset(null)
+    } catch (err) {
+      onNotify(err instanceof Error ? err.message : 'Update failed', 'error')
+    }
+  }
+
+  async function handleDelete(item: CmsMediaAsset, force = false) {
+    const res = await fetch(
+      `/api/admin/media?id=${encodeURIComponent(item.id)}${force ? '&force=true' : ''}`,
+      { method: 'DELETE' }
+    )
+    const data = await res.json().catch(() => ({}))
+    if (res.status === 409 && !force) {
+      setDeleteWarning({
+        asset: item,
+        usages: Array.isArray(data.usages) ? data.usages : ['Unknown content'],
+      })
       return
     }
+
     if (res.ok) {
       onChange(media.filter((m) => m.id !== item.id))
-      onNotify('Media asset deleted.')
+      onNotify('Media asset permanently deleted.')
+      setDeleteWarning(null)
     } else {
       onNotify(data.error || 'Failed to delete asset.', 'error')
     }
   }
 
+  function formatDuration(sec?: number | null) {
+    if (!sec || isNaN(sec)) return null
+    const mins = Math.floor(sec / 60)
+    const remaining = Math.round(sec % 60)
+    return `${mins}:${remaining.toString().padStart(2, '0')}`
+  }
+
+  function formatSize(bytes: number) {
+    if (!bytes) return '0 KB'
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    return `${Math.round(bytes / 1024)} KB`
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="admin-serif text-3xl text-[#1c1a17]">Media Library</h2>
           <p className="text-xs text-[#7c7367] mt-0.5">
-            Persistent Supabase Storage uploads with safe-delete reference checks.
+            Cloudinary &amp; Atlas persistent media management with video support and safe-delete verification.
           </p>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
           <input
             ref={fileRef}
             type="file"
             multiple
-            accept="image/*"
+            accept="image/*,video/mp4,video/webm,video/quicktime,video/*"
             className="hidden"
             onChange={(e) => handleUpload(e.target.files)}
           />
@@ -1836,65 +2005,346 @@ export function MediaLibraryManager({
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Upload Images
+                Upload Images / Videos
               </>
             )}
           </button>
         </div>
       </div>
 
-      <div className="relative max-w-md">
-        <Search className="w-4 h-4 text-[#8b8174] absolute left-3 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search media..."
-          className="admin-input pl-9"
-        />
+      {/* Hidden file input for Replace action */}
+      <input
+        ref={replaceFileRef}
+        type="file"
+        accept="image/*,video/mp4,video/webm,video/quicktime,video/*"
+        className="hidden"
+        onChange={(e) => handleReplace(e.target.files)}
+      />
+
+      {/* Drag & Drop Upload Zone */}
+      <div
+        onDragOver={(e) => {
+          e.preventDefault()
+          setIsDragging(true)
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault()
+          setIsDragging(false)
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+          setIsDragging(false)
+          if (e.dataTransfer.files) handleUpload(e.dataTransfer.files)
+        }}
+        className={`p-6 border-2 border-dashed rounded-xl text-center transition-all ${
+          isDragging
+            ? 'border-[#b68d54] bg-[#b68d54]/10'
+            : 'border-[#dfd7c9] bg-white hover:border-[#b68d54]/60'
+        }`}
+      >
+        <Film className="w-8 h-8 mx-auto mb-2 text-[#9b9081]" />
+        <p className="text-sm font-medium text-[#1c1a17]">Drag &amp; drop media files here</p>
+        <p className="text-xs text-[#7c7367] mt-0.5">
+          Supports JPG, PNG, WebP, AVIF, SVG, MP4, WebM, and MOV up to 100MB
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filtered.map((item) => (
-          <div key={item.id} className="admin-card overflow-hidden flex flex-col">
-            <div className="aspect-[4/3] bg-[#ede8de]">
-              <img
-                src={item.publicUrl}
-                alt={item.altText || item.fileName}
-                className="w-full h-full object-cover"
-              />
+      {uploadProgress && (
+        <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-800 flex items-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>{uploadProgress}</span>
+        </div>
+      )}
+
+      {/* Filter Tabs & Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 p-1 bg-[#ede8de] rounded-lg border border-[#dfd7c9]">
+          <button
+            type="button"
+            onClick={() => setFilterTab('all')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              filterTab === 'all'
+                ? 'bg-white text-[#161513] shadow-sm font-semibold'
+                : 'text-[#6e6456] hover:text-[#161513]'
+            }`}
+          >
+            All Media ({media.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterTab('image')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              filterTab === 'image'
+                ? 'bg-white text-[#161513] shadow-sm font-semibold'
+                : 'text-[#6e6456] hover:text-[#161513]'
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            Images ({media.filter((m) => !isVideoAsset(m)).length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterTab('video')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
+              filterTab === 'video'
+                ? 'bg-white text-[#161513] shadow-sm font-semibold'
+                : 'text-[#6e6456] hover:text-[#161513]'
+            }`}
+          >
+            <VideoIcon className="w-3.5 h-3.5" />
+            Videos ({media.filter((m) => isVideoAsset(m)).length})
+          </button>
+        </div>
+
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 text-[#8b8174] absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search filename or alt text..."
+            className="admin-input pl-9 text-xs"
+          />
+        </div>
+      </div>
+
+      {/* Grid of Media Items */}
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 admin-card">
+          <ImageIcon className="w-10 h-10 mx-auto mb-2 text-[#9b9081] opacity-50" />
+          <p className="text-sm font-medium text-[#1c1a17]">No media assets found</p>
+          <p className="text-xs text-[#7c7367] mt-1">Upload assets above to display them in this library.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filtered.map((item) => {
+            const isVid = isVideoAsset(item)
+            const durationLabel = formatDuration(item.duration)
+            return (
+              <div key={item.id} className="admin-card overflow-hidden flex flex-col group">
+                <div className="aspect-[4/3] bg-[#161513] relative overflow-hidden flex items-center justify-center">
+                  {isVid ? (
+                    <video
+                      src={item.publicUrl}
+                      poster={item.posterUrl || undefined}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={item.publicUrl}
+                      alt={item.altText || item.fileName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
+
+                  <span
+                    className={`absolute top-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase ${
+                      isVid ? 'bg-amber-600 text-white' : 'bg-black/70 text-white'
+                    }`}
+                  >
+                    {isVid ? (
+                      <span className="flex items-center gap-1">
+                        <Play className="w-2.5 h-2.5 fill-current" />
+                        Video {durationLabel && `(${durationLabel})`}
+                      </span>
+                    ) : (
+                      'Image'
+                    )}
+                  </span>
+                </div>
+
+                <div className="p-3 flex-1 flex flex-col justify-between gap-2.5 bg-white">
+                  <div>
+                    <p className="text-xs font-semibold text-[#1c1a17] truncate" title={item.fileName}>
+                      {item.fileName}
+                    </p>
+                    {item.altText && (
+                      <p className="text-[11px] text-[#7c7367] truncate mt-0.5 italic">
+                        &ldquo;{item.altText}&rdquo;
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between text-[11px] text-[#8b8174] mt-1.5 pt-1.5 border-t border-[#f0eae1]">
+                      <span>{formatSize(item.fileSize)}</span>
+                      {item.width && item.height && (
+                        <span>
+                          {item.width}×{item.height}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-1 pt-1 border-t border-[#f0eae1]">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.publicUrl)
+                          onNotify('Media URL copied to clipboard.')
+                        }}
+                        className="p-1.5 rounded hover:bg-[#ede8de] text-[#6e6456] transition-colors"
+                        title="Copy direct URL"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditingAsset(item)}
+                        className="p-1.5 rounded hover:bg-[#ede8de] text-[#6e6456] transition-colors"
+                        title="Edit metadata"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReplaceTarget(item)
+                          replaceFileRef.current?.click()
+                        }}
+                        className="p-1.5 rounded hover:bg-[#ede8de] text-[#6e6456] transition-colors"
+                        title="Replace media asset"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item)}
+                      className="p-1.5 rounded hover:bg-red-50 text-red-600 transition-colors"
+                      title="Delete asset"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Edit Metadata Modal */}
+      {editingAsset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-white border border-[#dfd7c9] shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#e6dfd3] pb-3">
+              <h3 className="admin-serif text-xl text-[#1c1a17]">Edit Media Details</h3>
+              <button
+                type="button"
+                onClick={() => setEditingAsset(null)}
+                className="p-1 text-[#7c7367] hover:text-[#1c1a17]"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <div className="p-3 flex-1 flex flex-col justify-between gap-2">
+
+            <div className="space-y-3">
               <div>
-                <p className="text-xs font-medium text-[#1c1a17] truncate">{item.fileName}</p>
-                <p className="text-[11px] text-[#7c7367]">
-                  {(item.fileSize / 1024).toFixed(0)} KB
-                </p>
+                <label className="admin-label">File Display Name</label>
+                <input
+                  type="text"
+                  value={editingAsset.fileName}
+                  onChange={(e) =>
+                    setEditingAsset({ ...editingAsset, fileName: e.target.value })
+                  }
+                  className="admin-input text-xs"
+                />
               </div>
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(item.publicUrl)
-                    onNotify('Image URL copied to clipboard.')
-                  }}
-                  className="text-[11px] text-[#8f6a37] hover:underline"
-                >
-                  Copy URL
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item)}
-                  className="text-red-600 hover:text-red-800 p-1"
-                  title="Delete asset"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+
+              <div>
+                <label className="admin-label">Alt Text / Description</label>
+                <input
+                  type="text"
+                  value={editingAsset.altText}
+                  onChange={(e) =>
+                    setEditingAsset({ ...editingAsset, altText: e.target.value })
+                  }
+                  placeholder="Architectural exterior, minimalist interior..."
+                  className="admin-input text-xs"
+                />
               </div>
+
+              {isVideoAsset(editingAsset) && (
+                <div>
+                  <label className="admin-label">Video Poster URL (Thumbnail)</label>
+                  <input
+                    type="text"
+                    value={editingAsset.posterUrl || ''}
+                    onChange={(e) =>
+                      setEditingAsset({ ...editingAsset, posterUrl: e.target.value })
+                    }
+                    placeholder="https://res.cloudinary.com/.../poster.jpg"
+                    className="admin-input text-xs"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#e6dfd3]">
+              <button
+                type="button"
+                onClick={() => setEditingAsset(null)}
+                className="admin-btn-secondary text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSaveMetadata(editingAsset)}
+                className="admin-btn-primary text-xs"
+              >
+                Save Details
+              </button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {/* Safe Delete Warning Modal */}
+      {deleteWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white border border-red-200 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center gap-3 text-red-600">
+              <AlertTriangle className="w-6 h-6 shrink-0" />
+              <h3 className="admin-serif text-xl text-[#1c1a17]">Cannot Delete in-use Media</h3>
+            </div>
+
+            <p className="text-xs text-[#6e6456]">
+              <strong>&ldquo;{deleteWarning.asset.fileName}&rdquo;</strong> is currently referenced across the studio website in the following locations:
+            </p>
+
+            <ul className="text-xs text-red-700 bg-red-50 p-3 rounded-lg border border-red-200 list-disc list-inside space-y-1 max-h-40 overflow-y-auto">
+              {deleteWarning.usages.map((u, i) => (
+                <li key={i}>{u}</li>
+              ))}
+            </ul>
+
+            <p className="text-[11px] text-[#7c7367]">
+              Deleting this asset now may cause broken images or missing videos on public pages.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#e6dfd3]">
+              <button
+                type="button"
+                onClick={() => setDeleteWarning(null)}
+                className="admin-btn-secondary text-xs"
+              >
+                Keep Asset Safe
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteWarning.asset, true)}
+                className="admin-btn-danger text-xs"
+              >
+                Force Delete Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

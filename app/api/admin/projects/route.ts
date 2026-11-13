@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { withAdminDb, slugify } from '@/lib/cms/api-helpers'
 import { logAdminActivity, revalidatePublicSite } from '@/lib/cms/queries'
-import type { CmsProjectImage } from '@/lib/cms/types'
+import type { CmsProjectGalleryItem } from '@/lib/cms/types'
 
 function normalizeGallery(
   projectId: string,
   galleryImages: unknown
-): CmsProjectImage[] {
+): CmsProjectGalleryItem[] {
   if (!Array.isArray(galleryImages)) return []
   return galleryImages
     .filter((img): img is Record<string, unknown> => Boolean(img && typeof img === 'object' && img.url))
@@ -17,7 +17,10 @@ function normalizeGallery(
       projectId,
       url: String(img.url),
       altText: String(img.altText || ''),
-      displayOrder: idx,
+      type: (img.type === 'video' ? 'video' : 'image') as 'image' | 'video',
+      posterUrl: img.posterUrl ? String(img.posterUrl) : null,
+      duration: typeof img.duration === 'number' ? img.duration : null,
+      displayOrder: typeof img.displayOrder === 'number' ? img.displayOrder : idx,
     }))
 }
 
@@ -72,6 +75,9 @@ export async function POST(request: Request) {
     fullDescription: String(body.fullDescription || ''),
     mainImage: String(body.mainImage || ''),
     mainImageAlt: String(body.mainImageAlt || title),
+    mainMediaType: (body.mainMediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
+    mainVideoUrl: String(body.mainVideoUrl || ''),
+    mainPosterUrl: String(body.mainPosterUrl || ''),
     thumbnailImage: String(body.thumbnailImage || body.mainImage || ''),
     details: Array.isArray(body.details) ? body.details.map(String) : [],
     galleryImages: normalizeGallery(id, body.galleryImages),
@@ -143,6 +149,9 @@ export async function PATCH(request: Request) {
     fullDescription: String(body.fullDescription || ''),
     mainImage: String(body.mainImage || ''),
     mainImageAlt: String(body.mainImageAlt || title),
+    mainMediaType: (body.mainMediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
+    mainVideoUrl: String(body.mainVideoUrl || ''),
+    mainPosterUrl: String(body.mainPosterUrl || ''),
     thumbnailImage: String(body.thumbnailImage || ''),
     details: Array.isArray(body.details) ? body.details.map(String) : [],
     galleryImages: normalizeGallery(id, body.galleryImages),

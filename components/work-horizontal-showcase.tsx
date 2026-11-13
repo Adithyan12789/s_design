@@ -456,9 +456,26 @@ export function WorkHorizontalShowcase({
                           ref={(el) => {
                             primaryImgRefs.current[index] = el
                           }}
-                          className="exhibition-frame-img"
-                          style={{ backgroundImage: `url(${project.image})` }}
-                        />
+                          className="exhibition-frame-img overflow-hidden"
+                          style={
+                            project.mainMediaType !== 'video' || !project.mainVideoUrl
+                              ? { backgroundImage: `url(${project.image})` }
+                              : undefined
+                          }
+                        >
+                          {project.mainMediaType === 'video' && project.mainVideoUrl && (
+                            <video
+                              src={project.mainVideoUrl}
+                              poster={project.mainPosterUrl || project.image}
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              preload="metadata"
+                              className="w-full h-full object-cover pointer-events-none"
+                            />
+                          )}
+                        </div>
                         <div className="exhibition-frame-vignette" />
                         <div className="exhibition-hover-pill">
                           <span>Open Case Study</span>

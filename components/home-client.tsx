@@ -39,6 +39,10 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
     description: p.shortDescription || p.fullDescription,
     details: p.details,
     gallery: p.galleryImages.map((img) => img.url),
+    mainMediaType: p.mainMediaType,
+    mainVideoUrl: p.mainVideoUrl,
+    mainPosterUrl: p.mainPosterUrl,
+    galleryItems: p.galleryImages,
   }))
 
   const visibleNav = navigation.filter((n) => n.visible && !n.isCta)
@@ -168,6 +172,9 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
         description={homepage.heroDescription}
         indexText={homepage.heroIndexText}
         imageUrl={homepage.heroImageUrl}
+        mediaType={homepage.heroMediaType}
+        videoUrl={homepage.heroVideoUrl}
+        posterUrl={homepage.heroPosterUrl}
         targetSectionId="#selected-work"
         studioName={homepage.heroStudioName || settings.studioName}
         studioSubtitle={homepage.heroStudioSubtitle}
@@ -181,17 +188,32 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
           <div className="section-kicker">
             ( 01 ) <span>{studioInfo.kicker || 'Studio note'}</span>
           </div>
-          <ParallaxImage
-            src={
-              studioInfo.studioImage ||
-              studioInfo.studioImages?.[0] ||
-              'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85'
-            }
-            alt="S_Designs Studio architecture and materiality"
-            className="intro-parallax-stage"
-            enableClipReveal
-            parallaxSpeed={10}
-          />
+          {studioInfo.studioMediaType === 'video' && studioInfo.studioVideoUrl ? (
+            <div className="intro-parallax-stage relative overflow-hidden rounded-lg">
+              <video
+                src={studioInfo.studioVideoUrl}
+                poster={studioInfo.studioPosterUrl || studioInfo.studioImage || undefined}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <ParallaxImage
+              src={
+                studioInfo.studioImage ||
+                studioInfo.studioImages?.[0] ||
+                'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85'
+              }
+              alt="S_Designs Studio architecture and materiality"
+              className="intro-parallax-stage"
+              enableClipReveal
+              parallaxSpeed={10}
+            />
+          )}
         </div>
 
         <div className="intro-copy">
@@ -240,13 +262,28 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
 
       {/* Statement Section with Architectural Parallax & Clip Reveal */}
       <section className="statement">
-        <ParallaxImage
-          src={homepage.approachImageUrl}
-          alt="Architectural stone structure and light aperture"
-          className="statement-parallax-stage"
-          enableClipReveal
-          parallaxSpeed={12}
-        />
+        {homepage.approachMediaType === 'video' && homepage.approachVideoUrl ? (
+          <div className="statement-parallax-stage relative overflow-hidden rounded-lg">
+            <video
+              src={homepage.approachVideoUrl}
+              poster={homepage.approachPosterUrl || homepage.approachImageUrl || undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <ParallaxImage
+            src={homepage.approachImageUrl}
+            alt="Architectural stone structure and light aperture"
+            className="statement-parallax-stage"
+            enableClipReveal
+            parallaxSpeed={12}
+          />
+        )}
 
         <div className="statement-copy">
           <div className="section-kicker">( 03 ) <span>{homepage.approachKicker}</span></div>

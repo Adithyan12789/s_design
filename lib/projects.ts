@@ -12,6 +12,17 @@ export type Project = {
   description: string
   details: string[]
   gallery: string[]
+  mainMediaType?: 'image' | 'video'
+  mainVideoUrl?: string
+  mainPosterUrl?: string
+  galleryItems?: {
+    id?: string
+    url: string
+    altText?: string
+    type?: 'image' | 'video'
+    posterUrl?: string | null
+    duration?: number | null
+  }[]
 }
 
 export const projects: Project[] = [

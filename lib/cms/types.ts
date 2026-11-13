@@ -1,12 +1,30 @@
 export type ProjectStatus = 'draft' | 'published'
+export type MediaType = 'image' | 'video'
+
+export type CmsMediaItem = {
+  type: MediaType
+  url: string
+  publicId?: string | null
+  alt?: string
+  posterUrl?: string | null
+  duration?: number | null
+  width?: number | null
+  height?: number | null
+  fileSize?: number | null
+}
 
 export type CmsProjectImage = {
   id: string
   projectId: string
   url: string
+  type?: MediaType
+  posterUrl?: string | null
+  duration?: number | null
   altText: string
   displayOrder: number
 }
+
+export type CmsProjectGalleryItem = CmsProjectImage
 
 export type CmsProject = {
   id: string
@@ -22,10 +40,13 @@ export type CmsProject = {
   shortDescription: string
   fullDescription: string
   mainImage: string
+  mainMediaType?: MediaType
+  mainVideoUrl?: string
+  mainPosterUrl?: string
   mainImageAlt: string
   thumbnailImage: string
   details: string[]
-  galleryImages: CmsProjectImage[]
+  galleryImages: CmsProjectGalleryItem[]
   displayOrder: number
   status: ProjectStatus
   featured: boolean
@@ -41,6 +62,9 @@ export type CmsService = {
   shortDescription: string
   fullDescription: string
   imageUrl: string
+  mediaType?: MediaType
+  videoUrl?: string
+  posterUrl?: string
   iconName: string
   displayOrder: number
   status: ProjectStatus
@@ -74,6 +98,11 @@ export type CmsStudioInfo = {
   history: string
   studioImages: string[]
   studioImage?: string
+  studioMediaType?: MediaType
+  studioVideoUrl?: string
+  studioPosterUrl?: string
+  introVideoUrl?: string
+  introVideoPoster?: string
   teamMembers: StudioTeamMember[]
   extraSections: StudioExtraSection[]
 }
@@ -159,6 +188,9 @@ export type CmsHomepageContent = {
   heroTitleLine2: string
   heroDescription: string
   heroImageUrl: string
+  heroMediaType?: MediaType
+  heroVideoUrl?: string
+  heroPosterUrl?: string
   heroIndexText: string
   heroStudioName: string
   heroStudioSubtitle: string
@@ -169,6 +201,9 @@ export type CmsHomepageContent = {
   approachHeading2: string
   approachDescription: string
   approachImageUrl: string
+  approachMediaType?: MediaType
+  approachVideoUrl?: string
+  approachPosterUrl?: string
   initiateKicker: string
   initiateHeading: string
   initiateSubtitle: string
@@ -199,15 +234,20 @@ export type CmsNavItem = {
 
 export type CmsMediaAsset = {
   id: string
+  type: MediaType
   storagePath: string
   publicUrl: string
+  publicId?: string | null
+  posterUrl?: string | null
   fileName: string
   mimeType: string
   fileSize: number
   width: number | null
   height: number | null
+  duration?: number | null
   altText: string
   createdAt: string
+  updatedAt?: string
 }
 
 export type CmsSeoSetting = {

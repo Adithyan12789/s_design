@@ -129,8 +129,9 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [pickerState, setPickerState] = useState<{
     open: boolean
-    cb: ((url: string, alt?: string) => void) | null
-  }>({ open: false, cb: null })
+    cb: ((url: string, alt?: string, asset?: CmsMediaAsset) => void) | null
+    defaultFilter?: 'all' | 'image' | 'video'
+  }>({ open: false, cb: null, defaultFilter: 'all' })
 
   function notify(msg: string, type: 'success' | 'error' = 'success') {
     setToast({ msg, type })
@@ -153,8 +154,11 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
     setMobileOpen(false)
   }
 
-  function openMediaPicker(cb: (url: string, alt?: string) => void) {
-    setPickerState({ open: true, cb })
+  function openMediaPicker(
+    cb: (url: string, alt?: string, asset?: CmsMediaAsset) => void,
+    filter: 'all' | 'image' | 'video' = 'all'
+  ) {
+    setPickerState({ open: true, cb, defaultFilter: filter })
   }
 
   async function handleLogout() {
@@ -498,8 +502,9 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
       <MediaPickerModal
         open={pickerState.open}
         media={media}
-        onClose={() => setPickerState({ open: false, cb: null })}
-        onSelect={(url, alt) => pickerState.cb?.(url, alt)}
+        defaultFilter={pickerState.defaultFilter}
+        onClose={() => setPickerState({ open: false, cb: null, defaultFilter: 'all' })}
+        onSelect={(url, alt, asset) => pickerState.cb?.(url, alt, asset)}
         onUploaded={(asset) => setMedia((prev) => [asset, ...prev])}
       />
     </div>

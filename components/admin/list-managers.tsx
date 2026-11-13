@@ -13,11 +13,15 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react'
-import type { CmsService, CmsTestimonial, CmsNavItem, CmsProject } from '@/lib/cms/types'
+import type { CmsService, CmsTestimonial, CmsNavItem, CmsProject, CmsMediaAsset } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
+import { MediaField } from './media-field'
 
 interface BaseListProps {
-  onPickImage: (cb: (url: string, alt?: string) => void) => void
+  onPickImage: (
+    cb: (url: string, alt?: string, asset?: CmsMediaAsset) => void,
+    filter?: 'all' | 'image' | 'video'
+  ) => void
   onNotify: (msg: string, type?: 'success' | 'error') => void
   onDirtyChange: (dirty: boolean) => void
 }
@@ -46,6 +50,9 @@ export function ServicesManager({
       shortDescription: '',
       fullDescription: '',
       imageUrl: '',
+      mediaType: 'image',
+      videoUrl: '',
+      posterUrl: '',
       iconName: '',
       displayOrder: services.length,
       status: 'published',
@@ -203,13 +210,18 @@ export function ServicesManager({
             />
           </div>
 
-          <ImageField
-            label="Service Image"
-            value={editing.imageUrl}
-            onChange={(url) => setEditing({ ...editing, imageUrl: url })}
-            onOpenPicker={() =>
-              onPickImage((url) => setEditing((prev) => (prev ? { ...prev, imageUrl: url } : null)))
-            }
+          <MediaField
+            label="Service Cover Media"
+            description="Choose an architectural photograph or looping video representing this discipline."
+            mediaType={editing.mediaType || 'image'}
+            imageUrl={editing.imageUrl || ''}
+            videoUrl={editing.videoUrl || ''}
+            posterUrl={editing.posterUrl || ''}
+            onMediaTypeChange={(type) => setEditing({ ...editing, mediaType: type })}
+            onImageUrlChange={(url) => setEditing({ ...editing, imageUrl: url })}
+            onVideoUrlChange={(url) => setEditing({ ...editing, videoUrl: url })}
+            onPosterUrlChange={(url) => setEditing({ ...editing, posterUrl: url })}
+            onOpenPicker={onPickImage}
           />
         </div>
       </form>
@@ -279,7 +291,7 @@ export function ServicesManager({
                   setEditing(s)
                   onDirtyChange(true)
                 }}
-                className="admin-btn-secondary text-xs py-1.5"
+                className="admin-btn-secondary admin-btn-sm"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit
@@ -287,7 +299,7 @@ export function ServicesManager({
               <button
                 type="button"
                 onClick={() => handleDelete(s)}
-                className="admin-btn-danger text-xs py-1.5"
+                className="admin-btn-danger admin-btn-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -538,17 +550,38 @@ export function TestimonialsManager({
           </div>
 
           <div className="pt-2 border-t border-[#e6dfd3] space-y-3">
-            <label className="admin-label">Testimonial Video (MP4 / WebM / MOV)</label>
+            <label className="admin-label">Client Video Testimonial (MP4 / WebM / MOV)</label>
             <div className="flex flex-col sm:flex-row gap-3 items-start">
               <input
                 type="text"
                 value={editing.videoUrl || ''}
                 onChange={(e) => setEditing({ ...editing, videoUrl: e.target.value })}
-                placeholder="/uploads/... or https://..."
+                placeholder="https://res.cloudinary.com/... or /uploads/..."
                 className="admin-input flex-1"
               />
+              <button
+                type="button"
+                onClick={() =>
+                  onPickImage(
+                    (url, _alt, asset) =>
+                      setEditing((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              videoUrl: url,
+                              posterImage: asset?.posterUrl || prev.posterImage,
+                            }
+                          : null
+                      ),
+                    'video'
+                  )
+                }
+                className="admin-btn-secondary text-xs shrink-0"
+              >
+                Choose from Library
+              </button>
               <label className="admin-btn-secondary text-xs cursor-pointer shrink-0">
-                {uploadingVideo ? 'Uploading Video...' : 'Upload Video'}
+                {uploadingVideo ? 'Uploading...' : 'Upload Video'}
                 <input
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime,video/ogg"
@@ -669,7 +702,7 @@ export function TestimonialsManager({
                   setEditing(t)
                   onDirtyChange(true)
                 }}
-                className="admin-btn-secondary text-xs py-1.5"
+                className="admin-btn-secondary admin-btn-sm"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit
@@ -677,7 +710,7 @@ export function TestimonialsManager({
               <button
                 type="button"
                 onClick={() => handleDelete(t)}
-                className="admin-btn-danger text-xs py-1.5"
+                className="admin-btn-danger admin-btn-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -949,7 +982,7 @@ export function NavigationManager({
                   setEditing(n)
                   onDirtyChange(true)
                 }}
-                className="admin-btn-secondary text-xs py-1.5"
+                className="admin-btn-secondary admin-btn-sm"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit
@@ -957,7 +990,7 @@ export function NavigationManager({
               <button
                 type="button"
                 onClick={() => handleDelete(n)}
-                className="admin-btn-danger text-xs py-1.5"
+                className="admin-btn-danger admin-btn-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
