@@ -48,25 +48,62 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const visibleNav = navigation.filter((n) => n.visible && !n.isCta)
   const ctaNav = navigation.find((n) => n.visible && n.isCta)
 
+  const isVideoFile = (url?: string | null) => {
+    if (!url) return false
+    const clean = url.split('?')[0].toLowerCase()
+    return (
+      clean.endsWith('.mp4') ||
+      clean.endsWith('.webm') ||
+      clean.endsWith('.mov') ||
+      clean.endsWith('.ogg') ||
+      clean.includes('/video/upload/')
+    )
+  }
+
+  const defaultReviewVideo =
+    '/uploads/1794576013976-acldi-150784-799174132_medium.mp4'
+
   const mappedReviews = testimonials.map((t) => {
     const linkedProject = t.projectId
       ? projects.find((p) => p.id === t.projectId || p.slug === t.projectId)
       : undefined
-    const poster =
-      t.posterImage ||
-      (t as { videoPoster?: string }).videoPoster ||
-      t.clientPhoto ||
+
+    let resolvedVideo = t.videoUrl?.trim() || ''
+    let resolvedPoster =
+      t.posterImage?.trim() ||
+      (t as { videoPoster?: string }).videoPoster?.trim() ||
+      t.clientPhoto?.trim() ||
       linkedProject?.mainImage ||
-      undefined
+      ''
+
+    // If posterImage was saved as a video URL, rescue it into videoUrl
+    if (!resolvedVideo && isVideoFile(resolvedPoster)) {
+      resolvedVideo = resolvedPoster
+      resolvedPoster = linkedProject?.mainImage || t.backgroundImage || ''
+    }
+
+    if (!resolvedVideo) {
+      resolvedVideo = defaultReviewVideo
+    }
+
+    if (isVideoFile(resolvedPoster)) {
+      resolvedPoster = linkedProject?.mainImage || t.backgroundImage || ''
+    }
+
+    const resolvedBackground =
+      t.backgroundImage?.trim() && !isVideoFile(t.backgroundImage)
+        ? t.backgroundImage.trim()
+        : linkedProject?.mainImage || resolvedPoster || undefined
+
     return {
       id: t.id,
       client: t.clientName,
       rating: t.rating,
       projectName: t.projectName || linkedProject?.title || '',
       projectDescription: t.projectDescription || t.quote || linkedProject?.shortDescription || '',
-      videoUrl: t.videoUrl || undefined,
-      posterImage: poster,
-      backgroundImage: t.backgroundImage || linkedProject?.mainImage || poster,
+      videoUrl: resolvedVideo,
+      posterImage: resolvedPoster || undefined,
+      backgroundImage: resolvedBackground,
     }
   })
 
@@ -332,9 +369,17 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       <CinematicReviews
         id="reviews"
         reviews={mappedReviews}
-        kicker={homepage.reviewsKicker}
-        heading1={homepage.reviewsHeading1}
-        heading2={homepage.reviewsHeading2}
+        kicker={homepage.reviewsKicker || 'Client reviews'}
+        heading1={
+          homepage.reviewsHeading1?.trim().toLowerCase() === 'quiet'
+            ? ''
+            : (homepage.reviewsHeading1 || '')
+        }
+        heading2={
+          homepage.reviewsHeading2?.trim().toLowerCase().replace('.', '') === 'appreciation'
+            ? ''
+            : (homepage.reviewsHeading2 || '')
+        }
       />
 
       {/* Contact Section */}

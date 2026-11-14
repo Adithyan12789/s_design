@@ -29,12 +29,24 @@ interface CinematicReviewsProps {
 
 const AUTO_PLAY_MS = 7000
 
+const isVideoFile = (url?: string | null) => {
+  if (!url) return false
+  const clean = url.split('?')[0].toLowerCase()
+  return (
+    clean.endsWith('.mp4') ||
+    clean.endsWith('.webm') ||
+    clean.endsWith('.mov') ||
+    clean.endsWith('.ogg') ||
+    clean.includes('/video/upload/')
+  )
+}
+
 export function CinematicReviews({
   id = 'reviews',
   reviews,
   kicker = 'Client reviews',
-  heading1 = 'Client',
-  heading2 = 'reviews',
+  heading1 = '',
+  heading2 = '',
 }: CinematicReviewsProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const frameRef = useRef<HTMLDivElement | null>(null)
@@ -52,9 +64,33 @@ export function CinematicReviews({
   const currentIndex = safeReviews.length > 0 ? activeIndex % safeReviews.length : 0
   const current = safeReviews[currentIndex]
 
-  const hasVideo = Boolean(current?.videoUrl && current.videoUrl.trim().length > 0 && videoErrorId !== current.id)
-  const posterSrc = current?.posterImage || current?.backgroundImage || ''
-  const backdropSrc = current?.backgroundImage || current?.posterImage || ''
+  // Clear error state whenever active testimonial changes
+  useEffect(() => {
+    setVideoErrorId(null)
+  }, [currentIndex])
+
+  const rawVideo = current?.videoUrl?.trim() || ''
+  const rawPoster = current?.posterImage?.trim() || ''
+
+  const videoSrc = useMemo(() => {
+    if (rawVideo) return rawVideo
+    if (rawPoster && isVideoFile(rawPoster)) return rawPoster
+    return '/uploads/1794576013976-acldi-150784-799174132_medium.mp4'
+  }, [rawVideo, rawPoster])
+
+  const posterSrc = useMemo(() => {
+    if (rawPoster && !isVideoFile(rawPoster)) return rawPoster
+    if (current?.backgroundImage && !isVideoFile(current.backgroundImage)) return current.backgroundImage
+    return ''
+  }, [rawPoster, current?.backgroundImage])
+
+  const backdropSrc = useMemo(() => {
+    if (current?.backgroundImage && !isVideoFile(current.backgroundImage)) return current.backgroundImage
+    if (rawPoster && !isVideoFile(rawPoster)) return rawPoster
+    return ''
+  }, [current?.backgroundImage, rawPoster])
+
+  const hasVideo = Boolean(videoSrc && videoErrorId !== current?.id)
 
   // Pause video when leaving viewport and resume muted autoplay when returning.
   useEffect(() => {
@@ -74,7 +110,7 @@ export function CinematicReviews({
           video.pause()
         } else if (visible && hasVideo && video.paused) {
           video.muted = true
-          video.play().catch(() => {})
+          video.play().then(() => setIsVideoPlaying(true)).catch(() => {})
         }
       },
       { threshold: 0.15 }
@@ -96,11 +132,15 @@ export function CinematicReviews({
     video.currentTime = 0
     video.muted = true
     if (isInViewport) {
-      video.play().catch(() => {
-        setIsVideoPlaying(false)
-      })
+      video.play()
+        .then(() => {
+          setIsVideoPlaying(true)
+        })
+        .catch(() => {
+          setIsVideoPlaying(false)
+        })
     }
-  }, [currentIndex, current?.videoUrl, hasVideo, isInViewport])
+  }, [currentIndex, videoSrc, hasVideo, isInViewport])
 
   // Auto-advance when idle and visible.
   useEffect(() => {
@@ -155,11 +195,18 @@ export function CinematicReviews({
     const video = videoRef.current
     if (!video || !hasVideo) return
     if (video.paused) {
+      video.muted = false
       try {
         await video.play()
         setIsVideoPlaying(true)
       } catch {
-        setIsVideoPlaying(false)
+        try {
+          video.muted = true
+          await video.play()
+          setIsVideoPlaying(true)
+        } catch {
+          setIsVideoPlaying(false)
+        }
       }
     } else {
       video.pause()
@@ -170,6 +217,10 @@ export function CinematicReviews({
   if (!current) return null
 
   const normalizedRating = Math.min(5, Math.max(1, Math.round(current.rating || 5)))
+  const showCustomHeading = Boolean(
+    (heading1?.trim() && heading1.trim().toLowerCase() !== 'quiet') ||
+    (heading2?.trim() && heading2.trim().toLowerCase().replace('.', '') !== 'appreciation')
+  )
 
   return (
     <section
@@ -188,9 +239,11 @@ export function CinematicReviews({
           <div className="section-kicker">
             ( 05 ) <span>{kicker}</span>
           </div>
-          <h2>
-            {heading1} <em>{heading2}</em>
-          </h2>
+          {showCustomHeading && (
+            <h2>
+              {heading1} {heading2 ? <em>{heading2}</em> : null}
+            </h2>
+          )}
         </header>
 
         <div ref={frameRef} className="reviews-editorial-frame">
@@ -314,8 +367,8 @@ export function CinematicReviews({
                 <>
                   <video
                     ref={videoRef}
-                    key={current.videoUrl}
-                    src={current.videoUrl}
+                    key={videoSrc}
+                    src={videoSrc}
                     poster={posterSrc || undefined}
                     autoPlay
                     muted
@@ -323,11 +376,11 @@ export function CinematicReviews({
                     loop
                     preload="auto"
                     controls
+                    onClick={handleTogglePlay}
                     onPlay={() => setIsVideoPlaying(true)}
                     onPause={() => setIsVideoPlaying(false)}
                     onError={() => {
                       setIsVideoPlaying(false)
-                      setVideoErrorId(current.id)
                     }}
                     className="reviews-video-element"
                     aria-label={`Video testimonial from ${current.client}`}

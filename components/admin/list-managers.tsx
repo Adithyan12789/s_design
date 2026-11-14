@@ -377,10 +377,20 @@ export function TestimonialsManager({
     if (!editing) return
     setSaving(true)
     try {
+      const isVideo = (url?: string | null) =>
+        Boolean(url && /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url.trim()))
+
+      const toSave = { ...editing }
+      // Auto-correct if user accidentally selected or pasted a video into posterImage
+      if (!toSave.videoUrl && isVideo(toSave.posterImage)) {
+        toSave.videoUrl = toSave.posterImage
+        toSave.posterImage = ''
+      }
+
       const res = await fetch('/api/admin/testimonials', {
-        method: editing.id ? 'PATCH' : 'POST',
+        method: toSave.id ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editing),
+        body: JSON.stringify(toSave),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to save review')
@@ -616,8 +626,9 @@ export function TestimonialsManager({
             value={editing.posterImage || ''}
             onChange={(url) => setEditing({ ...editing, posterImage: url })}
             onOpenPicker={() =>
-              onPickImage((url) =>
-                setEditing((prev) => (prev ? { ...prev, posterImage: url } : null))
+              onPickImage(
+                (url) => setEditing((prev) => (prev ? { ...prev, posterImage: url } : null)),
+                'image'
               )
             }
           />
@@ -627,8 +638,9 @@ export function TestimonialsManager({
             value={editing.backgroundImage || ''}
             onChange={(url) => setEditing({ ...editing, backgroundImage: url })}
             onOpenPicker={() =>
-              onPickImage((url) =>
-                setEditing((prev) => (prev ? { ...prev, backgroundImage: url } : null))
+              onPickImage(
+                (url) => setEditing((prev) => (prev ? { ...prev, backgroundImage: url } : null)),
+                'image'
               )
             }
           />

@@ -133,7 +133,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     quote:
       'A serene hillside courtyard home shaped in limewashed plaster, oak, and filtered daylight.',
     clientPhoto: '',
-    videoUrl: '',
+    videoUrl: '/uploads/1794572484006-an78r-demon-mask-samurai-live-wallpaper.mp4',
     posterImage:
       'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=85',
     backgroundImage:
@@ -155,7 +155,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     quote:
       'An intimate timber-and-stone gallery residence balancing quiet proportion with natural shadow.',
     clientPhoto: '',
-    videoUrl: '',
+    videoUrl: '/uploads/1794576013976-acldi-150784-799174132_medium.mp4',
     posterImage:
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=85',
     backgroundImage:
@@ -177,7 +177,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     quote:
       'A monolithic travertine sanctuary designed around framed landscape views and tactile stillness.',
     clientPhoto: '',
-    videoUrl: '',
+    videoUrl: '/uploads/1794576013976-acldi-150784-799174132_medium.mp4',
     posterImage:
       'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85',
     backgroundImage:
@@ -219,7 +219,7 @@ export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
     workDescGap: 'clamp(32px, 4vw, 56px)',
     workSlideGap: 'clamp(140px, 18vw, 270px)',
     workImageScale: '1',
-    workSecondaryImageSize: 'clamp(165px, 16.5vw, 255px)',
+    workSecondaryImageSize: 'clamp(185px, 17.5vw, 340px)',
     approachHeadingSize: 'clamp(54px, 6.2vw, 96px)',
     approachBodySize: '14px',
     servicesTitleSize: 'clamp(25px, 3.3vw, 46px)',
@@ -275,8 +275,8 @@ export const DEFAULT_HOMEPAGE: CmsHomepageContent = {
   servicesKicker: 'What we do',
   servicesNote: 'From first sketch to final detail.',
   reviewsKicker: 'Client reviews',
-  reviewsHeading1: 'Quiet',
-  reviewsHeading2: 'appreciation.',
+  reviewsHeading1: '',
+  reviewsHeading2: '',
   contactKicker: 'Begin a project',
   contactHeading1: 'Have a place',
   contactHeading2: 'in mind?',

@@ -878,9 +878,9 @@ export function TypographyManager({
             label="Secondary Detail Image Size"
             sublabel="Floating offset detail thumbnail width"
             value={typo.workSecondaryImageSize}
-            defaultValue="clamp(165px, 16.5vw, 255px)"
+            defaultValue="clamp(185px, 17.5vw, 340px)"
             min={120}
-            max={320}
+            max={420}
             step={5}
             unit="px"
             onChange={(val) => updateTypo('workSecondaryImageSize', val)}
@@ -1536,23 +1536,23 @@ export function HomepageManager({
             />
           </div>
           <div>
-            <label className="admin-label">Reviews Heading Line 1</label>
+            <label className="admin-label">Reviews Heading Line 1 (Optional)</label>
             <input
               type="text"
               value={form.reviewsHeading1}
               onChange={(e) => updateField('reviewsHeading1', e.target.value)}
               className="admin-input"
-              placeholder="Quiet"
+              placeholder="Leave empty for kicker only"
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="admin-label">Reviews Heading Line 2 (Accent)</label>
+            <label className="admin-label">Reviews Heading Line 2 Accent (Optional)</label>
             <input
               type="text"
               value={form.reviewsHeading2}
               onChange={(e) => updateField('reviewsHeading2', e.target.value)}
               className="admin-input"
-              placeholder="appreciation."
+              placeholder="Optional accent line"
             />
           </div>
         </div>
