@@ -236,8 +236,9 @@ export function CinematicReviews({
 
       <div className="container reviews-container">
         <header className="reviews-section-header">
-          <div className="section-kicker">
-            ( 05 ) <span>{kicker}</span>
+          <div className="section-kicker reviews-section-kicker">
+            <span className="reviews-kicker-num">( 05 )</span>
+            <span className="reviews-kicker-title">{kicker}</span>
           </div>
           {showCustomHeading && (
             <h2>
