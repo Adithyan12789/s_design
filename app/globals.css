@@ -2238,10 +2238,20 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 1440px) {
   :root {
     --slide-w: min(clamp(640px, 52vw, 1080px), 68vh);
+    --gap-work-slide: clamp(190px, 20vw, 340px);
     --size-work-secondary-image: clamp(215px, 17.5vw, 305px);
+  }
+  .exhibition-track {
+    gap: var(--gap-work-slide, clamp(190px, 20vw, 340px));
   }
   .exhibition-secondary-frame {
     width: var(--size-work-secondary-image, clamp(215px, 17.5vw, 305px));
+  }
+  .statement-parallax-stage {
+    width: 86%;
+    max-width: 520px;
+    aspect-ratio: 3 / 4.4;
+    max-height: 76vh;
   }
 }
 
@@ -2249,8 +2259,12 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 1680px) {
   :root {
     --slide-w: min(clamp(780px, 48vw, 1280px), 70vh);
-    --gap-work-slide: clamp(160px, 16vw, 320px);
+    --gap-work-slide: clamp(220px, 19vw, 390px);
     --size-work-secondary-image: clamp(250px, 16.5vw, 360px);
+  }
+
+  .exhibition-track {
+    gap: var(--gap-work-slide, clamp(220px, 19vw, 390px));
   }
 
   .exhibition-secondary-frame {
@@ -2341,6 +2355,12 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     max-width: 520px;
     font-size: 16px;
   }
+  .statement-parallax-stage {
+    width: 88%;
+    max-width: 560px;
+    aspect-ratio: 3 / 4.4;
+    max-height: 78vh;
+  }
 
   .service-row {
     padding: 32px 0;
@@ -2379,8 +2399,12 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 2200px) {
   :root {
     --slide-w: min(clamp(960px, 45vw, 1600px), 72vh);
-    --gap-work-slide: clamp(220px, 15vw, 420px);
+    --gap-work-slide: clamp(280px, 18vw, 490px);
     --size-work-secondary-image: clamp(310px, 14.5vw, 450px);
+  }
+
+  .exhibition-track {
+    gap: var(--gap-work-slide, clamp(280px, 18vw, 490px));
   }
 
   .exhibition-secondary-frame {
@@ -2482,6 +2506,12 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     max-width: 640px;
     font-size: 18px;
     line-height: 1.75;
+  }
+  .statement-parallax-stage {
+    width: 90%;
+    max-width: 680px;
+    aspect-ratio: 3 / 4.4;
+    max-height: 80vh;
   }
 
   .service-row {
