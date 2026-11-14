@@ -14,6 +14,8 @@ type WorkHorizontalShowcaseProps = {
   projects: Project[]
   kicker?: string
   heading?: string
+  slideGap?: string
+  secondaryImageSize?: string
 }
 
 const SLIDE_ASPECTS = [
@@ -30,6 +32,8 @@ export function WorkHorizontalShowcase({
   projects,
   kicker = 'SELECTED WORKS ARCHIVE',
   heading = '2021 — 2024',
+  slideGap,
+  secondaryImageSize,
 }: WorkHorizontalShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const stageRef = useRef<HTMLDivElement | null>(null)
@@ -410,7 +414,16 @@ export function WorkHorizontalShowcase({
 
         {/* Horizontal Parallax Gallery Track */}
         <div className="exhibition-viewport">
-          <div ref={trackRef} className="exhibition-track">
+          <div
+            ref={trackRef}
+            className="exhibition-track"
+            style={
+              {
+                ...(slideGap ? { '--gap-work-slide': slideGap } : {}),
+                ...(secondaryImageSize ? { '--size-work-secondary-image': secondaryImageSize } : {}),
+              } as React.CSSProperties
+            }
+          >
             {projects.map((project, index) => {
               const aspectClass = SLIDE_ASPECTS[index % SLIDE_ASPECTS.length]
               const secondaryImage = project.gallery[0] || project.image

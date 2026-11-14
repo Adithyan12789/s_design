@@ -1763,20 +1763,24 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   padding-top: 16px;
   padding-bottom: 24px;
 }
+:root {
+  --slide-w: min(clamp(540px, 58vw, 920px), 66vh);
+}
+
 .exhibition-track {
   display: flex;
   align-items: center;
-  gap: var(--gap-work-slide, clamp(120px, 16vw, 240px));
+  gap: var(--gap-work-slide, clamp(140px, 18vw, 270px));
   /* Center Slide 0 in viewport on initial SSR render */
-  padding-left: calc(50vw - min(clamp(270px, 29vw, 460px), 33vh));
-  padding-right: calc(50vw - min(clamp(270px, 29vw, 460px), 33vh));
+  padding-left: calc(50vw - (var(--slide-w) / 2));
+  padding-right: calc(50vw - (var(--slide-w) / 2));
   will-change: transform;
 }
 
 .exhibition-slide {
   position: relative;
   flex-shrink: 0;
-  width: min(clamp(540px, 58vw, 920px), 66vh);
+  width: var(--slide-w);
   transform: scale(var(--scale-work-image, 1));
   transform-origin: center center;
   will-change: opacity;
@@ -1918,7 +1922,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 /* Secondary Offset Architectural Detail Frame */
 .exhibition-secondary-frame {
   position: absolute;
-  width: clamp(140px, 14vw, 220px);
+  width: var(--size-work-secondary-image, clamp(165px, 16.5vw, 255px));
   z-index: 4;
   pointer-events: none;
   will-change: transform;
@@ -2121,7 +2125,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 /* Tablet Breakpoint (768px - 1023px) */
 @media (max-width: 1023px) {
   .exhibition-track {
-    gap: 14vw;
+    gap: var(--gap-work-slide-tablet, clamp(80px, 14vw, 140px));
     padding-left: calc(50vw - min(36vw, 29vh));
     padding-right: calc(50vw - min(36vw, 29vh));
   }
@@ -2132,7 +2136,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     margin-top: 32px;
   }
   .exhibition-secondary-frame {
-    width: 170px;
+    width: var(--size-work-secondary-image-tablet, 195px);
   }
   .work-directory-heading-row {
     grid-template-columns: 1fr;
@@ -2171,7 +2175,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .exhibition-track {
     flex-direction: column;
-    gap: clamp(72px, 12vw, 110px);
+    gap: clamp(64px, 14vw, 100px);
     padding: 0 6vw;
     width: 100%;
     transform: none !important;
@@ -2215,6 +2219,274 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 }
 .work-archive-page .work-empty-state .submit-button {
   margin: 0 auto;
+}
+
+/* ==========================================================================
+   Monitor & Large Screen Responsive Architecture (1440px, 1680px, 1920px+, 2560px+ QHD & 4K)
+   ========================================================================== */
+
+/* 1. Large Laptops & Standard Desktop Monitors (1440px - 1679px) */
+@media (min-width: 1440px) {
+  :root {
+    --slide-w: min(clamp(640px, 52vw, 1080px), 68vh);
+  }
+}
+
+/* 2. Full HD & Widescreen Desktop Monitors (1680px - 2199px) */
+@media (min-width: 1680px) {
+  :root {
+    --slide-w: min(clamp(780px, 48vw, 1280px), 70vh);
+    --gap-work-slide: clamp(160px, 16vw, 320px);
+    --size-work-secondary-image: clamp(200px, 15vw, 300px);
+  }
+
+  .site-header {
+    padding: 0 calc((100vw - 1520px) / 2);
+    height: 84px;
+  }
+
+  .section-pad {
+    padding: 150px calc((100vw - 1520px) / 2);
+  }
+
+  .story-hero-content {
+    padding: 22vh calc((100vw - 1520px) / 2) 8vh;
+  }
+  .cinematic-hero-title {
+    max-width: 1280px;
+  }
+  .cinematic-hero-bottom {
+    max-width: 960px;
+  }
+  .cinematic-hero-bottom p {
+    max-width: 380px;
+    font-size: 16px;
+  }
+  .cinematic-hero-index {
+    right: calc((100vw - 1520px) / 2);
+  }
+  .story-brand-reveal .story-brand-title {
+    font-size: clamp(110px, 10vw, 210px);
+  }
+
+  .intro-copy {
+    max-width: 960px;
+  }
+  .intro p {
+    max-width: 520px;
+    font-size: 16px;
+  }
+
+  .exhibition-top-bar {
+    padding: 22px calc((100vw - 1520px) / 2);
+    font-size: 11px;
+  }
+  .slide-project-title {
+    font-size: var(--font-size-work-title, clamp(32px, 2.2vw, 48px));
+  }
+  .slide-project-description {
+    max-width: 620px;
+    font-size: clamp(14px, 0.95vw, 17px);
+  }
+
+  .work-cta-strip {
+    padding: 140px calc((100vw - 1520px) / 2);
+  }
+  .cta-strip-copy h2 {
+    font-size: clamp(48px, 4vw, 76px);
+  }
+  .cta-strip-inner p {
+    max-width: 620px;
+    font-size: 17px;
+  }
+
+  .statement {
+    padding: 120px calc((100vw - 1520px) / 2);
+    gap: 96px;
+  }
+  .statement h2 {
+    font-size: clamp(64px, 5vw, 110px);
+  }
+  .statement-copy p {
+    max-width: 520px;
+    font-size: 16px;
+  }
+
+  .service-row {
+    padding: 32px 0;
+  }
+  .service-row h3 {
+    font-size: clamp(30px, 2.5vw, 50px);
+  }
+
+  .reviews {
+    padding: 120px calc((100vw - 1520px) / 2);
+  }
+  .reviews-section-header h2 {
+    font-size: clamp(48px, 3.8vw, 78px);
+  }
+  .reviews-editorial-frame {
+    --reviews-video-w: clamp(280px, 18vw, 380px);
+    min-height: 660px;
+  }
+  .reviews-client-heading {
+    font-size: clamp(34px, 2.4vw, 50px);
+  }
+  .reviews-description {
+    font-size: 17px;
+    max-width: 580px;
+  }
+
+  .contact {
+    padding: 140px calc((100vw - 1520px) / 2);
+  }
+  .site-footer {
+    padding: 40px calc((100vw - 1520px) / 2) 46px;
+  }
+}
+
+/* 3. High-Resolution & Ultrawide Monitors (2200px+ — QHD 1440p, 4K, 3440x1440p) */
+@media (min-width: 2200px) {
+  :root {
+    --slide-w: min(clamp(960px, 45vw, 1600px), 72vh);
+    --gap-work-slide: clamp(220px, 15vw, 420px);
+    --size-work-secondary-image: clamp(260px, 13vw, 400px);
+  }
+
+  .site-header {
+    padding: 0 calc((100vw - 1920px) / 2);
+    height: 96px;
+  }
+
+  .section-pad {
+    padding: 190px calc((100vw - 1920px) / 2);
+  }
+
+  .story-hero-content {
+    padding: 24vh calc((100vw - 1920px) / 2) 8vh;
+  }
+  .cinematic-hero-title {
+    max-width: 1680px;
+    font-size: clamp(90px, 6.5vw, 170px);
+  }
+  .cinematic-hero-bottom {
+    max-width: 1200px;
+  }
+  .cinematic-hero-bottom p {
+    max-width: 480px;
+    font-size: 18px;
+  }
+  .cinematic-hero-index {
+    right: calc((100vw - 1920px) / 2);
+    font-size: 13px;
+  }
+  .story-brand-reveal .story-brand-title {
+    font-size: clamp(140px, 9.5vw, 260px);
+  }
+
+  .intro-copy {
+    max-width: 1200px;
+  }
+  .intro h2 {
+    font-size: clamp(60px, 4.5vw, 100px);
+  }
+  .intro p {
+    max-width: 640px;
+    font-size: 18px;
+    line-height: 1.75;
+  }
+
+  .exhibition-top-bar {
+    padding: 30px calc((100vw - 1920px) / 2);
+    font-size: 13px;
+  }
+  .exhibition-index-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  .slide-project-title {
+    font-size: var(--font-size-work-title, clamp(42px, 2vw, 64px));
+  }
+  .slide-project-description {
+    max-width: 760px;
+    font-size: 18px;
+    line-height: 1.75;
+  }
+
+  .work-cta-strip {
+    padding: 180px calc((100vw - 1920px) / 2);
+  }
+  .cta-strip-copy h2 {
+    font-size: clamp(60px, 3.8vw, 96px);
+  }
+  .cta-strip-inner p {
+    max-width: 740px;
+    font-size: 19px;
+  }
+
+  .statement {
+    padding: 160px calc((100vw - 1920px) / 2);
+    gap: 128px;
+  }
+  .statement h2 {
+    font-size: clamp(80px, 4.8vw, 130px);
+  }
+  .statement-copy p {
+    max-width: 640px;
+    font-size: 18px;
+    line-height: 1.75;
+  }
+
+  .service-row {
+    padding: 44px 0;
+  }
+  .service-row h3 {
+    font-size: clamp(40px, 2.2vw, 68px);
+  }
+
+  .reviews {
+    padding: 160px calc((100vw - 1920px) / 2);
+  }
+  .reviews-section-header h2 {
+    font-size: clamp(60px, 3.5vw, 96px);
+  }
+  .reviews-editorial-frame {
+    --reviews-video-w: clamp(340px, 16vw, 460px);
+    min-height: 780px;
+  }
+  .reviews-client-heading {
+    font-size: clamp(42px, 2.2vw, 62px);
+  }
+  .reviews-description {
+    font-size: 19px;
+    max-width: 700px;
+    line-height: 1.75;
+  }
+
+  .contact {
+    padding: 180px calc((100vw - 1920px) / 2);
+  }
+  .site-footer {
+    padding: 52px calc((100vw - 1920px) / 2) 60px;
+    font-size: 13px;
+  }
+
+  .detail-header {
+    padding: 28px calc((100vw - 1920px) / 2);
+  }
+  .detail-hero-copy {
+    padding: 8vw calc((100vw - 1920px) / 2) 7vw;
+    max-width: 1400px;
+  }
+  .detail-intro-grid,
+  .detail-facts-grid,
+  .detail-gallery-grid {
+    padding-left: calc((100vw - 1920px) / 2);
+    padding-right: calc((100vw - 1920px) / 2);
+  }
+  .detail-footer {
+    padding: 36px calc((100vw - 1920px) / 2) 42px;
+  }
 }
 
 

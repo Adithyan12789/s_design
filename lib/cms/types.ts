@@ -138,6 +138,7 @@ export type CmsTypographySettings = {
   workDescGap?: string
   workSlideGap?: string
   workImageScale?: string
+  workSecondaryImageSize?: string
   approachHeadingSize?: string
   approachBodySize?: string
   servicesTitleSize?: string

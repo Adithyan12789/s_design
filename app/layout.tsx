@@ -32,6 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 export const viewport: Viewport = { colorScheme: 'light', themeColor: '#f1eee7', width: 'device-width', initialScale: 1 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -53,6 +55,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   if (typography?.workDescGap) bodyStyle['--gap-work-desc'] = typography.workDescGap
   if (typography?.workSlideGap) bodyStyle['--gap-work-slide'] = typography.workSlideGap
   if (typography?.workImageScale) bodyStyle['--scale-work-image'] = typography.workImageScale
+  if (typography?.workSecondaryImageSize) bodyStyle['--size-work-secondary-image'] = typography.workSecondaryImageSize
   if (typography?.approachHeadingSize) bodyStyle['--font-size-approach-heading'] = typography.approachHeadingSize
   if (typography?.approachBodySize) bodyStyle['--font-size-approach-body'] = typography.approachBodySize
   if (typography?.servicesTitleSize) bodyStyle['--font-size-services-title'] = typography.servicesTitleSize

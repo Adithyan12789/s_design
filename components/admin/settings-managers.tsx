@@ -567,7 +567,7 @@ export function TypographyManager({
         workTitleSize: 'clamp(25px, 2.4vw, 36px)',
         workDescSize: 'clamp(13px, 1.05vw, 15px)',
         workDescGap: '44px',
-        workSlideGap: 'calc(50vw - 380px)',
+        workSlideGap: 'clamp(140px, 18vw, 270px)',
         workImageScale: '1',
         approachHeadingSize: 'clamp(54px, 6.2vw, 96px)',
         approachBodySize: '14px',
@@ -590,7 +590,7 @@ export function TypographyManager({
         workTitleSize: 'clamp(20px, 1.9vw, 28px)',
         workDescSize: '13px',
         workDescGap: '32px',
-        workSlideGap: 'calc(50vw - 420px)',
+        workSlideGap: 'clamp(36px, 4.5vw, 68px)',
         workImageScale: '0.9',
         approachHeadingSize: 'clamp(42px, 5vw, 76px)',
         approachBodySize: '13px',
@@ -613,7 +613,7 @@ export function TypographyManager({
         workTitleSize: 'clamp(30px, 3vw, 46px)',
         workDescSize: '15.5px',
         workDescGap: '58px',
-        workSlideGap: 'calc(50vw - 320px)',
+        workSlideGap: 'clamp(64px, 7.5vw, 110px)',
         workImageScale: '1.1',
         approachHeadingSize: 'clamp(64px, 7.5vw, 115px)',
         approachBodySize: '15.5px',
@@ -856,9 +856,9 @@ export function TypographyManager({
             label="Gap Between Works"
             sublabel="Horizontal spacing between cards"
             value={typo.workSlideGap}
-            defaultValue="calc(50vw - 380px)"
+            defaultValue="clamp(140px, 18vw, 270px)"
             min={20}
-            max={180}
+            max={320}
             step={4}
             unit="px"
             onChange={(val) => updateTypo('workSlideGap', val)}
@@ -873,6 +873,17 @@ export function TypographyManager({
             step={0.05}
             unit=""
             onChange={(val) => updateTypo('workImageScale', val)}
+          />
+          <SizingControl
+            label="Secondary Detail Image Size"
+            sublabel="Floating offset detail thumbnail width"
+            value={typo.workSecondaryImageSize}
+            defaultValue="clamp(165px, 16.5vw, 255px)"
+            min={120}
+            max={320}
+            step={5}
+            unit="px"
+            onChange={(val) => updateTypo('workSecondaryImageSize', val)}
           />
         </div>
       </div>

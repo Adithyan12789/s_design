@@ -240,6 +240,8 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
         projects={showcaseProjects}
         kicker={homepage.selectedWorkKicker}
         heading={homepage.selectedWorkHeading}
+        slideGap={settings.typography?.workSlideGap}
+        secondaryImageSize={settings.typography?.workSecondaryImageSize}
       />
 
       {/* PAGE 3 — Initiate a Project */}
