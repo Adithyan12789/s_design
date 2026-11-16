@@ -2488,20 +2488,21 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(54px, 3.4vw, 86px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(430px, 20.5vw, 510px), 56vh);
-    min-height: clamp(800px, 74vh, 920px);
+    --reviews-video-w: clamp(480px, 26vw, 560px);
+    min-height: clamp(720px, 68vh, 840px);
     border-radius: 26px;
   }
   .reviews-video-stage {
-    left: 55%;
+    left: 54%;
   }
   .reviews-video-card {
+    aspect-ratio: 16 / 9;
     border-radius: 18px;
     box-shadow: 0 34px 80px rgba(0, 0, 0, 0.7);
   }
   .reviews-left-panel {
     padding: 56px clamp(48px, 3.2vw, 72px);
-    padding-right: calc(var(--reviews-video-w) * 0.5 + 46px);
+    padding-right: calc(var(--reviews-video-w) * 0.44 + 40px);
   }
   .reviews-copy-block {
     gap: 22px;
@@ -2676,20 +2677,21 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(60px, 3.5vw, 96px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(475px, 19vw, 545px), 56vh);
-    min-height: clamp(860px, 75vh, 980px);
+    --reviews-video-w: clamp(540px, 24vw, 640px);
+    min-height: clamp(760px, 70vh, 880px);
     border-radius: 28px;
   }
   .reviews-video-stage {
-    left: 55%;
+    left: 54%;
   }
   .reviews-video-card {
+    aspect-ratio: 16 / 9;
     border-radius: 20px;
     box-shadow: 0 38px 88px rgba(0, 0, 0, 0.74);
   }
   .reviews-left-panel {
     padding: 64px clamp(52px, 3vw, 78px);
-    padding-right: calc(var(--reviews-video-w) * 0.5 + 50px);
+    padding-right: calc(var(--reviews-video-w) * 0.44 + 44px);
   }
   .reviews-copy-block {
     gap: 24px;
@@ -2797,20 +2799,21 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(64px, 3.2vw, 104px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(530px, 16.5vw, 600px), 58vh);
-    min-height: clamp(900px, 75vh, 1040px);
+    --reviews-video-w: clamp(620px, 20vw, 720px);
+    min-height: clamp(800px, 70vh, 920px);
     border-radius: 32px;
   }
   .reviews-video-stage {
-    left: 55%;
+    left: 54%;
   }
   .reviews-video-card {
+    aspect-ratio: 16 / 9;
     border-radius: 22px;
     box-shadow: 0 42px 96px rgba(0, 0, 0, 0.78);
   }
   .reviews-left-panel {
     padding: 72px clamp(56px, 2.8vw, 86px);
-    padding-right: calc(var(--reviews-video-w) * 0.5 + 56px);
+    padding-right: calc(var(--reviews-video-w) * 0.44 + 48px);
   }
   .reviews-copy-block {
     gap: 26px;
