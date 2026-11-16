@@ -2493,7 +2493,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     border-radius: 26px;
   }
   .reviews-video-stage {
-    left: 70%;
+    left: calc((100% * 21 / 41) + (var(--reviews-video-w) * 0.2));
     top: 65%;
   }
   .reviews-video-card {
@@ -2503,6 +2503,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .reviews-left-panel {
     padding: 56px clamp(48px, 3.2vw, 72px);
+    padding-right: calc(var(--reviews-video-w) * 0.3 + 36px);
   }
   .reviews-copy-block {
     gap: 22px;
@@ -2682,7 +2683,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     border-radius: 28px;
   }
   .reviews-video-stage {
-    left: 70%;
+    left: calc((100% * 21 / 41) + (var(--reviews-video-w) * 0.2));
     top: 65%;
   }
   .reviews-video-card {
@@ -2692,6 +2693,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .reviews-left-panel {
     padding: 64px clamp(52px, 3vw, 78px);
+    padding-right: calc(var(--reviews-video-w) * 0.3 + 40px);
   }
   .reviews-copy-block {
     gap: 24px;
@@ -2804,7 +2806,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     border-radius: 32px;
   }
   .reviews-video-stage {
-    left: 70%;
+    left: calc((100% * 21 / 41) + (var(--reviews-video-w) * 0.2));
     top: 64%;
   }
   .reviews-video-card {
@@ -2814,6 +2816,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .reviews-left-panel {
     padding: 72px clamp(56px, 2.8vw, 86px);
+    padding-right: calc(var(--reviews-video-w) * 0.3 + 44px);
   }
   .reviews-copy-block {
     gap: 26px;
