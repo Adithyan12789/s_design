@@ -2311,17 +2311,17 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 1600px) {
   :root {
     --slide-w: min(clamp(780px, 48vw, 1280px), 70vh);
-    --gap-work-slide: clamp(420px, 25vw, 620px);
+    --gap-work-slide: clamp(260px, 17vw, 360px);
     --size-work-secondary-image: clamp(250px, 16.5vw, 360px);
   }
 
   body {
-    --gap-work-slide: clamp(420px, 25vw, 620px) !important;
+    --gap-work-slide: clamp(260px, 17vw, 360px) !important;
   }
 
   .exhibition-track {
-    --gap-work-slide: clamp(420px, 25vw, 620px) !important;
-    gap: var(--gap-work-slide, clamp(420px, 25vw, 620px)) !important;
+    --gap-work-slide: clamp(260px, 17vw, 360px) !important;
+    gap: var(--gap-work-slide, clamp(260px, 17vw, 360px)) !important;
   }
 
   .exhibition-secondary-frame {
@@ -2488,7 +2488,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(54px, 3.4vw, 86px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(390px, 18.5vw, 460px), 54vh);
+    --reviews-video-w: min(clamp(430px, 20.5vw, 510px), 56vh);
     min-height: clamp(800px, 74vh, 920px);
     border-radius: 26px;
   }
@@ -2532,17 +2532,17 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 2200px) {
   :root {
     --slide-w: min(clamp(960px, 45vw, 1600px), 72vh);
-    --gap-work-slide: clamp(580px, 26vw, 820px);
+    --gap-work-slide: clamp(350px, 16vw, 440px);
     --size-work-secondary-image: clamp(310px, 14.5vw, 450px);
   }
 
   body {
-    --gap-work-slide: clamp(580px, 26vw, 820px) !important;
+    --gap-work-slide: clamp(350px, 16vw, 440px) !important;
   }
 
   .exhibition-track {
-    --gap-work-slide: clamp(580px, 26vw, 820px) !important;
-    gap: var(--gap-work-slide, clamp(580px, 26vw, 820px)) !important;
+    --gap-work-slide: clamp(350px, 16vw, 440px) !important;
+    gap: var(--gap-work-slide, clamp(350px, 16vw, 440px)) !important;
     padding-left: calc(50vw - (var(--slide-w) / 2));
     padding-right: calc(50vw - (var(--slide-w) / 2) + 4vw);
   }
@@ -2676,7 +2676,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(60px, 3.5vw, 96px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(430px, 17.5vw, 490px), 54vh);
+    --reviews-video-w: min(clamp(475px, 19vw, 545px), 56vh);
     min-height: clamp(860px, 75vh, 980px);
     border-radius: 28px;
   }
@@ -2745,19 +2745,19 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 2560px) {
   :root {
     --slide-w: min(clamp(1080px, 42vw, 1800px), 74vh);
-    --gap-work-slide: clamp(740px, 28vw, 1150px);
+    --gap-work-slide: clamp(440px, 16vw, 580px);
     --size-work-secondary-image: clamp(340px, 13vw, 500px);
   }
 
   body {
-    --gap-work-slide: clamp(740px, 28vw, 1150px) !important;
+    --gap-work-slide: clamp(440px, 16vw, 580px) !important;
   }
 
   .exhibition-track {
-    --gap-work-slide: clamp(740px, 28vw, 1150px) !important;
-    gap: var(--gap-work-slide, clamp(740px, 28vw, 1150px)) !important;
+    --gap-work-slide: clamp(440px, 16vw, 580px) !important;
+    gap: var(--gap-work-slide, clamp(440px, 16vw, 580px)) !important;
     padding-left: calc(50vw - (var(--slide-w) / 2));
-    padding-right: calc(50vw - (var(--slide-w) / 2) + 6vw);
+    padding-right: calc(50vw - (var(--slide-w) / 2) + 5vw);
   }
 
   .exhibition-secondary-frame {
@@ -2797,7 +2797,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(64px, 3.2vw, 104px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: min(clamp(480px, 15vw, 540px), 56vh);
+    --reviews-video-w: min(clamp(530px, 16.5vw, 600px), 58vh);
     min-height: clamp(900px, 75vh, 1040px);
     border-radius: 32px;
   }
