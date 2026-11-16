@@ -419,7 +419,9 @@ export function WorkHorizontalShowcase({
             className="exhibition-track"
             style={
               {
-                ...(slideGap ? { '--gap-work-slide': slideGap } : {}),
+                ...(slideGap && slideGap !== 'clamp(140px, 18vw, 270px)'
+                  ? { '--gap-work-slide': slideGap }
+                  : {}),
                 ...(secondaryImageSize ? { '--size-work-secondary-image': secondaryImageSize } : {}),
               } as React.CSSProperties
             }

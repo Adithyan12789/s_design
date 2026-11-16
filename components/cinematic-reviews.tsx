@@ -234,7 +234,7 @@ export function CinematicReviews({
     >
       <div className="reviews-ambient-glow" aria-hidden="true" />
 
-      <div className="container reviews-container">
+      <div className="reviews-container">
         <header className="reviews-section-header">
           <div className="section-kicker reviews-section-kicker">
             <span className="reviews-kicker-num">( 05 )</span>

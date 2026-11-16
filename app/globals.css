@@ -98,7 +98,7 @@ em { color: var(--bronze); font-style: italic; }
 .services { background:var(--ivory); }.service-list { border-top:1px solid var(--line); }.service-row { display:grid; grid-template-columns: 45px 1fr 30px; align-items:center; padding: 26px 0; border-bottom:1px solid var(--line); }.service-row span { font-size:10px; color:var(--bronze); }.service-row h3 { font:400 var(--font-size-services-title, clamp(25px, 3.3vw, 46px)) Georgia, serif; letter-spacing:-.04em; }.service-row svg { opacity:.55; }
 .reviews { position: relative; background: #141311; border-top: 1px solid var(--line); isolation: isolate; overflow: hidden; }
 .reviews-ambient-glow { position: absolute !important; inset: 0; z-index: 0 !important; pointer-events: none; background: radial-gradient(circle at 46% 50%, rgba(217, 182, 134, 0.08) 0%, rgba(20, 19, 17, 0) 64%); }
-.reviews-container { position: relative; z-index: 2; }
+.reviews-container { position: relative; z-index: 2; width: 100%; max-width: 100%; }
 .reviews-section-header {
   display: flex;
   flex-direction: column;
@@ -2272,7 +2272,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
    Monitor & Large Screen Responsive Architecture (1440px, 1680px, 1920px+, 2560px+ QHD & 4K)
    ========================================================================== */
 
-/* 1. Large Laptops & Standard Desktop Monitors (1440px - 1679px) */
+/* 1. Large Laptops & Standard Desktop Monitors (1440px - 1599px) */
 @media (min-width: 1440px) {
   :root {
     --slide-w: min(clamp(640px, 52vw, 1080px), 68vh);
@@ -2292,24 +2292,36 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     max-height: 76vh;
   }
   .reviews {
-    padding: 120px calc((100vw - 1380px) / 2);
+    padding: 120px calc((100vw - min(1440px, 92vw)) / 2);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: clamp(240px, 18vw, 290px);
-    min-height: clamp(680px, 72vh, 760px);
+    --reviews-video-w: min(clamp(290px, 20vw, 340px), 52vh);
+    min-height: clamp(680px, 68vh, 780px);
+  }
+  .reviews-video-stage {
+    left: 55%;
+  }
+  .reviews-left-panel {
+    padding: clamp(36px, 3.2vw, 54px);
+    padding-right: calc(var(--reviews-video-w) * 0.5 + 36px);
   }
 }
 
-/* 2. Full HD & Widescreen Desktop Monitors (1680px - 2199px) */
-@media (min-width: 1680px) {
+/* 2. Full HD & Widescreen Desktop Monitors (1600px - 2199px) */
+@media (min-width: 1600px) {
   :root {
     --slide-w: min(clamp(780px, 48vw, 1280px), 70vh);
-    --gap-work-slide: clamp(220px, 19vw, 390px);
+    --gap-work-slide: clamp(420px, 25vw, 620px);
     --size-work-secondary-image: clamp(250px, 16.5vw, 360px);
   }
 
+  body {
+    --gap-work-slide: clamp(420px, 25vw, 620px) !important;
+  }
+
   .exhibition-track {
-    gap: var(--gap-work-slide, clamp(220px, 19vw, 390px));
+    --gap-work-slide: clamp(420px, 25vw, 620px) !important;
+    gap: var(--gap-work-slide, clamp(420px, 25vw, 620px)) !important;
   }
 
   .exhibition-secondary-frame {
@@ -2415,7 +2427,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
 
   .reviews {
-    padding: 120px calc((100vw - 1580px) / 2);
+    padding: 130px calc((100vw - min(1660px, 90vw)) / 2);
   }
   .reviews-section-header .section-kicker,
   .reviews-section-kicker {
@@ -2429,15 +2441,26 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(48px, 3.8vw, 78px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: clamp(240px, 18vw, 290px);
-    min-height: clamp(740px, 76vh, 840px);
+    --reviews-video-w: min(clamp(340px, 19.5vw, 395px), 52vh);
+    min-height: clamp(740px, 72vh, 850px);
+  }
+  .reviews-video-stage {
+    left: 55%;
+  }
+  .reviews-left-panel {
+    padding: clamp(44px, 3.5vw, 64px);
+    padding-right: calc(var(--reviews-video-w) * 0.5 + 40px);
+  }
+  .reviews-copy-block {
+    gap: 20px;
   }
   .reviews-client-heading {
-    font-size: clamp(34px, 2.4vw, 50px);
+    font-size: clamp(32px, 2.2vw, 48px);
   }
   .reviews-description {
-    font-size: 17px;
+    font-size: 16.5px;
     max-width: 580px;
+    line-height: 1.7;
   }
 
   .contact {
@@ -2448,16 +2471,80 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
 }
 
-/* 3. High-Resolution & Ultrawide Monitors (2200px+ — QHD 1440p, 4K, 3440x1440p) */
+/* 2b. Full HD & Large Desktop Monitors (1920px - 2199px) — Client Reviews Enhancement */
+@media (min-width: 1920px) {
+  .reviews {
+    padding: 140px calc((100vw - min(1980px, 88vw)) / 2);
+  }
+  .reviews-section-header .section-kicker,
+  .reviews-section-kicker {
+    font-size: 16px;
+  }
+  .reviews-section-header .section-kicker span,
+  .reviews-section-kicker .reviews-kicker-title {
+    font-size: 26px;
+  }
+  .reviews-section-header h2 {
+    font-size: clamp(54px, 3.4vw, 86px);
+  }
+  .reviews-editorial-frame {
+    --reviews-video-w: min(clamp(390px, 18.5vw, 460px), 54vh);
+    min-height: clamp(800px, 74vh, 920px);
+    border-radius: 26px;
+  }
+  .reviews-video-stage {
+    left: 55%;
+  }
+  .reviews-video-card {
+    border-radius: 18px;
+    box-shadow: 0 34px 80px rgba(0, 0, 0, 0.7);
+  }
+  .reviews-left-panel {
+    padding: 56px clamp(48px, 3.2vw, 72px);
+    padding-right: calc(var(--reviews-video-w) * 0.5 + 46px);
+  }
+  .reviews-copy-block {
+    gap: 22px;
+  }
+  .reviews-client-heading {
+    font-size: clamp(36px, 2.1vw, 52px);
+  }
+  .reviews-description {
+    font-size: 17.5px;
+    max-width: 640px;
+    line-height: 1.75;
+  }
+  .reviews-project-title {
+    font-size: 12.5px;
+    letter-spacing: 0.17em;
+  }
+  .reviews-nav-btn {
+    width: 42px;
+    height: 42px;
+  }
+  .reviews-play-ring {
+    width: 68px;
+    height: 68px;
+  }
+}
+
+/* 3. High-Resolution Desktop Monitors (2200px - 2559px) */
 @media (min-width: 2200px) {
   :root {
     --slide-w: min(clamp(960px, 45vw, 1600px), 72vh);
-    --gap-work-slide: clamp(280px, 18vw, 490px);
+    --gap-work-slide: clamp(580px, 26vw, 820px);
     --size-work-secondary-image: clamp(310px, 14.5vw, 450px);
   }
 
+  body {
+    --gap-work-slide: clamp(580px, 26vw, 820px) !important;
+  }
+
   .exhibition-track {
-    gap: var(--gap-work-slide, clamp(280px, 18vw, 490px));
+    --gap-work-slide: clamp(580px, 26vw, 820px) !important;
+    gap: var(--gap-work-slide, clamp(580px, 26vw, 820px)) !important;
+    padding-left: calc(50vw - (var(--slide-w) / 2));
+    padding-right: calc(50vw - (var(--slide-w) / 2) + 4vw);
   }
 
   .exhibition-secondary-frame {
@@ -2575,7 +2662,7 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
 
   .reviews {
-    padding: 160px calc((100vw - 2000px) / 2);
+    padding: 150px calc((100vw - min(2100px, 86vw)) / 2);
   }
   .reviews-section-header .section-kicker,
   .reviews-section-kicker {
@@ -2589,16 +2676,43 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     font-size: clamp(60px, 3.5vw, 96px);
   }
   .reviews-editorial-frame {
-    --reviews-video-w: clamp(250px, 16vw, 300px);
-    min-height: clamp(840px, 80vh, 960px);
+    --reviews-video-w: min(clamp(430px, 17.5vw, 490px), 54vh);
+    min-height: clamp(860px, 75vh, 980px);
+    border-radius: 28px;
+  }
+  .reviews-video-stage {
+    left: 55%;
+  }
+  .reviews-video-card {
+    border-radius: 20px;
+    box-shadow: 0 38px 88px rgba(0, 0, 0, 0.74);
+  }
+  .reviews-left-panel {
+    padding: 64px clamp(52px, 3vw, 78px);
+    padding-right: calc(var(--reviews-video-w) * 0.5 + 50px);
+  }
+  .reviews-copy-block {
+    gap: 24px;
   }
   .reviews-client-heading {
-    font-size: clamp(42px, 2.2vw, 62px);
+    font-size: clamp(38px, 2vw, 56px);
   }
   .reviews-description {
-    font-size: 19px;
-    max-width: 700px;
+    font-size: 18.5px;
+    max-width: 660px;
     line-height: 1.75;
+  }
+  .reviews-project-title {
+    font-size: 13px;
+    letter-spacing: 0.17em;
+  }
+  .reviews-nav-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .reviews-play-ring {
+    width: 74px;
+    height: 74px;
   }
 
   .contact {
@@ -2626,6 +2740,103 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
     padding: 36px calc((100vw - 1920px) / 2) 42px;
   }
 }
+
+/* 4. Ultra-Wide & 4K Monitors (2560px+ — 21:9 UWQHD 3440x1440p, 3840x1600, 3840x2160 4K, 5120x1440) */
+@media (min-width: 2560px) {
+  :root {
+    --slide-w: min(clamp(1080px, 42vw, 1800px), 74vh);
+    --gap-work-slide: clamp(740px, 28vw, 1150px);
+    --size-work-secondary-image: clamp(340px, 13vw, 500px);
+  }
+
+  body {
+    --gap-work-slide: clamp(740px, 28vw, 1150px) !important;
+  }
+
+  .exhibition-track {
+    --gap-work-slide: clamp(740px, 28vw, 1150px) !important;
+    gap: var(--gap-work-slide, clamp(740px, 28vw, 1150px)) !important;
+    padding-left: calc(50vw - (var(--slide-w) / 2));
+    padding-right: calc(50vw - (var(--slide-w) / 2) + 6vw);
+  }
+
+  .exhibition-secondary-frame {
+    width: clamp(340px, 13vw, 500px);
+  }
+  .exhibition-secondary-frame.pos-bottom-right {
+    right: -3vw;
+    bottom: -60px;
+  }
+  .exhibition-secondary-frame.pos-top-right {
+    right: -2.5vw;
+    top: -48px;
+  }
+
+  .exhibition-top-bar {
+    padding: 32px calc((100vw - 2200px) / 2);
+    font-size: 14px;
+  }
+  .exhibition-index-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  /* Client Reviews — Ultra-Wide & 4K Proportional Scale */
+  .reviews {
+    padding: 170px calc((100vw - min(2320px, 84vw)) / 2);
+  }
+  .reviews-section-header .section-kicker,
+  .reviews-section-kicker {
+    font-size: 18px;
+  }
+  .reviews-section-header .section-kicker span,
+  .reviews-section-kicker .reviews-kicker-title {
+    font-size: 28px;
+  }
+  .reviews-section-header h2 {
+    font-size: clamp(64px, 3.2vw, 104px);
+  }
+  .reviews-editorial-frame {
+    --reviews-video-w: min(clamp(480px, 15vw, 540px), 56vh);
+    min-height: clamp(900px, 75vh, 1040px);
+    border-radius: 32px;
+  }
+  .reviews-video-stage {
+    left: 55%;
+  }
+  .reviews-video-card {
+    border-radius: 22px;
+    box-shadow: 0 42px 96px rgba(0, 0, 0, 0.78);
+  }
+  .reviews-left-panel {
+    padding: 72px clamp(56px, 2.8vw, 86px);
+    padding-right: calc(var(--reviews-video-w) * 0.5 + 56px);
+  }
+  .reviews-copy-block {
+    gap: 26px;
+  }
+  .reviews-client-heading {
+    font-size: clamp(40px, 1.8vw, 58px);
+  }
+  .reviews-description {
+    font-size: 19.5px;
+    max-width: 700px;
+    line-height: 1.8;
+  }
+  .reviews-project-title {
+    font-size: 13.5px;
+    letter-spacing: 0.18em;
+  }
+  .reviews-nav-btn {
+    width: 46px;
+    height: 46px;
+  }
+  .reviews-play-ring {
+    width: 80px;
+    height: 80px;
+  }
+}
+
 
 
 

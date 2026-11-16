@@ -53,7 +53,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   if (typography?.workTitleSize) bodyStyle['--font-size-work-title'] = typography.workTitleSize
   if (typography?.workDescSize) bodyStyle['--font-size-work-desc'] = typography.workDescSize
   if (typography?.workDescGap) bodyStyle['--gap-work-desc'] = typography.workDescGap
-  if (typography?.workSlideGap) bodyStyle['--gap-work-slide'] = typography.workSlideGap
+  if (
+    typography?.workSlideGap &&
+    typography.workSlideGap !== 'clamp(140px, 18vw, 270px)'
+  ) {
+    bodyStyle['--gap-work-slide'] = typography.workSlideGap
+  }
   if (typography?.workImageScale) bodyStyle['--scale-work-image'] = typography.workImageScale
   if (typography?.workSecondaryImageSize) bodyStyle['--size-work-secondary-image'] = typography.workSecondaryImageSize
   if (typography?.approachHeadingSize) bodyStyle['--font-size-approach-heading'] = typography.approachHeadingSize

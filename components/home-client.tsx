@@ -277,7 +277,12 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
         projects={showcaseProjects}
         kicker={homepage.selectedWorkKicker}
         heading={homepage.selectedWorkHeading}
-        slideGap={settings.typography?.workSlideGap}
+        slideGap={
+          settings.typography?.workSlideGap &&
+          settings.typography.workSlideGap !== 'clamp(140px, 18vw, 270px)'
+            ? settings.typography.workSlideGap
+            : undefined
+        }
         secondaryImageSize={settings.typography?.workSecondaryImageSize}
       />
 
