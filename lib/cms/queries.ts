@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache'
 import { getMongoDb } from '@/lib/mongodb/client'
 import {
+  DEFAULT_FOUNDER_INFO,
   DEFAULT_HOMEPAGE,
   DEFAULT_NAVIGATION,
   DEFAULT_PROJECTS,
@@ -13,6 +14,7 @@ import {
 } from './defaults'
 import type {
   CmsActivityLog,
+  CmsFounderInfo,
   CmsHomepageContent,
   CmsMediaAsset,
   CmsNavItem,
@@ -71,10 +73,14 @@ export async function getPublicSiteData(): Promise<PublicSiteData> {
       if (s.pageKey) seoMap[s.pageKey] = s
     }
 
+    const studioInfo = studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO
+    const founder: CmsFounderInfo = studioInfo.founder || DEFAULT_FOUNDER_INFO
+
     return {
       projects: projectDocs.map((d) => stripMongoId<CmsProject>(d)),
       services: serviceDocs.map((d) => stripMongoId<CmsService>(d)),
-      studioInfo: studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO,
+      studioInfo,
+      founder,
       testimonials: testimonialDocs.map((d) => stripMongoId<CmsTestimonial>(d)),
       settings: settingsDoc ? stripMongoId<CmsWebsiteSettings>(settingsDoc) : DEFAULT_SETTINGS,
       homepage: homepageDoc ? stripMongoId<CmsHomepageContent>(homepageDoc) : DEFAULT_HOMEPAGE,
@@ -120,6 +126,7 @@ export async function getAdminOverviewData() {
       projects: DEFAULT_PROJECTS,
       services: DEFAULT_SERVICES,
       studioInfo: DEFAULT_STUDIO_INFO,
+      founder: DEFAULT_FOUNDER_INFO,
       testimonials: DEFAULT_TESTIMONIALS,
       settings: DEFAULT_SETTINGS,
       homepage: DEFAULT_HOMEPAGE,
@@ -155,10 +162,14 @@ export async function getAdminOverviewData() {
     db.collection('activityLogs').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
   ])
 
+  const studioInfo = studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO
+  const founder: CmsFounderInfo = studioInfo.founder || DEFAULT_FOUNDER_INFO
+
   return {
     projects: projectDocs.map((d) => stripMongoId<CmsProject>(d)),
     services: serviceDocs.map((d) => stripMongoId<CmsService>(d)),
-    studioInfo: studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO,
+    studioInfo,
+    founder,
     testimonials: testimonialDocs.map((d) => stripMongoId<CmsTestimonial>(d)),
     settings: settingsDoc ? stripMongoId<CmsWebsiteSettings>(settingsDoc) : DEFAULT_SETTINGS,
     homepage: homepageDoc ? stripMongoId<CmsHomepageContent>(homepageDoc) : DEFAULT_HOMEPAGE,

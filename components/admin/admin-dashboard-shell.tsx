@@ -23,11 +23,13 @@ import {
   Clock,
   Type,
   Sliders,
+  UserCheck,
 } from 'lucide-react'
 import type {
   CmsProject,
   CmsService,
   CmsStudioInfo,
+  CmsFounderInfo,
   CmsTestimonial,
   CmsWebsiteSettings,
   CmsHomepageContent,
@@ -39,6 +41,7 @@ import type {
 import { MediaPickerModal } from './media-picker-modal'
 import { ProjectsManager } from './projects-manager'
 import { ServicesManager, TestimonialsManager, NavigationManager } from './list-managers'
+import { FounderManager } from './founder-manager'
 import {
   StudioManager,
   BrandingManager,
@@ -52,21 +55,15 @@ import {
 
 type SectionId =
   | 'dashboard'
-  | 'typography'
+  | 'homepage'
+  | 'studio'
   | 'projects'
   | 'services'
-  | 'studio'
   | 'testimonials'
+  | 'founder'
   | 'contact'
   | 'branding'
-  | 'homepage'
-  | 'navigation'
-  | 'seo'
-  | 'media'
-  | 'settings'
-  | 'contact'
-  | 'branding'
-  | 'homepage'
+  | 'typography'
   | 'navigation'
   | 'seo'
   | 'media'
@@ -83,6 +80,7 @@ interface AdminDashboardShellProps {
     projects: CmsProject[]
     services: CmsService[]
     studioInfo: CmsStudioInfo
+    founder: CmsFounderInfo
     testimonials: CmsTestimonial[]
     settings: CmsWebsiteSettings
     homepage: CmsHomepageContent
@@ -95,15 +93,16 @@ interface AdminDashboardShellProps {
 
 const NAV_ITEMS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'typography', label: 'Typography & Sizing', icon: Type },
-  { id: 'projects', label: 'Projects', icon: Building2 },
+  { id: 'homepage', label: 'Home / Hero', icon: Home },
+  { id: 'studio', label: 'Studio / About', icon: Info },
+  { id: 'projects', label: 'Work / Projects', icon: Building2 },
   { id: 'services', label: 'Services', icon: Compass },
-  { id: 'studio', label: 'About Studio', icon: Info },
-  { id: 'testimonials', label: 'Testimonials & Reviews', icon: MessageSquareQuote },
-  { id: 'contact', label: 'Contact Information', icon: Phone },
+  { id: 'testimonials', label: 'Client Reviews', icon: MessageSquareQuote },
+  { id: 'founder', label: 'Founder Section', icon: UserCheck },
+  { id: 'contact', label: 'Contact', icon: Phone },
   { id: 'branding', label: 'Website Branding', icon: Palette },
-  { id: 'homepage', label: 'Homepage Content', icon: Home },
-  { id: 'navigation', label: 'Navigation Management', icon: MenuIcon },
+  { id: 'typography', label: 'Typography & Sizing', icon: Type },
+  { id: 'navigation', label: 'Navigation', icon: MenuIcon },
   { id: 'seo', label: 'SEO Settings', icon: Search },
   { id: 'media', label: 'Media Library', icon: ImageIcon },
   { id: 'settings', label: 'Admin Settings', icon: Settings },
@@ -118,6 +117,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
   const [projects, setProjects] = useState<CmsProject[]>(initialData.projects)
   const [services, setServices] = useState<CmsService[]>(initialData.services)
   const [studioInfo, setStudioInfo] = useState<CmsStudioInfo>(initialData.studioInfo)
+  const [founder, setFounder] = useState<CmsFounderInfo>(initialData.founder)
   const [testimonials, setTestimonials] = useState<CmsTestimonial[]>(initialData.testimonials)
   const [settings, setSettings] = useState<CmsWebsiteSettings>(initialData.settings)
   const [homepage, setHomepage] = useState<CmsHomepageContent>(initialData.homepage)
@@ -333,6 +333,22 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     </button>
                     <button
                       type="button"
+                      onClick={() => handleTabSwitch('founder')}
+                      className="admin-btn-secondary justify-start"
+                    >
+                      <UserCheck className="w-4 h-4" />
+                      Manage Founder Section
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabSwitch('testimonials')}
+                      className="admin-btn-secondary justify-start"
+                    >
+                      <MessageSquareQuote className="w-4 h-4" />
+                      Manage Client Reviews
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleTabSwitch('homepage')}
                       className="admin-btn-secondary justify-start"
                     >
@@ -434,6 +450,16 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
               testimonials={testimonials}
               projects={projects}
               onChange={setTestimonials}
+              onPickImage={openMediaPicker}
+              onNotify={notify}
+              onDirtyChange={setIsDirty}
+            />
+          )}
+
+          {activeTab === 'founder' && (
+            <FounderManager
+              founder={founder}
+              onChange={setFounder}
               onPickImage={openMediaPicker}
               onNotify={notify}
               onDirtyChange={setIsDirty}

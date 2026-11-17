@@ -1,5 +1,6 @@
 import { projects as staticProjects } from '@/lib/projects'
 import type {
+  CmsFounderInfo,
   CmsHomepageContent,
   CmsNavItem,
   CmsProject,
@@ -99,6 +100,35 @@ export const DEFAULT_SERVICES: CmsService[] = [
   },
 ]
 
+export const DEFAULT_FOUNDER_INFO: CmsFounderInfo = {
+  visible: true,
+  displayOrder: 6,
+  kicker: '( 06 )',
+  label: 'THE FOUNDER',
+  heading: 'Behind the Vision',
+  founderName: 'Henrique Almeida',
+  founderRole: 'Principal Architect & Founder',
+  founderPhoto:
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=85',
+  founderBio:
+    'Leading S_DE_SIGN with an unwavering commitment to spatial silence, tactile materiality, and the dialogue between built form and natural context. Every project is conceived as an enduring sanctuary—crafted slowly, deliberately, and in harmony with the landscape.',
+  philosophy:
+    'Architecture is not merely about form or enclosure; it is the quiet art of making room for life, shaped by light and tactile honesty.',
+  quote:
+    'Architecture is not merely about form or enclosure; it is the quiet art of making room for life, shaped by light and tactile honesty.',
+  stats: [
+    { value: '14+', label: 'Years of Experience', detail: 'Studio Practice' },
+    { value: '28+', label: 'Projects Completed', detail: 'Private & Cultural' },
+    { value: '18,000 m²', label: 'Total Area Designed', detail: 'Portugal & Global' },
+  ],
+  showStats: false,
+  buttonText: 'Our Philosophy',
+  buttonHref: '#studio',
+  showButton: false,
+  illustrationUrl: '',
+  showIllustration: false,
+}
+
 export const DEFAULT_STUDIO_INFO: CmsStudioInfo = {
   kicker: 'Studio note',
   heading: 'Architecture is the art of',
@@ -117,8 +147,18 @@ export const DEFAULT_STUDIO_INFO: CmsStudioInfo = {
   ],
   studioImage:
     'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85',
-  teamMembers: [],
+  teamMembers: [
+    {
+      id: 'founder-primary',
+      name: 'Henrique Almeida',
+      role: 'Principal Architect & Founder',
+      bio: 'Leading S_DE_SIGN with an unwavering commitment to spatial silence, tactile materiality, and the dialogue between built form and natural context.',
+      photoUrl:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=85',
+    },
+  ],
   extraSections: [],
+  founder: DEFAULT_FOUNDER_INFO,
 }
 
 export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
@@ -348,6 +388,7 @@ export const DEFAULT_PUBLIC_SITE_DATA: PublicSiteData = {
   projects: DEFAULT_PROJECTS,
   services: DEFAULT_SERVICES,
   studioInfo: DEFAULT_STUDIO_INFO,
+  founder: DEFAULT_FOUNDER_INFO,
   testimonials: DEFAULT_TESTIMONIALS,
   settings: DEFAULT_SETTINGS,
   homepage: DEFAULT_HOMEPAGE,

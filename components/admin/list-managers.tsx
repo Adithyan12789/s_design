@@ -438,6 +438,21 @@ export function TestimonialsManager({
     }
   }
 
+  async function handleQuickToggle(item: CmsTestimonial) {
+    const nextStatus = item.status === 'published' ? 'draft' : 'published'
+    const res = await fetch('/api/admin/testimonials', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...item, status: nextStatus }),
+    })
+    if (res.ok) {
+      onChange(testimonials.map((t) => (t.id === item.id ? { ...t, status: nextStatus } : t)))
+      onNotify(`Review "${item.clientName}" marked as ${nextStatus}.`)
+    } else {
+      onNotify('Failed to update status.', 'error')
+    }
+  }
+
   if (editing) {
     return (
       <form onSubmit={handleSave} className="space-y-6">
@@ -668,12 +683,13 @@ export function TestimonialsManager({
         {testimonials.map((t, idx) => (
           <div key={t.id} className="admin-card p-4 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 shrink-0">
                 <button
                   type="button"
                   onClick={() => handleReorder(idx, -1)}
                   disabled={idx === 0}
-                  className="p-1 rounded border border-[#dfd7c9] disabled:opacity-30"
+                  className="p-1 rounded border border-[#dfd7c9] disabled:opacity-30 hover:bg-[#ede8de]"
+                  title="Move up"
                 >
                   <ArrowUp className="w-3 h-3" />
                 </button>
@@ -681,33 +697,75 @@ export function TestimonialsManager({
                   type="button"
                   onClick={() => handleReorder(idx, 1)}
                   disabled={idx === testimonials.length - 1}
-                  className="p-1 rounded border border-[#dfd7c9] disabled:opacity-30"
+                  className="p-1 rounded border border-[#dfd7c9] disabled:opacity-30 hover:bg-[#ede8de]"
+                  title="Move down"
                 >
                   <ArrowDown className="w-3 h-3" />
                 </button>
               </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
+
+              {/* Poster / Thumbnail Preview */}
+              <div className="w-14 h-10 rounded border border-[#dfd7c9] bg-[#141311] overflow-hidden shrink-0 relative">
+                {t.posterImage || t.backgroundImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={t.posterImage || t.backgroundImage}
+                    alt={t.clientName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[9px] text-[#7c7367]">
+                    No Image
+                  </div>
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-medium text-[#1c1a17]">{t.clientName}</h3>
                   <div className="flex items-center text-[#b68d54]">
                     {Array.from({ length: t.rating }).map((_, i) => (
                       <Star key={i} className="w-3 h-3 fill-current" />
                     ))}
                   </div>
+                  {t.projectName && (
+                    <span className="text-[10px] uppercase tracking-wider text-[#8f6a37] font-semibold bg-[#f4efe6] px-2 py-0.5 rounded border border-[#dfd7c9]">
+                      {t.projectName}
+                    </span>
+                  )}
+                  {t.videoUrl && (
+                    <span className="text-[10px] uppercase tracking-wider text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                      Video
+                    </span>
+                  )}
                   <span
-                    className={`text-[11px] px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
                       t.status === 'published'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-amber-50 text-amber-800'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-amber-50 text-amber-800 border border-amber-200'
                     }`}
                   >
                     {t.status}
                   </span>
                 </div>
-                <p className="text-xs text-[#6b6358] line-clamp-1 mt-0.5">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-xs text-[#6b6358] line-clamp-1 mt-1">
+                  &ldquo;{t.projectDescription || t.quote}&rdquo;
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => handleQuickToggle(t)}
+                className="admin-btn-secondary admin-btn-sm"
+                title={t.status === 'published' ? 'Hide review (draft)' : 'Publish review'}
+              >
+                {t.status === 'published' ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">
+                  {t.status === 'published' ? 'Draft' : 'Publish'}
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => {

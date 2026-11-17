@@ -41,6 +41,7 @@ export async function PATCH(request: Request) {
     introVideoPoster: String(body.introVideoPoster ?? ''),
     teamMembers: Array.isArray(body.teamMembers) ? body.teamMembers : [],
     extraSections: Array.isArray(body.extraSections) ? body.extraSections : [],
+    ...(body.founder ? { founder: body.founder } : {}),
     updatedAt: now,
   }
 

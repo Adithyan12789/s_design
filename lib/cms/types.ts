@@ -86,6 +86,33 @@ export type StudioExtraSection = {
   content: string
 }
 
+export type FounderStat = {
+  value: string
+  label: string
+  detail: string
+}
+
+export type CmsFounderInfo = {
+  visible: boolean
+  displayOrder: number
+  kicker: string
+  label: string
+  heading: string
+  founderName: string
+  founderRole: string
+  founderPhoto: string
+  founderBio: string
+  philosophy: string
+  quote: string
+  stats: FounderStat[]
+  showStats?: boolean
+  buttonText: string
+  buttonHref: string
+  showButton?: boolean
+  illustrationUrl?: string
+  showIllustration?: boolean
+}
+
 export type CmsStudioInfo = {
   kicker: string
   heading: string
@@ -105,6 +132,7 @@ export type CmsStudioInfo = {
   introVideoPoster?: string
   teamMembers: StudioTeamMember[]
   extraSections: StudioExtraSection[]
+  founder?: CmsFounderInfo
 }
 
 export type CmsTestimonial = {
@@ -274,6 +302,7 @@ export type PublicSiteData = {
   projects: CmsProject[]
   services: CmsService[]
   studioInfo: CmsStudioInfo
+  founder: CmsFounderInfo
   testimonials: CmsTestimonial[]
   settings: CmsWebsiteSettings
   homepage: CmsHomepageContent

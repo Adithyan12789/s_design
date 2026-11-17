@@ -293,15 +293,23 @@ export function ProjectsManager({
                   />
                 </div>
                 <div>
-                  <label className="admin-label">Category / Type</label>
+                  <label className="admin-label">Category</label>
                   <input
                     type="text"
+                    list="project-categories"
                     value={editing.category}
                     onChange={(e) =>
                       setEditing({ ...editing, category: e.target.value, type: e.target.value })
                     }
+                    placeholder="e.g. Residential, Hospitality, Cultural..."
                     className="admin-input"
                   />
+                  <datalist id="project-categories">
+                    <option value="Residential" />
+                    <option value="Hospitality" />
+                    <option value="Cultural" />
+                    <option value="Renovation" />
+                  </datalist>
                 </div>
                 <div>
                   <label className="admin-label">Area / Size Label</label>

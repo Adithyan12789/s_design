@@ -22,7 +22,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const [submitted, setSubmitted] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('')
 
-  const { projects, services, studioInfo, testimonials, settings, homepage, navigation } = siteData
+  const { projects, services, studioInfo, founder, testimonials, settings, homepage, navigation } = siteData
 
   const showcaseProjects: Project[] = projects.map((p) => ({
     slug: p.slug,
@@ -390,6 +390,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
 
       {/* Founder / About Section */}
       <FounderSection
+        founder={founder}
         studioInfo={studioInfo}
         approachDescription={homepage.approachDescription}
       />
