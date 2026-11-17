@@ -117,11 +117,11 @@ export const DEFAULT_FOUNDER_INFO: CmsFounderInfo = {
   quote:
     'Architecture is not merely about form or enclosure; it is the quiet art of making room for life, shaped by light and tactile honesty.',
   stats: [
-    { value: '14+', label: 'Years of Experience', detail: 'Studio Practice' },
-    { value: '28+', label: 'Projects Completed', detail: 'Private & Cultural' },
-    { value: '18,000 m²', label: 'Total Area Designed', detail: 'Portugal & Global' },
+    { value: '10+', label: 'Years Experience', detail: '' },
+    { value: '500+', label: 'Projects Realized', detail: '' },
+    { value: '99K', label: 'SQ Meters Realized', detail: '' },
   ],
-  showStats: false,
+  showStats: true,
   buttonText: 'Our Philosophy',
   buttonHref: '#studio',
   showButton: false,

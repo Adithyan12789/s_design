@@ -55,8 +55,18 @@ export function FounderSection({
   const kicker = founder?.kicker?.trim() || '( 06 )'
   const label = founder?.label?.trim() || 'THE FOUNDER'
   const showButton = Boolean(founder?.showButton && founder?.buttonText?.trim())
-  const showStats = Boolean(founder?.showStats && founder?.stats && founder.stats.length > 0)
   const showIllustration = Boolean(founder?.showIllustration && founder?.illustrationUrl?.trim())
+
+  const fallbackStats = [
+    { value: '10+', label: 'Years Experience' },
+    { value: '500+', label: 'Projects Realized' },
+    { value: '99K', label: 'SQ Meters Realized' },
+  ]
+
+  const statsList =
+    founder?.stats && founder.stats.length >= 3 && founder.stats[0]?.value !== '14+'
+      ? founder.stats.slice(0, 3)
+      : fallbackStats
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -111,7 +121,7 @@ export function FounderSection({
 
       <div className="founder-container">
         <div className="founder-compact-grid">
-          {/* LEFT: Founder image with small size */}
+          {/* LEFT: Founder image with name and tag on the bottom */}
           <div ref={imageRef} className="founder-image-col">
             <div className="founder-small-portrait">
               <Image
@@ -124,17 +134,18 @@ export function FounderSection({
               />
               <div className="founder-portrait-scrim" aria-hidden="true" />
             </div>
+
+            <div className="founder-caption">
+              <h3 className="founder-name">{founderName}</h3>
+              <p className="founder-tag">{founderRole}</p>
+            </div>
           </div>
 
-          {/* RIGHT: Name, Tag, Details, Quote */}
+          {/* RIGHT: Kicker, Details, Quote, Counts/Stats, Philosophy Button */}
           <div ref={contentRef} className="founder-content-col">
             <div className="section-kicker founder-kicker">
               {kicker} <span>{label}</span>
             </div>
-
-            <h2 className="founder-name">{founderName}</h2>
-
-            <p className="founder-tag">{founderRole}</p>
 
             <p className="founder-details">{founderBio}</p>
 
@@ -142,26 +153,21 @@ export function FounderSection({
               <p className="founder-quote-text">“{founderQuote}”</p>
             </blockquote>
 
+            <div className="founder-profile-stats">
+              {statsList.map((st, i) => (
+                <div key={i} className="founder-profile-stat">
+                  <span className="founder-profile-stat-number">{st.value}</span>
+                  <span className="founder-profile-stat-label">{st.label}</span>
+                </div>
+              ))}
+            </div>
+
             {showButton && (
               <div className="founder-btn-wrap">
                 <a href={founder?.buttonHref || '#studio'} className="founder-action-btn">
                   <span>{founder?.buttonText || 'Our Philosophy'}</span>
                   <ArrowUpRight size={14} className="founder-btn-arrow" />
                 </a>
-              </div>
-            )}
-
-            {showStats && (
-              <div className="founder-stats-container">
-                <div className="founder-stats-grid">
-                  {founder?.stats?.map((st, i) => (
-                    <div key={i} className="founder-stat-item">
-                      <span className="founder-stat-number">{st.value}</span>
-                      <span className="founder-stat-label">{st.label}</span>
-                      <span className="founder-stat-detail">{st.detail}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
           </div>

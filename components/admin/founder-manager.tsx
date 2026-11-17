@@ -415,9 +415,9 @@ export function FounderManager({
         </div>
 
         <div className="p-6 md:p-8 rounded-xl bg-[#141311] text-[#efebe2] border border-[#2a2824] shadow-inner">
-          <div className="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-8 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-8 items-start">
             {/* Left Column Preview */}
-            <div className="w-full max-w-[200px]">
+            <div className="w-full max-w-[200px] space-y-3">
               <div className="aspect-[4/5.2] rounded-xl overflow-hidden border border-[rgba(244,239,230,0.12)] bg-[#181614] relative shadow-lg">
                 {form.founderPhoto ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -432,21 +432,22 @@ export function FounderManager({
                   </div>
                 )}
               </div>
+
+              <div>
+                <h4 className="font-serif text-lg text-[#fbf9f4] font-normal leading-tight">
+                  {form.founderName || 'Founder Name'}
+                </h4>
+                <div className="text-[10px] uppercase tracking-[0.12em] text-[#f1cf9e] font-medium mt-1">
+                  {form.founderRole || 'Principal Architect & Founder'}
+                </div>
+              </div>
             </div>
 
             {/* Right Column Preview */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="text-[10px] tracking-[0.15em] uppercase text-[#d9b686]">
                 {form.kicker || '( 06 )'}{' '}
                 <span className="text-[#8c857b]">{form.label || 'THE FOUNDER'}</span>
-              </div>
-
-              <h4 className="font-serif text-2xl md:text-3xl text-[#fbf9f4] font-normal leading-tight">
-                {form.founderName || 'Founder Name'}
-              </h4>
-
-              <div className="text-xs uppercase tracking-[0.12em] text-[#f1cf9e] font-medium">
-                {form.founderRole || 'Principal Architect & Founder'}
               </div>
 
               <p className="text-xs text-[#dfdbd2] leading-relaxed max-w-xl">
@@ -459,24 +460,34 @@ export function FounderManager({
                 </blockquote>
               )}
 
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[rgba(244,239,230,0.1)] max-w-lg">
+                {(form.stats && form.stats.length >= 3
+                  ? form.stats.slice(0, 3)
+                  : [
+                      { value: '10+', label: 'Years Experience' },
+                      { value: '500+', label: 'Projects Realized' },
+                      { value: '99K', label: 'SQ Meters Realized' },
+                    ]
+                ).map((st, i) => (
+                  <div
+                    key={i}
+                    className={i > 0 ? 'pl-3 border-l border-[rgba(244,239,230,0.1)]' : ''}
+                  >
+                    <div className="font-serif font-bold text-lg text-[#fbf9f4] leading-tight">
+                      {st.value || '-'}
+                    </div>
+                    <div className="text-[9px] uppercase tracking-wider text-[#8c857b] leading-tight mt-1">
+                      {st.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {form.showButton && form.buttonText && (
                 <div className="pt-2">
                   <span className="inline-block px-3 py-1.5 text-[10px] uppercase tracking-wider text-[#fbf9f4] border border-[rgba(244,239,230,0.28)] rounded">
                     {form.buttonText} ↗
                   </span>
-                </div>
-              )}
-
-              {form.showStats && form.stats && form.stats.length > 0 && (
-                <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[rgba(244,239,230,0.1)]">
-                  {form.stats.map((st, i) => (
-                    <div key={i}>
-                      <div className="font-serif text-lg text-[#fbf9f4]">{st.value || '-'}</div>
-                      <div className="text-[9px] uppercase tracking-wider text-[#8c857b]">
-                        {st.label}
-                      </div>
-                    </div>
-                  ))}
                 </div>
               )}
             </div>
