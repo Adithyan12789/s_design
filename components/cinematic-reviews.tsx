@@ -235,21 +235,21 @@ export function CinematicReviews({
       <div className="reviews-ambient-glow" aria-hidden="true" />
 
       <div className="reviews-container">
-        <header className="reviews-section-header">
-          <div className="section-kicker reviews-section-kicker">
-            <span className="reviews-kicker-num">( 05 )</span>
-            <span className="reviews-kicker-title">{kicker}</span>
-          </div>
-          {showCustomHeading && (
-            <h2>
-              {heading1} {heading2 ? <em>{heading2}</em> : null}
-            </h2>
-          )}
-        </header>
-
         <div ref={frameRef} className="reviews-editorial-frame">
           {/* LEFT PANEL — Simplified 4-element client review details */}
           <div className="reviews-left-panel">
+            <header className="reviews-section-header">
+              <div className="section-kicker reviews-section-kicker">
+                <span className="reviews-kicker-num">( 05 )</span>
+                <span className="reviews-kicker-title">{kicker}</span>
+              </div>
+              {showCustomHeading && (
+                <h2>
+                  {heading1} {heading2 ? <em>{heading2}</em> : null}
+                </h2>
+              )}
+            </header>
+
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current.id}

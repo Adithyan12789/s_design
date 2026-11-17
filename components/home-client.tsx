@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { CinematicReviews } from '@/components/cinematic-reviews'
+import { FounderSection } from '@/components/founder-section'
 import { WorkHorizontalShowcase } from '@/components/work-horizontal-showcase'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
@@ -14,7 +15,7 @@ import { HamburgerButton } from '@/components/motion/hamburger-button'
 import type { Project } from '@/lib/projects'
 import type { PublicSiteData } from '@/lib/cms/types'
 
-const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'contact'] as const
+const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'founder', 'contact'] as const
 
 export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -385,6 +386,12 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
             ? ''
             : (homepage.reviewsHeading2 || '')
         }
+      />
+
+      {/* Founder / About Section */}
+      <FounderSection
+        studioInfo={studioInfo}
+        approachDescription={homepage.approachDescription}
       />
 
       {/* Contact Section */}
