@@ -13,7 +13,7 @@ import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { FullNavOverlay } from '@/components/motion/full-nav-overlay'
 import { HamburgerButton } from '@/components/motion/hamburger-button'
 import type { Project } from '@/lib/projects'
-import type { PublicSiteData } from '@/lib/cms/types'
+import type { PublicSiteData, CmsNavItem } from '@/lib/cms/types'
 
 const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'founder', 'contact'] as const
 
@@ -46,8 +46,40 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
     galleryItems: p.galleryImages,
   }))
 
-  const visibleNav = navigation.filter((n) => n.visible && !n.isCta)
-  const ctaNav = navigation.find((n) => n.visible && n.isCta)
+  const rawNav = Array.isArray(navigation) ? navigation : []
+  const rawVisibleNav = rawNav.filter((n) => n && n.visible && !n.isCta)
+  const hasAboutNav = rawVisibleNav.some(
+    (n) => n && (n.href?.includes('founder') || n.label?.toLowerCase() === 'about')
+  )
+
+  const visibleNav: CmsNavItem[] = hasAboutNav
+    ? rawVisibleNav.map((n) =>
+        n.label?.toLowerCase() === 'about' && !n.href?.includes('founder')
+          ? { ...n, href: '#founder' }
+          : n
+      )
+    : (() => {
+        const items = [...rawVisibleNav]
+        const aboutItem: CmsNavItem = {
+          id: 'nav-founder',
+          label: 'About',
+          href: '#founder',
+          subtitle: 'The Founder & Philosophy',
+          previewImage:
+            founder?.founderPhoto ||
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=85',
+          displayOrder: 3.5,
+          visible: true,
+          isCta: false,
+        }
+        const contactIdx = items.findIndex((i) => i.href?.includes('contact'))
+        if (contactIdx !== -1) {
+          items.splice(contactIdx, 0, aboutItem)
+        } else {
+          items.push(aboutItem)
+        }
+        return items
+      })()
 
   const isVideoFile = (url?: string | null) => {
     if (!url) return false
@@ -159,7 +191,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
         isOpen={isNavOpen}
         onClose={() => setIsNavOpen(false)}
         activeSection={activeSection}
-        navItems={navigation}
+        navItems={visibleNav}
         settings={settings}
       />
 
@@ -190,9 +222,6 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
                 </a>
               )
             })}
-            <a className="nav-cta" href={ctaNav?.href || '#contact'}>
-              {ctaNav?.label || 'Start a project'} <ArrowUpRight size={15} />
-            </a>
           </nav>
 
           <HamburgerButton
@@ -449,7 +478,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
           darkLogoUrl={settings.darkLogoUrl}
         />
         <div className="footer-links">
-          {visibleNav.slice(0, 3).map((item) => {
+          {(visibleNav || []).map((item) => {
             const href = item.href.startsWith('/#') ? item.href.slice(1) : item.href
             return (
               <a key={item.id} href={href}>

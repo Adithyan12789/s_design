@@ -57,8 +57,8 @@ export function SiteHeaderNav({
             </Link>
           )}
 
-          <Link className="nav-cta" href="/#contact">
-            Start a project <ArrowUpRight size={14} />
+          <Link className="nav-cta" href="/#founder">
+            About <ArrowUpRight size={14} />
           </Link>
 
           <HamburgerButton

@@ -42,6 +42,14 @@ const DEFAULT_NAV_ITEMS = [
   },
   {
     index: '04',
+    id: 'founder',
+    title: 'About',
+    href: '/#founder',
+    subtitle: 'The Founder & Philosophy',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    index: '05',
     id: 'contact',
     title: 'Contact',
     href: '/#contact',

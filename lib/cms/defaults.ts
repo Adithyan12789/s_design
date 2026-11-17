@@ -359,13 +359,24 @@ export const DEFAULT_NAVIGATION: CmsNavItem[] = [
     isCta: false,
   },
   {
+    id: 'nav-founder',
+    label: 'About',
+    href: '/#founder',
+    subtitle: 'The Founder & Philosophy',
+    previewImage:
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=85',
+    displayOrder: 3,
+    visible: true,
+    isCta: false,
+  },
+  {
     id: 'nav-contact',
     label: 'Contact',
     href: '/#contact',
     subtitle: 'Initiate a Conversation',
     previewImage:
       'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80',
-    displayOrder: 3,
+    displayOrder: 4,
     visible: true,
     isCta: false,
   },
