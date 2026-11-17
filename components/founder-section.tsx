@@ -160,7 +160,7 @@ export function FounderSection({
 
             {showButton && (
               <div className="founder-btn-wrap">
-                <a href={buttonHref} className="founder-action-btn">
+                <a href={buttonHref} className="founder-action-btn cursor-target">
                   <span>{buttonText}</span>
                   <ArrowUpRight size={14} className="founder-btn-arrow" />
                 </a>

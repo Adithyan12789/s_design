@@ -295,7 +295,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
                 <a
                   key={item.id}
                   href={href}
-                  className={isCurrent ? 'is-active' : undefined}
+                  className={`cursor-target ${isCurrent ? 'is-active' : ''}`}
                   aria-current={isCurrent ? 'location' : undefined}
                 >
                   {item.label}
@@ -374,7 +374,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
 
           <ScrollReveal delay={0.25}>
             <p>{studioInfo.description || studioInfo.introText}</p>
-            <a className="text-link" href="#contact">
+            <a className="text-link cursor-target" href="#contact">
               More about the studio <ArrowUpRight size={16} />
             </a>
           </ScrollReveal>
@@ -406,7 +406,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
             <p>{homepage.initiateDescription}</p>
           </ScrollReveal>
           <ScrollReveal delay={0.14} className="cta-strip-actions">
-            <a href={homepage.initiateCtaHref || '#contact'} className="submit-button">
+            <a href={homepage.initiateCtaHref || '#contact'} className="submit-button cursor-target" data-cursor-label="Initiate">
               <span>{homepage.initiateCtaLabel}</span>
               <ArrowUpRight size={18} />
             </a>
@@ -446,7 +446,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
 
           <ScrollReveal delay={0.2}>
             <p>{homepage.approachDescription}</p>
-            <a className="text-link" href="#contact">
+            <a className="text-link cursor-target" href="#contact" data-cursor-label="Contact">
               Start a conversation <ArrowUpRight size={16} />
             </a>
           </ScrollReveal>
@@ -464,7 +464,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
         <ScrollReveal variant="stagger-children" stagger={0.1}>
           <div className="service-list">
             {services.map((service, i) => (
-              <div className="service-row group" key={service.id}>
+              <div className="service-row group cursor-target" key={service.id}>
                 <span>0{i + 1}</span>
                 <h3>{service.title}</h3>
                 <ArrowUpRight size={20} className="service-arrow" />
@@ -533,7 +533,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
                 Tell us about your project
                 <textarea required name="message" rows={4} placeholder="A few words to begin..." suppressHydrationWarning />
               </label>
-              <button className="submit-button" type="submit" suppressHydrationWarning>
+              <button className="submit-button cursor-target" data-cursor-label="Submit" type="submit" suppressHydrationWarning>
                 {submitted ? 'Message sent — thank you' : 'Send inquiry'} <ArrowUpRight size={17} />
               </button>
             </form>
@@ -555,7 +555,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
           {(visibleNav || []).map((item) => {
             const href = item.href.startsWith('/#') ? item.href.slice(1) : item.href
             return (
-              <a key={item.id} href={href}>
+              <a key={item.id} href={href} className="cursor-target">
                 {item.label}
               </a>
             )
@@ -567,6 +567,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
             target={settings.instagramUrl ? '_blank' : undefined}
             rel={settings.instagramUrl ? 'noopener noreferrer' : undefined}
             aria-label="Instagram"
+            className="cursor-target"
           >
             Instagram
           </a>
@@ -575,6 +576,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
             target={settings.linkedinUrl ? '_blank' : undefined}
             rel={settings.linkedinUrl ? 'noopener noreferrer' : undefined}
             aria-label="LinkedIn"
+            className="cursor-target"
           >
             LinkedIn
           </a>

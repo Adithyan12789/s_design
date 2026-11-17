@@ -195,7 +195,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden p-1 text-[#e7e1d6]/70 hover:text-white"
+            className="lg:hidden p-1 text-[#e7e1d6]/70 hover:text-white cursor-target"
           >
             <X className="w-5 h-5" />
           </button>
@@ -210,7 +210,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                 key={item.id}
                 type="button"
                 onClick={() => handleTabSwitch(item.id)}
-                className={`admin-nav-btn ${active ? 'is-active' : ''}`}
+                className={`admin-nav-btn cursor-target ${active ? 'is-active' : ''}`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span className="truncate">{item.label}</span>
@@ -229,7 +229,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
           <button
             type="button"
             onClick={handleLogout}
-            className="admin-nav-btn text-red-300/90 hover:text-red-200 hover:bg-red-500/10"
+            className="admin-nav-btn cursor-target text-red-300/90 hover:text-red-200 hover:bg-red-500/10"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Logout</span>
@@ -244,7 +244,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg border border-[#dfd7c9] bg-white text-[#1c1a17]"
+              className="lg:hidden p-2 rounded-lg border border-[#dfd7c9] bg-white text-[#1c1a17] cursor-target"
               aria-label="Open menu"
             >
               <MenuIcon className="w-5 h-5" />
@@ -258,7 +258,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="admin-btn-secondary text-xs py-1.5"
+            className="admin-btn-secondary cursor-target text-xs py-1.5"
           >
             View Live Website
             <ExternalLink className="w-3.5 h-3.5" />
@@ -326,7 +326,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('projects')}
-                      className="admin-btn-primary justify-start"
+                      className="admin-btn-primary cursor-target justify-start"
                     >
                       <Building2 className="w-4 h-4" />
                       Manage Projects Portfolio
@@ -334,7 +334,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('founder')}
-                      className="admin-btn-secondary justify-start"
+                      className="admin-btn-secondary cursor-target justify-start"
                     >
                       <UserCheck className="w-4 h-4" />
                       Manage Founder Section
@@ -342,7 +342,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('testimonials')}
-                      className="admin-btn-secondary justify-start"
+                      className="admin-btn-secondary cursor-target justify-start"
                     >
                       <MessageSquareQuote className="w-4 h-4" />
                       Manage Client Reviews
@@ -350,7 +350,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('homepage')}
-                      className="admin-btn-secondary justify-start"
+                      className="admin-btn-secondary cursor-target justify-start"
                     >
                       <Home className="w-4 h-4" />
                       Edit Homepage Headlines
@@ -358,7 +358,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('branding')}
-                      className="admin-btn-secondary justify-start"
+                      className="admin-btn-secondary cursor-target justify-start"
                     >
                       <Palette className="w-4 h-4" />
                       Update Logos &amp; Branding
@@ -366,7 +366,7 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('media')}
-                      className="admin-btn-secondary justify-start"
+                      className="admin-btn-secondary cursor-target justify-start"
                     >
                       <ImageIcon className="w-4 h-4" />
                       Open Media Library

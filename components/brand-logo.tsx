@@ -60,7 +60,7 @@ export function BrandLogo({
   if (!href) return content
 
   return (
-    <Link href={href} className="brand-logo-link" aria-label={`${studioName} home`}>
+    <Link href={href} className="brand-logo-link cursor-target" aria-label={`${studioName} home`}>
       {content}
     </Link>
   )

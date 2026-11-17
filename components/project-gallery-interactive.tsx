@@ -34,7 +34,8 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
           return (
             <div
               key={image}
-              className="gallery-item-wrapper group cursor-pointer"
+              className="gallery-item-wrapper group cursor-pointer cursor-target"
+              data-cursor-label={isVid ? 'Play' : 'Expand'}
               onClick={() => openLightbox(index)}
             >
               {isVid ? (
@@ -78,7 +79,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
         >
           <div className="lightbox-container" onClick={(e) => e.stopPropagation()}>
             <button
-              className="lightbox-close-btn"
+              className="lightbox-close-btn cursor-target"
               onClick={closeLightbox}
               aria-label="Close media viewer"
               suppressHydrationWarning
@@ -87,7 +88,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
             </button>
 
             <button
-              className="lightbox-nav-btn prev"
+              className="lightbox-nav-btn prev cursor-target"
               onClick={showPrev}
               aria-label="Previous media"
               suppressHydrationWarning
@@ -119,7 +120,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
             </div>
 
             <button
-              className="lightbox-nav-btn next"
+              className="lightbox-nav-btn next cursor-target"
               onClick={showNext}
               aria-label="Next media"
               suppressHydrationWarning

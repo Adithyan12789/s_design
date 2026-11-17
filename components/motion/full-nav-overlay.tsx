@@ -151,7 +151,7 @@ export function FullNavOverlay({
             darkLogoUrl={settings?.darkLogoUrl}
           />
           <button
-            className="nav-overlay-close-btn"
+            className="nav-overlay-close-btn cursor-target"
             onClick={onClose}
             aria-label="Close navigation menu"
             suppressHydrationWarning
@@ -182,7 +182,7 @@ export function FullNavOverlay({
                       window.dispatchEvent(new CustomEvent('lenis:start'))
                       onClose()
                     }}
-                    className="nav-item-anchor"
+                    className="nav-item-anchor cursor-target"
                     aria-current={isCurrent ? 'location' : undefined}
                   >
                     <span className="nav-item-index">{item.index}</span>
@@ -219,7 +219,8 @@ export function FullNavOverlay({
             <span className="meta-label">INQUIRIES</span>
             <a
               href={`mailto:${settings?.email || 'hello@sdesigns.studio'}`}
-              className="meta-value"
+              className="meta-value cursor-target"
+              data-cursor-label="Contact"
             >
               {settings?.email || 'hello@sdesigns.studio'}
             </a>
@@ -244,6 +245,7 @@ export function FullNavOverlay({
                 target={settings?.instagramUrl ? '_blank' : undefined}
                 rel={settings?.instagramUrl ? 'noopener noreferrer' : undefined}
                 aria-label="Instagram"
+                className="cursor-target"
               >
                 Instagram
               </a>
@@ -253,6 +255,7 @@ export function FullNavOverlay({
                 target={settings?.linkedinUrl ? '_blank' : undefined}
                 rel={settings?.linkedinUrl ? 'noopener noreferrer' : undefined}
                 aria-label="LinkedIn"
+                className="cursor-target"
               >
                 LinkedIn
               </a>

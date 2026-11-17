@@ -296,7 +296,7 @@ export function CinematicReviews({
                 <div className="reviews-nav-buttons">
                   <button
                     type="button"
-                    className="reviews-nav-btn"
+                    className="reviews-nav-btn cursor-target"
                     onClick={() => stepReview(-1)}
                     aria-label="Previous testimonial"
                     suppressHydrationWarning
@@ -305,7 +305,7 @@ export function CinematicReviews({
                   </button>
                   <button
                     type="button"
-                    className="reviews-nav-btn"
+                    className="reviews-nav-btn cursor-target"
                     onClick={() => stepReview(1)}
                     aria-label="Next testimonial"
                     suppressHydrationWarning
@@ -324,7 +324,7 @@ export function CinematicReviews({
                         role="tab"
                         aria-selected={isActive}
                         aria-label={`View testimonial from ${review.client}`}
-                        className={`reviews-dot${isActive ? ' is-active' : ''}`}
+                        className={`reviews-dot cursor-target${isActive ? ' is-active' : ''}`}
                         onClick={() => selectReview(index)}
                         suppressHydrationWarning
                       />
@@ -390,7 +390,8 @@ export function CinematicReviews({
                   {!isVideoPlaying && (
                     <button
                       type="button"
-                      className="reviews-play-overlay"
+                      className="reviews-play-overlay cursor-target"
+                      data-cursor-label="Play"
                       onClick={handleTogglePlay}
                       aria-label={`Play video testimonial from ${current.client}`}
                       suppressHydrationWarning

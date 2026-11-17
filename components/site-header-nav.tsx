@@ -52,12 +52,12 @@ export function SiteHeaderNav({
 
         <div className="flex items-center gap-6">
           {showBackLink && (
-            <Link className="back-link" href={backHref}>
+            <Link className="back-link cursor-target" data-cursor-label="Back" href={backHref}>
               <ArrowLeft size={15} /> {backLabel}
             </Link>
           )}
 
-          <Link className="nav-cta" href="/#founder">
+          <Link className="nav-cta cursor-target" href="/#founder">
             About <ArrowUpRight size={14} />
           </Link>
 

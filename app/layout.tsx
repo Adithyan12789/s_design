@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { SmoothScrollProvider } from '@/components/motion/smooth-scroll'
+import TargetCursor from '@/components/TargetCursor'
 import { getPublicSiteData } from '@/lib/cms/queries'
 import './globals.css'
 
@@ -78,6 +79,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <SmoothScrollProvider>
           {children}
         </SmoothScrollProvider>
+        <TargetCursor
+          spinDuration={2}
+          hoverDuration={0.2}
+          size={36}
+          cornerSize={12}
+          thickness={3}
+          padding={6}
+          dotSize={4}
+          cursorColor="#ffffff"
+          cursorColorOnTarget="#ffffff"
+          blendMode="difference"
+          parallaxOn={true}
+          matchRadius={true}
+          showLabel={true}
+          clickEffect={true}
+          hideDefaultCursor={true}
+        />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

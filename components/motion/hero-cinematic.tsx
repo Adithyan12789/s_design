@@ -548,7 +548,8 @@ export function HeroCinematic({
             <p ref={bottomCopyRef}>{description}</p>
             <a
               ref={circleLinkRef}
-              className="circle-link"
+              className="circle-link cursor-target"
+              data-cursor-label="Explore"
               href={targetSectionId}
               aria-label="Explore selected work"
             >

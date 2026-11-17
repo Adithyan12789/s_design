@@ -50,7 +50,12 @@ export function TiltProjectCard({
       }}
       style={{ '--tilt-x': `${tilt.x}deg`, '--tilt-y': `${tilt.y}deg` } as React.CSSProperties}
     >
-      <Link href={projectHref} className="project-card-link" aria-label={`View ${title} project details`}>
+      <Link
+        href={projectHref}
+        className="project-card-link cursor-target"
+        data-cursor-label="View Project"
+        aria-label={`View ${title} project details`}
+      >
         <div className="tilt-project-stage">
           <div className="project-image" style={{ backgroundImage: `url(${image})` }} />
           <div className="tilt-project-overlay" />

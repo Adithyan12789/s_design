@@ -100,7 +100,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <div className="detail-hero-scroll">
               Scroll to explore <span>↓</span>
             </div>
-            <Link href="/#contact" className="text-link detail-hero-cta">
+            <Link href="/#contact" className="text-link detail-hero-cta cursor-target" data-cursor-label="Contact">
               Start a conversation <ArrowUpRight size={15} />
             </Link>
           </div>
@@ -159,11 +159,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <h2>{nextProject.title}</h2>
             <p>{nextProject.location} — {nextProject.type}</p>
             <div className="next-actions">
-              <Link href={`/work/${nextProject.slug}`} className="submit-button">
+              <Link href={`/work/${nextProject.slug}`} className="submit-button cursor-target" data-cursor-label="Next">
                 <span>View {nextProject.title}</span>
                 <ArrowRight size={17} />
               </Link>
-              <Link href="/#selected-work" className="text-link">
+              <Link href="/#selected-work" className="text-link cursor-target">
                 View entire collection <ArrowUpRight size={16} />
               </Link>
             </div>
@@ -183,15 +183,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           darkLogoUrl={siteData.settings.darkLogoUrl}
         />
         <div className="project-pager-nav">
-          <Link href={`/work/${prevProject.slug}`} className="pager-link">
+          <Link href={`/work/${prevProject.slug}`} className="pager-link cursor-target" data-cursor-label="Previous">
             <ArrowLeft size={14} /> Previous: {prevProject.title}
           </Link>
           <span className="dot">/</span>
-          <Link href={`/work/${nextProject.slug}`} className="pager-link">
+          <Link href={`/work/${nextProject.slug}`} className="pager-link cursor-target" data-cursor-label="Next">
             Next: {nextProject.title} <ArrowRight size={14} />
           </Link>
         </div>
-        <Link className="text-link" href="/#contact">
+        <Link className="text-link cursor-target" href="/#contact" data-cursor-label="Contact">
           Start a conversation <ArrowUpRight size={16} />
         </Link>
       </footer>

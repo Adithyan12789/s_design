@@ -9,7 +9,7 @@ type HamburgerButtonProps = {
 export function HamburgerButton({ isOpen, onClick, className = '' }: HamburgerButtonProps) {
   return (
     <button
-      className={`hamburger-architectural-btn ${isOpen ? 'is-active' : ''} ${className}`}
+      className={`hamburger-architectural-btn cursor-target ${isOpen ? 'is-active' : ''} ${className}`}
       onClick={onClick}
       aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
       aria-expanded={isOpen}

@@ -401,7 +401,7 @@ export function WorkHorizontalShowcase({
                   key={project.slug}
                   type="button"
                   onClick={() => scrollToProject(idx)}
-                  className={`exhibition-index-btn ${idx === activeIndex ? 'is-active' : ''}`}
+                  className={`exhibition-index-btn cursor-target ${idx === activeIndex ? 'is-active' : ''}`}
                   aria-label={`View ${project.title}`}
                   suppressHydrationWarning
                 >
@@ -448,7 +448,8 @@ export function WorkHorizontalShowcase({
                   >
                     <Link
                       href={`/work/${project.slug}`}
-                      className="slide-title-link"
+                      className="slide-title-link cursor-target"
+                      data-cursor-label="View Project"
                       aria-label={`View ${project.title}`}
                     >
                       <h2 className="slide-project-title">{project.title}</h2>
@@ -463,7 +464,8 @@ export function WorkHorizontalShowcase({
                         primaryLinkRefs.current[index] = el
                       }}
                       href={`/work/${project.slug}`}
-                      className="exhibition-primary-link"
+                      className="exhibition-primary-link cursor-target"
+                      data-cursor-label="View Project"
                       aria-label={`Explore ${project.title} in ${project.location}`}
                     >
                       <div className="exhibition-frame-mask">
