@@ -61,6 +61,18 @@ export async function PATCH(request: Request) {
     }
   }
 
+  const approachPublicId = String(body.approachPublicId ?? '').trim()
+  const approachAlt = String(body.approachAlt ?? 'Our architectural design approach').trim()
+  const approachPoster = String(body.approachPosterUrl ?? '').trim()
+
+  const approachMedia = {
+    type: approachType,
+    url: approachType === 'video' ? approachVideo : approachImg,
+    publicId: approachPublicId,
+    posterUrl: approachPoster,
+    alt: approachAlt,
+  }
+
   const payload = {
     heroEyebrow: String(body.heroEyebrow ?? ''),
     heroTitleLine1: String(body.heroTitleLine1 ?? ''),
@@ -82,7 +94,10 @@ export async function PATCH(request: Request) {
     approachImageUrl: approachImg,
     approachMediaType: approachType,
     approachVideoUrl: approachVideo,
-    approachPosterUrl: String(body.approachPosterUrl ?? ''),
+    approachPosterUrl: approachPoster,
+    approachPublicId,
+    approachAlt,
+    approachMedia,
     initiateKicker: String(body.initiateKicker ?? ''),
     initiateHeading: String(body.initiateHeading ?? ''),
     initiateSubtitle: String(body.initiateSubtitle ?? ''),

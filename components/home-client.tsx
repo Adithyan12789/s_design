@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { CinematicReviews } from '@/components/cinematic-reviews'
@@ -16,6 +16,86 @@ import type { Project } from '@/lib/projects'
 import type { PublicSiteData, CmsNavItem } from '@/lib/cms/types'
 
 const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'founder', 'contact'] as const
+
+function ApproachMediaVideo({
+  videoUrl,
+  posterUrl,
+  altText,
+  fallbackImageUrl,
+}: {
+  videoUrl: string
+  posterUrl?: string
+  altText?: string
+  fallbackImageUrl?: string
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || hasError) return
+
+    video.muted = true
+    video.defaultMuted = true
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const playPromise = video.play()
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {})
+            }
+          } else {
+            video.pause()
+          }
+        }
+      },
+      { threshold: 0.15 }
+    )
+
+    observer.observe(video)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [hasError, videoUrl])
+
+  if (hasError && (fallbackImageUrl || posterUrl)) {
+    return (
+      <ParallaxImage
+        src={fallbackImageUrl || posterUrl}
+        alt={altText || 'Architectural design approach'}
+        className="statement-parallax-stage"
+        enableClipReveal
+        parallaxSpeed={12}
+      />
+    )
+  }
+
+  return (
+    <ParallaxImage
+      className="statement-parallax-stage"
+      enableClipReveal
+      parallaxSpeed={12}
+      alt={altText || 'Our architectural approach'}
+    >
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        poster={posterUrl || fallbackImageUrl || undefined}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onError={() => setHasError(true)}
+        aria-label={altText || 'Architectural design approach video'}
+        className="w-full h-full object-cover"
+      />
+    </ParallaxImage>
+  )
+}
 
 export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -337,22 +417,16 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       {/* Statement Section with Architectural Parallax & Clip Reveal */}
       <section className="statement">
         {homepage.approachMediaType === 'video' && homepage.approachVideoUrl ? (
-          <div className="statement-parallax-stage relative overflow-hidden rounded-lg">
-            <video
-              src={homepage.approachVideoUrl}
-              poster={homepage.approachPosterUrl || homepage.approachImageUrl || undefined}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <ApproachMediaVideo
+            videoUrl={homepage.approachVideoUrl}
+            posterUrl={homepage.approachPosterUrl}
+            altText={homepage.approachAlt}
+            fallbackImageUrl={homepage.approachImageUrl}
+          />
         ) : (
           <ParallaxImage
             src={homepage.approachImageUrl}
-            alt="Architectural stone structure and light aperture"
+            alt={homepage.approachAlt || "Architectural stone structure and light aperture"}
             className="statement-parallax-stage"
             enableClipReveal
             parallaxSpeed={12}

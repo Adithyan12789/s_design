@@ -16,10 +16,14 @@ export interface MediaFieldProps {
   imageUrl?: string
   videoUrl?: string
   posterUrl?: string
+  publicId?: string
+  alt?: string
   onMediaTypeChange?: (type: MediaType) => void
   onImageUrlChange?: (url: string) => void
   onVideoUrlChange?: (url: string) => void
   onPosterUrlChange?: (url: string) => void
+  onPublicIdChange?: (publicId: string) => void
+  onAltChange?: (alt: string) => void
   onOpenPicker: (
     cb: (url: string, alt?: string, asset?: CmsMediaAsset) => void,
     filter?: 'all' | 'image' | 'video'
@@ -34,10 +38,14 @@ export function MediaField({
   imageUrl = '',
   videoUrl = '',
   posterUrl = '',
+  publicId = '',
+  alt = '',
   onMediaTypeChange,
   onImageUrlChange,
   onVideoUrlChange,
   onPosterUrlChange,
+  onPublicIdChange,
+  onAltChange,
   onOpenPicker,
   allowVideo = true,
 }: MediaFieldProps) {
@@ -128,11 +136,15 @@ export function MediaField({
                       if (isVid && onVideoUrlChange) {
                         onMediaTypeChange?.('video')
                         onVideoUrlChange(url)
+                        if (asset?.publicId) onPublicIdChange?.(asset.publicId)
+                        if (asset?.altText || _alt) onAltChange?.(asset?.altText || _alt || '')
                         if (asset?.posterUrl && onPosterUrlChange && !posterUrl) {
                           onPosterUrlChange(asset.posterUrl)
                         }
                       } else {
                         onImageUrlChange?.(url)
+                        if (asset?.publicId) onPublicIdChange?.(asset.publicId)
+                        if (asset?.altText || _alt) onAltChange?.(asset?.altText || _alt || '')
                       }
                     },
                     'image'
@@ -146,7 +158,10 @@ export function MediaField({
               {imageUrl && (
                 <button
                   type="button"
-                  onClick={() => onImageUrlChange?.('')}
+                  onClick={() => {
+                    onImageUrlChange?.('')
+                    onPublicIdChange?.('')
+                  }}
                   className="admin-btn-danger admin-btn-sm"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -206,6 +221,8 @@ export function MediaField({
                       (url, _alt, asset) => {
                         onMediaTypeChange?.('video')
                         onVideoUrlChange?.(url)
+                        if (asset?.publicId) onPublicIdChange?.(asset.publicId)
+                        if (asset?.altText || _alt) onAltChange?.(asset?.altText || _alt || '')
                         if (asset?.posterUrl && !posterUrl) {
                           onPosterUrlChange?.(asset.posterUrl)
                         }
@@ -221,7 +238,10 @@ export function MediaField({
                 {videoUrl && (
                   <button
                     type="button"
-                    onClick={() => onVideoUrlChange?.('')}
+                    onClick={() => {
+                      onVideoUrlChange?.('')
+                      onPublicIdChange?.('')
+                    }}
                     className="admin-btn-danger admin-btn-sm"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -280,6 +300,40 @@ export function MediaField({
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Configurable Metadata (Alt Text & Cloudinary Public ID) */}
+      {(onAltChange || onPublicIdChange) && (
+        <div className="pt-3 border-t border-[#e8e2d8] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          {onAltChange && (
+            <div>
+              <label className="text-[11px] font-medium text-[#6e6456] uppercase tracking-wider block mb-1">
+                Media Alt Text / Description
+              </label>
+              <input
+                type="text"
+                value={alt}
+                onChange={(e) => onAltChange(e.target.value)}
+                placeholder="Architectural design approach..."
+                className="admin-input text-xs"
+              />
+            </div>
+          )}
+          {onPublicIdChange && (
+            <div>
+              <label className="text-[11px] font-medium text-[#6e6456] uppercase tracking-wider block mb-1">
+                Cloudinary Public ID
+              </label>
+              <input
+                type="text"
+                value={publicId}
+                onChange={(e) => onPublicIdChange(e.target.value)}
+                placeholder="e.g. s_design/approach_v01"
+                className="admin-input text-xs"
+              />
             </div>
           )}
         </div>

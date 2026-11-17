@@ -233,6 +233,15 @@ export type CmsHomepageContent = {
   approachMediaType?: MediaType
   approachVideoUrl?: string
   approachPosterUrl?: string
+  approachPublicId?: string
+  approachAlt?: string
+  approachMedia?: {
+    type: MediaType
+    url: string
+    publicId?: string
+    posterUrl?: string
+    alt?: string
+  }
   initiateKicker: string
   initiateHeading: string
   initiateSubtitle: string

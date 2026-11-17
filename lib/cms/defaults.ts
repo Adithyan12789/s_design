@@ -305,6 +305,18 @@ export const DEFAULT_HOMEPAGE: CmsHomepageContent = {
     'We work slowly and collaboratively, building a clear idea before adding anything else. The result is architecture that feels inevitable — generous, tactile and made to last.',
   approachImageUrl:
     'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=85',
+  approachMediaType: 'image',
+  approachVideoUrl: '',
+  approachPosterUrl: '',
+  approachPublicId: '',
+  approachAlt: 'Architectural stone structure and light aperture',
+  approachMedia: {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1400&q=85',
+    publicId: '',
+    posterUrl: '',
+    alt: 'Architectural stone structure and light aperture',
+  },
   initiateKicker: '( INITIATE A PROJECT )',
   initiateHeading: 'INITIATE A PROJECT',
   initiateSubtitle: 'Have a site or idea in mind?',

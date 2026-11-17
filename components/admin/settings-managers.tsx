@@ -1423,10 +1423,14 @@ export function HomepageManager({
           imageUrl={form.approachImageUrl || ''}
           videoUrl={form.approachVideoUrl || ''}
           posterUrl={form.approachPosterUrl || ''}
+          publicId={form.approachPublicId || ''}
+          alt={form.approachAlt || ''}
           onMediaTypeChange={(type) => updateField('approachMediaType', type)}
           onImageUrlChange={(url) => updateField('approachImageUrl', url)}
           onVideoUrlChange={(url) => updateField('approachVideoUrl', url)}
           onPosterUrlChange={(url) => updateField('approachPosterUrl', url)}
+          onPublicIdChange={(id) => updateField('approachPublicId', id)}
+          onAltChange={(alt) => updateField('approachAlt', alt)}
           onOpenPicker={onPickImage}
         />
       </div>
