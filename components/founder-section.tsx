@@ -54,7 +54,10 @@ export function FounderSection({
 
   const kicker = founder?.kicker?.trim() || '( 06 )'
   const label = founder?.label?.trim() || 'THE FOUNDER'
-  const showButton = Boolean(founder?.showButton && founder?.buttonText?.trim())
+  const heading = founder?.heading?.trim() || 'Behind the Vision'
+  const showButton = Boolean(founder?.showButton !== false && (founder?.buttonText?.trim() || 'Our Philosophy'))
+  const buttonText = founder?.buttonText?.trim() || 'Our Philosophy'
+  const buttonHref = founder?.buttonHref?.trim() || '#studio'
   const showIllustration = Boolean(founder?.showIllustration && founder?.illustrationUrl?.trim())
 
   const fallbackStats = [
@@ -121,14 +124,18 @@ export function FounderSection({
 
       <div className="founder-container">
         <div className="founder-compact-grid">
-          {/* LEFT: Founder image with name and tag on the bottom */}
+          {/* LEFT COLUMN: Section Label, Portrait, Attribution */}
           <div ref={imageRef} className="founder-image-col">
+            <div className="section-kicker founder-kicker">
+              {kicker} <span>{label}</span>
+            </div>
+
             <div className="founder-small-portrait">
               <Image
                 src={founderPhoto}
                 alt={`${founderName} — ${founderRole}`}
                 fill
-                sizes="(max-width: 768px) 220px, 320px"
+                sizes="(max-width: 768px) 240px, 320px"
                 className="founder-portrait-img"
                 priority={false}
               />
@@ -141,17 +148,24 @@ export function FounderSection({
             </div>
           </div>
 
-          {/* RIGHT: Kicker, Details, Quote, Counts/Stats, Philosophy Button */}
+          {/* RIGHT COLUMN: Large Heading, Supporting Description, Quote, CTA Button, Statistics */}
           <div ref={contentRef} className="founder-content-col">
-            <div className="section-kicker founder-kicker">
-              {kicker} <span>{label}</span>
-            </div>
+            <h2 className="founder-main-heading">{heading}</h2>
 
             <p className="founder-details">{founderBio}</p>
 
             <blockquote className="founder-quote-block">
               <p className="founder-quote-text">“{founderQuote}”</p>
             </blockquote>
+
+            {showButton && (
+              <div className="founder-btn-wrap">
+                <a href={buttonHref} className="founder-action-btn">
+                  <span>{buttonText}</span>
+                  <ArrowUpRight size={14} className="founder-btn-arrow" />
+                </a>
+              </div>
+            )}
 
             <div className="founder-profile-stats">
               {statsList.map((st, i) => (
@@ -161,15 +175,6 @@ export function FounderSection({
                 </div>
               ))}
             </div>
-
-            {showButton && (
-              <div className="founder-btn-wrap">
-                <a href={founder?.buttonHref || '#studio'} className="founder-action-btn">
-                  <span>{founder?.buttonText || 'Our Philosophy'}</span>
-                  <ArrowUpRight size={14} className="founder-btn-arrow" />
-                </a>
-              </div>
-            )}
           </div>
         </div>
       </div>

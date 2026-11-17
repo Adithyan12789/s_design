@@ -415,9 +415,14 @@ export function FounderManager({
         </div>
 
         <div className="p-6 md:p-8 rounded-xl bg-[#141311] text-[#efebe2] border border-[#2a2824] shadow-inner">
-          <div className="grid grid-cols-1 md:grid-cols-[200px_minmax(0,1fr)] gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)] gap-8 items-start">
             {/* Left Column Preview */}
-            <div className="w-full max-w-[200px] space-y-3">
+            <div className="w-full max-w-[220px] space-y-3">
+              <div className="text-[10px] tracking-[0.15em] uppercase text-[#d9b686]">
+                {form.kicker || '( 06 )'}{' '}
+                <span className="text-[#8c857b]">{form.label || 'THE FOUNDER'}</span>
+              </div>
+
               <div className="aspect-[4/5.2] rounded-xl overflow-hidden border border-[rgba(244,239,230,0.12)] bg-[#181614] relative shadow-lg">
                 {form.founderPhoto ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -434,7 +439,7 @@ export function FounderManager({
               </div>
 
               <div>
-                <h4 className="font-serif text-lg text-[#fbf9f4] font-normal leading-tight">
+                <h4 className="font-serif text-base text-[#fbf9f4] font-normal leading-tight">
                   {form.founderName || 'Founder Name'}
                 </h4>
                 <div className="text-[10px] uppercase tracking-[0.12em] text-[#f1cf9e] font-medium mt-1">
@@ -445,10 +450,9 @@ export function FounderManager({
 
             {/* Right Column Preview */}
             <div className="space-y-4">
-              <div className="text-[10px] tracking-[0.15em] uppercase text-[#d9b686]">
-                {form.kicker || '( 06 )'}{' '}
-                <span className="text-[#8c857b]">{form.label || 'THE FOUNDER'}</span>
-              </div>
+              <h3 className="font-serif text-2xl text-[#fbf9f4] font-normal leading-snug">
+                {form.heading || 'Behind the Vision'}
+              </h3>
 
               <p className="text-xs text-[#dfdbd2] leading-relaxed max-w-xl">
                 {form.founderBio || 'Founder introduction...'}
@@ -460,7 +464,15 @@ export function FounderManager({
                 </blockquote>
               )}
 
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[rgba(244,239,230,0.1)] max-w-lg">
+              {(form.showButton !== false) && (
+                <div>
+                  <span className="inline-block px-3 py-1.5 text-[10px] uppercase tracking-wider text-[#fbf9f4] border border-[rgba(244,239,230,0.28)] rounded">
+                    {form.buttonText || 'Our Philosophy'} ↗
+                  </span>
+                </div>
+              )}
+
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-[rgba(244,239,230,0.1)] max-w-lg mt-6">
                 {(form.stats && form.stats.length >= 3
                   ? form.stats.slice(0, 3)
                   : [
@@ -482,14 +494,6 @@ export function FounderManager({
                   </div>
                 ))}
               </div>
-
-              {form.showButton && form.buttonText && (
-                <div className="pt-2">
-                  <span className="inline-block px-3 py-1.5 text-[10px] uppercase tracking-wider text-[#fbf9f4] border border-[rgba(244,239,230,0.28)] rounded">
-                    {form.buttonText} ↗
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>

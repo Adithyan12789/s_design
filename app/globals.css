@@ -569,24 +569,41 @@ em { color: var(--bronze); font-style: italic; }
 
 .founder-compact-grid {
   display: grid;
-  grid-template-columns: clamp(200px, 22vw, 280px) minmax(0, 1fr);
+  grid-template-columns: clamp(240px, 26vw, 320px) minmax(0, 1fr);
   gap: clamp(48px, 6vw, 96px);
-  align-items: start;
+  align-items: stretch;
 }
 
-/* Left Column: Small Founder Portrait & Caption */
+/* Left Column: Section Label, Portrait, Quote, Attribution */
 .founder-image-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  max-width: clamp(200px, 22vw, 280px);
+  max-width: clamp(240px, 26vw, 320px);
+}
+
+.founder-kicker {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 clamp(16px, 1.6vw, 22px);
+  color: var(--bronze);
+  font-size: var(--font-size-kicker, 10px);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.founder-kicker span {
+  color: var(--muted);
+  letter-spacing: 0.13em;
 }
 
 .founder-small-portrait {
   position: relative;
   width: 100%;
-  max-width: clamp(200px, 22vw, 280px);
+  max-width: clamp(240px, 26vw, 320px);
   aspect-ratio: 4 / 5.2;
   border-radius: clamp(12px, 1.2vw, 18px);
   overflow: hidden;
@@ -626,12 +643,12 @@ em { color: var(--bronze); font-style: italic; }
   margin-top: clamp(14px, 1.4vw, 18px);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .founder-name {
   font-family: var(--font-display, Georgia, 'Times New Roman', serif);
-  font-size: clamp(20px, 1.6vw, 26px);
+  font-size: clamp(18px, 1.4vw, 22px);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -640,7 +657,7 @@ em { color: var(--bronze); font-style: italic; }
 }
 
 .founder-tag {
-  font-size: clamp(10px, 0.78vw, 11.5px);
+  font-size: clamp(9.5px, 0.72vw, 11px);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -648,41 +665,35 @@ em { color: var(--bronze); font-style: italic; }
   margin: 0;
 }
 
-/* Right Column: Kicker, Details, Quote */
+/* Right Column: Studio Introduction, Quote & Statistics */
 .founder-content-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   max-width: 680px;
+  height: 100%;
 }
 
-.founder-kicker {
-  display: inline-flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 0 0 20px;
-  color: var(--bronze);
-  font-size: var(--font-size-kicker, 10px);
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.founder-kicker span {
-  color: var(--muted);
-  letter-spacing: 0.13em;
+.founder-main-heading {
+  font-family: var(--font-display, Georgia, 'Times New Roman', serif);
+  font-size: clamp(32px, 3.2vw, 56px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #efebe2;
+  margin: 0 0 clamp(20px, 1.8vw, 26px);
 }
 
 .founder-details {
-  margin: 0 0 26px;
+  margin: 0 0 clamp(20px, 1.8vw, 26px);
   color: #dfdbd2;
   font-size: clamp(14.5px, 1.05vw, 16px);
   line-height: 1.75;
-  max-width: 620px;
+  max-width: 640px;
 }
 
 .founder-quote-block {
-  margin: 0 0 clamp(24px, 2.2vw, 32px);
+  margin: 0;
   padding: 4px 0 4px 20px;
   border-left: 2px solid var(--bronze);
   max-width: 620px;
@@ -697,10 +708,39 @@ em { color: var(--bronze); font-style: italic; }
   color: #c7c2b6;
 }
 
+.founder-btn-wrap {
+  margin-top: clamp(24px, 2.2vw, 32px);
+  margin-bottom: clamp(36px, 3.5vw, 52px);
+}
+
+.founder-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border: 1px solid rgba(244, 239, 230, 0.28);
+  background: transparent;
+  color: #fbf9f4;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  text-decoration: none;
+}
+
+.founder-action-btn:hover {
+  background: #f4efe6;
+  color: #121110;
+  border-color: #f4efe6;
+}
+
 /* Horizontal 3 Statistics in Right Founder Column */
 .founder-profile-stats {
-  margin-top: 0;
-  padding-top: clamp(20px, 2vw, 28px);
+  margin-top: auto;
+  padding-top: clamp(24px, 2.2vw, 32px);
   border-top: 1px solid rgba(244, 239, 230, 0.12);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -736,34 +776,6 @@ em { color: var(--bronze); font-style: italic; }
   text-transform: uppercase;
   color: var(--muted);
   line-height: 1.35;
-}
-
-.founder-btn-wrap {
-  margin-top: 24px;
-}
-
-.founder-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 20px;
-  border: 1px solid rgba(244, 239, 230, 0.28);
-  background: transparent;
-  color: #fbf9f4;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
-  text-decoration: none;
-}
-
-.founder-action-btn:hover {
-  background: #f4efe6;
-  color: #121110;
-  border-color: #f4efe6;
 }
 
 .founder-stats-container {
@@ -826,12 +838,15 @@ em { color: var(--bronze); font-style: italic; }
 /* Tablet: 768px - 1023px */
 @media (max-width: 1023px) {
   .founder-compact-grid {
-    grid-template-columns: clamp(190px, 28vw, 240px) minmax(0, 1fr);
+    grid-template-columns: clamp(220px, 32vw, 280px) minmax(0, 1fr);
     gap: 36px;
     align-items: start;
   }
   .founder-image-col {
-    max-width: clamp(190px, 28vw, 240px);
+    max-width: clamp(220px, 32vw, 280px);
+  }
+  .founder-main-heading {
+    font-size: clamp(28px, 3.4vw, 42px);
   }
 }
 
@@ -842,14 +857,18 @@ em { color: var(--bronze); font-style: italic; }
   }
   .founder-compact-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 36px;
   }
   .founder-image-col {
-    max-width: 240px;
+    max-width: 280px;
   }
   .founder-small-portrait {
-    max-width: 220px;
+    max-width: 240px;
     border-radius: 14px;
+  }
+  .founder-main-heading {
+    font-size: 28px;
+    margin-bottom: 16px;
   }
   .founder-name {
     font-size: 20px;
@@ -857,6 +876,10 @@ em { color: var(--bronze); font-style: italic; }
   .founder-details {
     font-size: 14.5px;
     margin-bottom: 20px;
+  }
+  .founder-btn-wrap {
+    margin-top: 20px;
+    margin-bottom: 32px;
   }
   .founder-profile-stats {
     gap: 12px;
@@ -2772,6 +2795,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   .founder-compact-grid {
     gap: clamp(64px, 5vw, 110px);
   }
+  .founder-main-heading {
+    font-size: clamp(38px, 2.8vw, 62px);
+  }
   .founder-name {
     font-size: clamp(22px, 1.5vw, 28px);
   }
@@ -2835,6 +2861,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .founder-compact-grid {
     gap: clamp(70px, 5.5vw, 120px);
+  }
+  .founder-main-heading {
+    font-size: clamp(42px, 2.6vw, 68px);
   }
   .founder-name {
     font-size: clamp(24px, 1.5vw, 30px);
@@ -3042,6 +3071,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   .founder-compact-grid {
     gap: clamp(80px, 5vw, 140px);
   }
+  .founder-main-heading {
+    font-size: clamp(46px, 2.5vw, 74px);
+  }
   .founder-name {
     font-size: clamp(26px, 1.4vw, 32px);
   }
@@ -3180,6 +3212,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .founder-compact-grid {
     gap: clamp(90px, 4.8vw, 160px);
+  }
+  .founder-main-heading {
+    font-size: clamp(50px, 2.4vw, 80px);
   }
   .founder-name {
     font-size: clamp(28px, 1.4vw, 36px);
