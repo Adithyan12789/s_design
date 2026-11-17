@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import SplashCursor from '@/components/SplashCursor'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -405,6 +406,27 @@ export function HeroCinematic({
 
         {/* Atmospheric Contrast Overlay (Reveals only on scroll) */}
         <div ref={overlayRef} className="story-hero-overlay" aria-hidden="true" />
+
+        {/* Splash Cursor Fluid Simulation (Contained Exclusively to Homepage Hero) */}
+        <SplashCursor
+          colors={['#B08D57', '#C9A77A', '#E8DCC8']}
+          rainbow={false}
+          size={1}
+          force={1.1}
+          swirl={3}
+          trail={1.2}
+          clickSplash={true}
+          colorSpeed={1}
+          intensity={0.85}
+          momentum={1}
+          shading={1}
+          glow={0}
+          quality="high"
+          intro={true}
+          contained={true}
+          theme="dark"
+          zIndex={2}
+        />
 
         {/* Architectural Blueprint & Structural Geometry SVG Layer */}
         <svg
