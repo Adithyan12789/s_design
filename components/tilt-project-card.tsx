@@ -53,6 +53,7 @@ export function TiltProjectCard({
       <Link
         href={projectHref}
         className="project-card-link cursor-target"
+        data-crosshair-target
         data-cursor-label="View Project"
         aria-label={`View ${title} project details`}
       >

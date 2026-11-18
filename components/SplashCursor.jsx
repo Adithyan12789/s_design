@@ -911,7 +911,31 @@ function SplashCursor({
       else clearScreen();
     };
 
+    let inView = true;
+    let cachedRect = null;
+    let rectDirty = true;
+    const markRectDirty = () => {
+      rectDirty = true;
+    };
+
+    let observer = null;
+    if (typeof IntersectionObserver !== 'undefined' && canvas) {
+      observer = new IntersectionObserver(
+        entries => {
+          const entry = entries[0];
+          inView = entry ? entry.isIntersecting : true;
+          if (!inView && raf) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          }
+        },
+        { threshold: 0 }
+      );
+      observer.observe(canvas);
+    }
+
     const wake = () => {
+      if (!inView) return;
       lastActivity = performance.now();
       if (raf || disposed || lost) return;
       last = performance.now();
@@ -919,7 +943,12 @@ function SplashCursor({
     };
 
     const locate = (clientX, clientY) => {
-      const rect = canvas.getBoundingClientRect();
+      if (!inView) return null;
+      if (rectDirty || !cachedRect) {
+        cachedRect = canvas.getBoundingClientRect();
+        rectDirty = false;
+      }
+      const rect = cachedRect;
       const width = rect.width || window.innerWidth || 1;
       const height = rect.height || window.innerHeight || 1;
       const x = (clientX - (rect.left || 0)) / width;
@@ -960,18 +989,15 @@ function SplashCursor({
     };
 
     const onPointerMove = event => {
+      if (!inView) return;
       if (event.pointerType !== 'touch') track(`p${event.pointerId || 0}`, event.clientX, event.clientY);
     };
-    const onMouseMove = event => {
-      track('mouse', event.clientX, event.clientY);
-    };
     const onPointerDown = event => {
+      if (!inView) return;
       if (event.pointerType !== 'touch') press(event.clientX, event.clientY);
     };
-    const onMouseDown = event => {
-      press(event.clientX, event.clientY);
-    };
     const onTouchStart = event => {
+      if (!inView) return;
       Array.from(event.changedTouches).forEach(touch => {
         pointers.delete(`t${touch.identifier}`);
         track(`t${touch.identifier}`, touch.clientX, touch.clientY);
@@ -979,6 +1005,7 @@ function SplashCursor({
       });
     };
     const onTouchMove = event => {
+      if (!inView) return;
       Array.from(event.changedTouches).forEach(touch => track(`t${touch.identifier}`, touch.clientX, touch.clientY));
     };
     const onTouchEnd = event => {
@@ -997,15 +1024,19 @@ function SplashCursor({
     };
     const onRestored = () => setGeneration(value => value + 1);
 
+    const onResize = () => {
+      markRectDirty();
+      resize();
+    };
+
     window.addEventListener('pointermove', onPointerMove, { passive: true });
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
-    window.addEventListener('mousedown', onMouseDown, { passive: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
-    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+    window.addEventListener('scroll', markRectDirty, { passive: true });
     document.documentElement.addEventListener('pointerleave', onLeave);
     canvas.addEventListener('webglcontextlost', onLost);
     canvas.addEventListener('webglcontextrestored', onRestored);
@@ -1013,16 +1044,18 @@ function SplashCursor({
     const dispose = () => {
       if (disposed) return;
       disposed = true;
+      if (observer) {
+        observer.disconnect();
+      }
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
       window.removeEventListener('touchcancel', onTouchEnd);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', markRectDirty);
       document.documentElement.removeEventListener('pointerleave', onLeave);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);

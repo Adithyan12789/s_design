@@ -34,6 +34,24 @@ function stripMongoId<T>(doc: any): T {
   return rest as T
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mergeSettings(doc: any): CmsWebsiteSettings {
+  if (!doc) return DEFAULT_SETTINGS
+  const stripped = stripMongoId<CmsWebsiteSettings>(doc)
+  return {
+    ...DEFAULT_SETTINGS,
+    ...stripped,
+    brandColors: {
+      ...DEFAULT_SETTINGS.brandColors,
+      ...(stripped.brandColors || {}),
+    },
+    typography: {
+      ...DEFAULT_SETTINGS.typography,
+      ...(stripped.typography || {}),
+    },
+  }
+}
+
 export async function getPublicSiteData(): Promise<PublicSiteData> {
   const db = await getMongoDb()
   if (!db) {
@@ -82,7 +100,7 @@ export async function getPublicSiteData(): Promise<PublicSiteData> {
       studioInfo,
       founder,
       testimonials: testimonialDocs.map((d) => stripMongoId<CmsTestimonial>(d)),
-      settings: settingsDoc ? stripMongoId<CmsWebsiteSettings>(settingsDoc) : DEFAULT_SETTINGS,
+      settings: mergeSettings(settingsDoc),
       homepage: homepageDoc ? stripMongoId<CmsHomepageContent>(homepageDoc) : DEFAULT_HOMEPAGE,
       navigation: navDocs.map((d) => stripMongoId<CmsNavItem>(d)),
       seo: seoMap,
@@ -171,7 +189,7 @@ export async function getAdminOverviewData() {
     studioInfo,
     founder,
     testimonials: testimonialDocs.map((d) => stripMongoId<CmsTestimonial>(d)),
-    settings: settingsDoc ? stripMongoId<CmsWebsiteSettings>(settingsDoc) : DEFAULT_SETTINGS,
+    settings: mergeSettings(settingsDoc),
     homepage: homepageDoc ? stripMongoId<CmsHomepageContent>(homepageDoc) : DEFAULT_HOMEPAGE,
     navigation: navDocs.map((d) => stripMongoId<CmsNavItem>(d)),
     media: mediaDocs.map((d) => stripMongoId<CmsMediaAsset>(d)),

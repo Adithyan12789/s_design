@@ -171,7 +171,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     designation: 'Private Homeowners',
     headline: 'A home shaped by stillness and warm light.',
     quote:
-      'A serene hillside courtyard home shaped in limewashed plaster, oak, and filtered daylight.',
+      'A home shaped by stillness and warm light — every space feels naturally balanced, tactile, and deeply personal.',
     clientPhoto: '',
     videoUrl: '/uploads/1794572484006-an78r-demon-mask-samurai-live-wallpaper.mp4',
     posterImage:
@@ -193,7 +193,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     designation: 'Commission Patron',
     headline: 'Material restraint that surprises every morning.',
     quote:
-      'An intimate timber-and-stone gallery residence balancing quiet proportion with natural shadow.',
+      'Material restraint that surprises every morning. Every volume, proportion, and shadow feels deliberate and deeply considered.',
     clientPhoto: '',
     videoUrl: '/uploads/1794576013976-acldi-150784-799174132_medium.mp4',
     posterImage:
@@ -215,7 +215,7 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
     designation: 'Foundation Director',
     headline: 'Clarity and precision from first sketch to handoff.',
     quote:
-      'A monolithic travertine sanctuary designed around framed landscape views and tactile stillness.',
+      'Clarity and precision from first sketch to handoff. The dialogue between travertine mass and framed nature exceeded all expectations.',
     clientPhoto: '',
     videoUrl: '/uploads/1794576013976-acldi-150784-799174132_medium.mp4',
     posterImage:
@@ -263,8 +263,8 @@ export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
     approachHeadingSize: 'clamp(54px, 6.2vw, 96px)',
     approachBodySize: '14px',
     servicesTitleSize: 'clamp(25px, 3.3vw, 46px)',
-    reviewsHeadingSize: 'clamp(36px, 4.8vw, 68px)',
-    reviewsClientHeadingSize: 'clamp(28px, 3.8vw, 54px)',
+    reviewsHeadingSize: 'clamp(24px, 2.75vw, 41px)',
+    reviewsClientHeadingSize: '',
     reviewsDescSize: '14.5px',
     reviewsCenterCardScale: '1',
     contactHeadingSize: 'clamp(62px, 8vw, 118px)',

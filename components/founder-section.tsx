@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
@@ -16,7 +16,7 @@ interface FounderSectionProps {
   approachDescription?: string
 }
 
-export function FounderSection({
+export const FounderSection = React.memo(function FounderSection({
   id = 'founder',
   founder,
   studioInfo,
@@ -191,4 +191,4 @@ export function FounderSection({
       )}
     </section>
   )
-}
+})

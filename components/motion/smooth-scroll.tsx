@@ -14,8 +14,6 @@ function scrollToHashTarget(targetHash: string, lenis: Lenis | null, immediate =
   const element = document.getElementById(id)
   if (!element) return false
 
-  ScrollTrigger.refresh()
-
   if (lenis) {
     lenis.start()
     lenis.scrollTo(element, {
@@ -61,7 +59,7 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       }
 
       gsap.ticker.add(tickerCallback)
-      gsap.ticker.lagSmoothing(0)
+      gsap.ticker.lagSmoothing(500, 33)
     }
 
     const onLenisStop = () => lenis?.stop()
@@ -124,15 +122,17 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     }
   }, [])
 
-  // Handle cross-page hash navigation (e.g. from /work/[slug] -> /#selected-work)
+  // Handle cross-page hash navigation (e.g. from /work/[slug] -> /#selected-work) once on entry
+  const initialHashHandledRef = useRef<string | null>(null)
   useEffect(() => {
     const hash = window.location.hash
-    if (!hash) return
+    if (!hash || initialHashHandledRef.current === `${pathname}:${hash}`) return
 
+    initialHashHandledRef.current = `${pathname}:${hash}`
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const timer = window.setTimeout(() => {
       scrollToHashTarget(hash, lenisRef.current, prefersReducedMotion)
-    }, 120)
+    }, 150)
 
     return () => window.clearTimeout(timer)
   }, [pathname])

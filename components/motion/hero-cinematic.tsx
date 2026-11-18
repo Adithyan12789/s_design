@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
@@ -24,7 +24,7 @@ type HeroCinematicProps = {
   studioSubtitle?: string
 }
 
-export function HeroCinematic({
+export const HeroCinematic = React.memo(function HeroCinematic({
   eyebrow = 'Independent architecture studio · Portugal / Worldwide',
   titleLine1 = 'Spaces with',
   titleLine2 = 'quiet presence.',
@@ -549,6 +549,7 @@ export function HeroCinematic({
             <a
               ref={circleLinkRef}
               className="circle-link cursor-target"
+              data-crosshair-target
               data-cursor-label="Explore"
               href={targetSectionId}
               aria-label="Explore selected work"
@@ -565,4 +566,4 @@ export function HeroCinematic({
       </section>
     </div>
   )
-}
+})

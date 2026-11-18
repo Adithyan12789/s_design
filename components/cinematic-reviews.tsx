@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowLeft, ArrowRight, Play, Star, VideoOff } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Play, Quote, Star, VideoOff } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -14,6 +14,8 @@ export interface ReviewItem {
   rating: number
   projectName?: string
   projectDescription?: string
+  quote?: string
+  headline?: string
   videoUrl?: string
   posterImage?: string
   backgroundImage?: string
@@ -41,7 +43,7 @@ const isVideoFile = (url?: string | null) => {
   )
 }
 
-export function CinematicReviews({
+export const CinematicReviews = React.memo(function CinematicReviews({
   id = 'reviews',
   reviews,
   kicker = 'Client reviews',
@@ -222,6 +224,11 @@ export function CinematicReviews({
     (heading2?.trim() && heading2.trim().toLowerCase().replace('.', '') !== 'appreciation')
   )
 
+  const resolvedQuote =
+    current.quote?.trim() ||
+    current.headline?.trim() ||
+    'A home shaped by quiet proportion, light, and enduring stillness.'
+
   return (
     <section
       id={id}
@@ -239,14 +246,14 @@ export function CinematicReviews({
           {/* LEFT PANEL — Simplified 4-element client review details */}
           <div className="reviews-left-panel">
             <header className="reviews-section-header">
-              <div className="section-kicker reviews-section-kicker">
+              <h2 className="section-kicker reviews-section-kicker">
                 <span className="reviews-kicker-num">( 05 )</span>
                 <span className="reviews-kicker-title">{kicker}</span>
-              </div>
+              </h2>
               {showCustomHeading && (
-                <h2>
+                <div className="reviews-custom-heading">
                   {heading1} {heading2 ? <em>{heading2}</em> : null}
-                </h2>
+                </div>
               )}
             </header>
 
@@ -260,7 +267,7 @@ export function CinematicReviews({
                 transition={{ duration: reducedMotion ? 0.15 : 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className="reviews-copy-block"
               >
-                <h2 className="reviews-client-heading">{current.client}</h2>
+                <h3 className="reviews-client-heading">{current.client}</h3>
 
                 <div
                   className="reviews-star-row"
@@ -271,7 +278,7 @@ export function CinematicReviews({
                     return (
                       <Star
                         key={index}
-                        size={16}
+                        size={15}
                         strokeWidth={1.5}
                         className={filled ? 'reviews-star-filled' : 'reviews-star-empty'}
                         fill={filled ? 'currentColor' : 'none'}
@@ -288,6 +295,22 @@ export function CinematicReviews({
                 {current.projectDescription && (
                   <p className="reviews-description">{current.projectDescription}</p>
                 )}
+
+                {/* Dedicated client personal quote */}
+                {resolvedQuote && (
+                  <blockquote className="reviews-quote-card">
+                    <Quote
+                      size={15}
+                      strokeWidth={1.4}
+                      className="reviews-quote-icon"
+                      aria-hidden="true"
+                    />
+                    <p className="reviews-quote-text">“{resolvedQuote}”</p>
+                    <footer className="reviews-quote-client">
+                      — {current.client}
+                    </footer>
+                  </blockquote>
+                )}
               </motion.div>
             </AnimatePresence>
 
@@ -297,6 +320,7 @@ export function CinematicReviews({
                   <button
                     type="button"
                     className="reviews-nav-btn cursor-target"
+                    data-crosshair-target
                     onClick={() => stepReview(-1)}
                     aria-label="Previous testimonial"
                     suppressHydrationWarning
@@ -306,6 +330,7 @@ export function CinematicReviews({
                   <button
                     type="button"
                     className="reviews-nav-btn cursor-target"
+                    data-crosshair-target
                     onClick={() => stepReview(1)}
                     aria-label="Next testimonial"
                     suppressHydrationWarning
@@ -325,6 +350,7 @@ export function CinematicReviews({
                         aria-selected={isActive}
                         aria-label={`View testimonial from ${review.client}`}
                         className={`reviews-dot cursor-target${isActive ? ' is-active' : ''}`}
+                        data-crosshair-target
                         onClick={() => selectReview(index)}
                         suppressHydrationWarning
                       />
@@ -391,6 +417,7 @@ export function CinematicReviews({
                     <button
                       type="button"
                       className="reviews-play-overlay cursor-target"
+                      data-crosshair-target
                       data-cursor-label="Play"
                       onClick={handleTogglePlay}
                       aria-label={`Play video testimonial from ${current.client}`}
@@ -425,4 +452,4 @@ export function CinematicReviews({
       </div>
     </section>
   )
-}
+})

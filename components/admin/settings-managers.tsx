@@ -484,7 +484,8 @@ function SizingControl({
   onChange: (val: string) => void
 }) {
   const currentVal = value || defaultValue
-  const numeric = parseFloat(currentVal)
+  const match = currentVal.match(/[\d.]+/)
+  const numeric = match ? parseFloat(match[0]) : parseFloat(currentVal)
   const sliderVal = Number.isFinite(numeric) ? Math.min(Math.max(numeric, min), max) : min
 
   return (
@@ -572,8 +573,8 @@ export function TypographyManager({
         approachHeadingSize: 'clamp(54px, 6.2vw, 96px)',
         approachBodySize: '14px',
         servicesTitleSize: 'clamp(25px, 3.3vw, 46px)',
-        reviewsHeadingSize: 'clamp(36px, 4.8vw, 68px)',
-        reviewsClientHeadingSize: 'clamp(28px, 3.8vw, 54px)',
+        reviewsHeadingSize: 'clamp(24px, 2.75vw, 41px)',
+        reviewsClientHeadingSize: '16px',
         reviewsDescSize: '14.5px',
         reviewsCenterCardScale: '1',
         contactHeadingSize: 'clamp(62px, 8vw, 118px)',
@@ -595,8 +596,8 @@ export function TypographyManager({
         approachHeadingSize: 'clamp(42px, 5vw, 76px)',
         approachBodySize: '13px',
         servicesTitleSize: 'clamp(22px, 2.8vw, 38px)',
-        reviewsHeadingSize: 'clamp(30px, 4vw, 54px)',
-        reviewsClientHeadingSize: 'clamp(24px, 3vw, 42px)',
+        reviewsHeadingSize: 'clamp(28px, 3.4vw, 48px)',
+        reviewsClientHeadingSize: '14px',
         reviewsDescSize: '13px',
         reviewsCenterCardScale: '0.88',
         contactHeadingSize: 'clamp(50px, 6.5vw, 92px)',
@@ -618,8 +619,8 @@ export function TypographyManager({
         approachHeadingSize: 'clamp(64px, 7.5vw, 115px)',
         approachBodySize: '15.5px',
         servicesTitleSize: 'clamp(30px, 3.8vw, 54px)',
-        reviewsHeadingSize: 'clamp(44px, 5.8vw, 84px)',
-        reviewsClientHeadingSize: 'clamp(34px, 4.6vw, 64px)',
+        reviewsHeadingSize: 'clamp(38px, 4.4vw, 64px)',
+        reviewsClientHeadingSize: '19px',
         reviewsDescSize: '16px',
         reviewsCenterCardScale: '1.12',
         contactHeadingSize: 'clamp(74px, 9.5vw, 138px)',
@@ -952,7 +953,7 @@ export function TypographyManager({
             label="Section Heading Size"
             sublabel="'Client reviews'"
             value={typo.reviewsHeadingSize}
-            defaultValue="clamp(36px, 4.8vw, 68px)"
+            defaultValue="clamp(24px, 2.75vw, 41px)"
             min={24}
             max={80}
             step={2}
@@ -963,10 +964,10 @@ export function TypographyManager({
             label="Client Name Size"
             sublabel="Client name on left card"
             value={typo.reviewsClientHeadingSize}
-            defaultValue="clamp(28px, 3.8vw, 54px)"
-            min={18}
-            max={64}
-            step={2}
+            defaultValue="16px"
+            min={11}
+            max={40}
+            step={0.5}
             unit="px"
             onChange={(val) => updateTypo('reviewsClientHeadingSize', val)}
           />

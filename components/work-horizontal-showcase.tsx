@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { ArrowUpRight, ArrowDown, Compass } from 'lucide-react'
 import gsap from 'gsap'
@@ -27,7 +27,49 @@ const SLIDE_ASPECTS = [
   'aspect-editorial-wide',
 ] as const
 
-export function WorkHorizontalShowcase({
+function ShowcaseSlideVideo({
+  videoUrl,
+  posterUrl,
+  isActive,
+}: {
+  videoUrl: string
+  posterUrl?: string
+  isActive: boolean
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = true
+    video.defaultMuted = true
+
+    if (isActive) {
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {})
+      }
+    } else {
+      video.pause()
+    }
+  }, [isActive])
+
+  return (
+    <video
+      ref={videoRef}
+      src={videoUrl}
+      poster={posterUrl || undefined}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      className="w-full h-full object-cover pointer-events-none"
+    />
+  )
+}
+
+export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase({
   id = 'selected-work',
   projects,
   kicker = 'SELECTED WORKS ARCHIVE',
@@ -45,9 +87,14 @@ export function WorkHorizontalShowcase({
   const secondaryFrameRefs = useRef<(HTMLDivElement | null)[]>([])
   const progressBarRef = useRef<HTMLDivElement | null>(null)
   const triggerInstanceRef = useRef<ScrollTrigger | null>(null)
+  const activeIndexRef = useRef(0)
 
   const [activeIndex, setActiveIndex] = useState(0)
-  const [scrollProgress, setScrollProgress] = useState(0)
+
+  const projectsKey = useMemo(
+    () => projects.map((p) => `${p.slug}-${p.mainMediaType}-${p.mainVideoUrl || ''}`).join('|'),
+    [projects]
+  )
 
   const scrollToProject = useCallback((index: number) => {
     const st = triggerInstanceRef.current
@@ -98,15 +145,27 @@ export function WorkHorizontalShowcase({
           return Math.max(0, lastCenter - firstCenter)
         }
 
-        // Update inner image parallax, secondary frame depth & active focus metadata
-        const updateParallaxAndActive = () => {
+        let travelDistance = computeTravel()
+        let slideCenters = slides.map(
+          (slide) => slide.offsetLeft + slide.offsetWidth / 2
+        )
+
+        const recalculateMetrics = () => {
+          travelDistance = computeTravel()
+          slideCenters = slides.map(
+            (slide) => slide.offsetLeft + slide.offsetWidth / 2
+          )
+        }
+
+        // Update inner image parallax, secondary frame depth & active focus metadata (pure math, zero DOM reflows)
+        const updateParallaxAndActive = (progress = 0) => {
           const viewportCenter = window.innerWidth / 2
+          const currentTrackX = -progress * travelDistance
           let closestIdx = 0
           let minDist = Infinity
 
-          slides.forEach((slide, i) => {
-            const rect = slide.getBoundingClientRect()
-            const slideCenter = rect.left + rect.width / 2
+          for (let i = 0; i < slides.length; i++) {
+            const slideCenter = (slideCenters[i] ?? 0) + currentTrackX
             const dist = Math.abs(slideCenter - viewportCenter)
 
             if (dist < minDist) {
@@ -132,9 +191,12 @@ export function WorkHorizontalShowcase({
                 y: signedOffset * -18,
               })
             }
-          })
+          }
 
-          setActiveIndex((prev) => (prev !== closestIdx ? closestIdx : prev))
+          if (closestIdx !== activeIndexRef.current) {
+            activeIndexRef.current = closestIdx
+            setActiveIndex(closestIdx)
+          }
         }
 
         const totalSteps = Math.max(0, slides.length - 1)
@@ -169,7 +231,7 @@ export function WorkHorizontalShowcase({
           }
         })
 
-        updateParallaxAndActive()
+        updateParallaxAndActive(0)
 
         const masterTl = gsap.timeline({
           scrollTrigger: {
@@ -179,17 +241,17 @@ export function WorkHorizontalShowcase({
             end: () => `+=${Math.max(window.innerHeight * 2.8, computeTravel() * 1.15)}`,
             scrub: 1,
             anticipatePin: 1,
-            invalidateOnRefresh: true,
+            invalidateOnRefresh: false,
             onUpdate: (self) => {
               triggerInstanceRef.current = self
-              setScrollProgress(self.progress)
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${self.progress})`
               }
-              updateParallaxAndActive()
+              updateParallaxAndActive(self.progress)
             },
-            onRefresh: () => {
-              updateParallaxAndActive()
+            onRefresh: (self) => {
+              recalculateMetrics()
+              updateParallaxAndActive(self.progress)
             },
           },
         })
@@ -357,7 +419,7 @@ export function WorkHorizontalShowcase({
       cancelAnimationFrame(refreshFrame)
       mm.revert()
     }
-  }, [projects])
+  }, [projectsKey, slideGap, secondaryImageSize])
 
   return (
     <section
@@ -402,6 +464,7 @@ export function WorkHorizontalShowcase({
                   type="button"
                   onClick={() => scrollToProject(idx)}
                   className={`exhibition-index-btn cursor-target ${idx === activeIndex ? 'is-active' : ''}`}
+                  data-crosshair-target
                   aria-label={`View ${project.title}`}
                   suppressHydrationWarning
                 >
@@ -449,6 +512,7 @@ export function WorkHorizontalShowcase({
                     <Link
                       href={`/work/${project.slug}`}
                       className="slide-title-link cursor-target"
+                      data-crosshair-target
                       data-cursor-label="View Project"
                       aria-label={`View ${project.title}`}
                     >
@@ -465,6 +529,7 @@ export function WorkHorizontalShowcase({
                       }}
                       href={`/work/${project.slug}`}
                       className="exhibition-primary-link cursor-target"
+                      data-crosshair-target
                       data-cursor-label="View Project"
                       aria-label={`Explore ${project.title} in ${project.location}`}
                     >
@@ -481,15 +546,10 @@ export function WorkHorizontalShowcase({
                           }
                         >
                           {project.mainMediaType === 'video' && project.mainVideoUrl && (
-                            <video
-                              src={project.mainVideoUrl}
-                              poster={project.mainPosterUrl || project.image}
-                              autoPlay
-                              muted
-                              loop
-                              playsInline
-                              preload="metadata"
-                              className="w-full h-full object-cover pointer-events-none"
+                            <ShowcaseSlideVideo
+                              videoUrl={project.mainVideoUrl}
+                              posterUrl={project.mainPosterUrl || project.image}
+                              isActive={index === activeIndex}
                             />
                           )}
                         </div>
@@ -533,10 +593,10 @@ export function WorkHorizontalShowcase({
           <div
             ref={progressBarRef}
             className="exhibition-progress-fill"
-            style={{ transform: `scaleX(${scrollProgress})` }}
+            style={{ transform: 'scaleX(0)' }}
           />
         </div>
       </div>
     </section>
   )
-}
+})

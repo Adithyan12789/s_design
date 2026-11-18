@@ -1,7 +1,8 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { SmoothScrollProvider } from '@/components/motion/smooth-scroll'
-import TargetCursor from '@/components/TargetCursor'
+import CrosshairCursor from '@/components/crosshair-cursor'
+import ClickSpark from '@/components/ClickSpark'
 import { getPublicSiteData } from '@/lib/cms/queries'
 import './globals.css'
 
@@ -77,25 +78,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning style={bodyStyle as React.CSSProperties}>
         <SmoothScrollProvider>
-          {children}
+          <ClickSpark
+            sparkColor="#fff"
+            shape="line"
+            sparkCount={8}
+            sparkSize={14}
+            sparkRadius={30}
+            duration={500}
+          >
+            {children}
+          </ClickSpark>
         </SmoothScrollProvider>
-        <TargetCursor
-          spinDuration={2}
-          hoverDuration={0.2}
-          size={36}
-          cornerSize={12}
-          thickness={3}
-          padding={6}
-          dotSize={4}
-          cursorColor="#ffffff"
-          cursorColorOnTarget="#ffffff"
-          blendMode="difference"
-          parallaxOn={true}
-          matchRadius={true}
-          showLabel={true}
-          clickEffect={true}
-          hideDefaultCursor={true}
-        />
+        <CrosshairCursor />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

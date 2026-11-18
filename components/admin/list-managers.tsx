@@ -560,16 +560,31 @@ export function TestimonialsManager({
             <label className="admin-label">Short Project Description (1 - 2 Sentences) *</label>
             <textarea
               required
-              rows={3}
-              value={editing.projectDescription ?? editing.quote ?? ''}
+              rows={2}
+              value={editing.projectDescription ?? ''}
               onChange={(e) =>
                 setEditing({
                   ...editing,
                   projectDescription: e.target.value,
-                  quote: e.target.value,
                 })
               }
               placeholder="Brief architectural concept, design, or project outcome..."
+              className="admin-textarea"
+            />
+          </div>
+
+          <div>
+            <label className="admin-label">Client Personal Quote (Dedicated Statement) *</label>
+            <textarea
+              rows={2}
+              value={editing.quote ?? ''}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  quote: e.target.value,
+                })
+              }
+              placeholder="A direct, personal statement from the client (e.g. 'A home shaped by stillness and warm light...')"
               className="admin-textarea"
             />
           </div>
