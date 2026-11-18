@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { SmoothScrollProvider } from '@/components/motion/smooth-scroll'
 import CrosshairCursor from '@/components/crosshair-cursor'
 import ClickSpark from '@/components/ClickSpark'
+import { ArchitecturalLoaderProvider } from '@/components/architectural-loader'
 import { getPublicSiteData } from '@/lib/cms/queries'
 import './globals.css'
 
@@ -77,18 +78,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning style={bodyStyle as React.CSSProperties}>
-        <SmoothScrollProvider>
-          <ClickSpark
-            sparkColor="#fff"
-            shape="line"
-            sparkCount={8}
-            sparkSize={14}
-            sparkRadius={30}
-            duration={500}
-          >
-            {children}
-          </ClickSpark>
-        </SmoothScrollProvider>
+        <ArchitecturalLoaderProvider
+          studioName={data.settings.studioName}
+          studioSubtitle={data.settings.studioSubtitle}
+        >
+          <SmoothScrollProvider>
+            <ClickSpark
+              sparkColor="#fff"
+              shape="line"
+              sparkCount={8}
+              sparkSize={14}
+              sparkRadius={30}
+              duration={500}
+            >
+              {children}
+            </ClickSpark>
+          </SmoothScrollProvider>
+        </ArchitecturalLoaderProvider>
         <CrosshairCursor />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
