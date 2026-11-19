@@ -2,10 +2,15 @@
 
 import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { CmsStudioInfo, CmsFounderInfo } from '@/lib/cms/types'
+
+const AeroShards = dynamic(() => import('@/components/AeroShards'), {
+  ssr: false,
+})
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -120,6 +125,36 @@ export const FounderSection = React.memo(function FounderSection({
 
   return (
     <section ref={sectionRef} className="founder-section" id={id} suppressHydrationWarning>
+      <div className="founder-aeroshards-bg absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-35" aria-hidden="true">
+        <AeroShards
+          shardColor="#7A5C38"
+          accentColor="#9E8055"
+          placement="full"
+          material="glass"
+          markers="plus"
+          count={380}
+          depthOfField={0.82}
+          vignette={0.45}
+          mouseInteraction={true}
+          pulseOnClick={true}
+          holdToGather={true}
+          lightMode={false}
+          shardSize={0.85}
+          spread={1}
+          twist={1}
+          billow={1}
+          speed={0.55}
+          scale={0.95}
+          glow={0.06}
+          grain={0.02}
+          intro={true}
+          mouseStrength={0.35}
+          parallax={0.3}
+          paused={false}
+          dpr={1.5}
+        />
+      </div>
+
       <div className="founder-ambient-glow" aria-hidden="true" />
 
       <div className="founder-container">

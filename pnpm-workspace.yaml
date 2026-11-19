@@ -5,3 +5,7 @@ minimumReleaseAgeExclude:
   - next
   - framer-motion@14.11.1
   - motion-dom@14.11.1
+
+allowBuilds:
+  '@vgpu/adapter-node': true
+  webgpu: true

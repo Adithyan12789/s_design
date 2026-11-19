@@ -24,6 +24,7 @@ import {
   Type,
   Sliders,
   UserCheck,
+  Star,
 } from 'lucide-react'
 import type {
   CmsProject,
@@ -42,6 +43,7 @@ import { MediaPickerModal } from './media-picker-modal'
 import { ProjectsManager } from './projects-manager'
 import { ServicesManager, TestimonialsManager, NavigationManager } from './list-managers'
 import { FounderManager } from './founder-manager'
+import { ProjectReviewsManager } from './project-reviews-manager'
 import {
   StudioManager,
   BrandingManager,
@@ -58,6 +60,7 @@ type SectionId =
   | 'homepage'
   | 'studio'
   | 'projects'
+  | 'project-reviews'
   | 'services'
   | 'testimonials'
   | 'founder'
@@ -96,6 +99,7 @@ const NAV_ITEMS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: 'homepage', label: 'Home / Hero', icon: Home },
   { id: 'studio', label: 'Studio / About', icon: Info },
   { id: 'projects', label: 'Work / Projects', icon: Building2 },
+  { id: 'project-reviews', label: 'Project Reviews', icon: Star },
   { id: 'services', label: 'Services', icon: Compass },
   { id: 'testimonials', label: 'Client Reviews', icon: MessageSquareQuote },
   { id: 'founder', label: 'Founder Section', icon: UserCheck },
@@ -333,6 +337,14 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     </button>
                     <button
                       type="button"
+                      onClick={() => handleTabSwitch('project-reviews')}
+                      className="admin-btn-secondary cursor-target justify-start"
+                    >
+                      <Star className="w-4 h-4 text-[#b68d54]" />
+                      Project Reviews &amp; Analytics
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleTabSwitch('founder')}
                       className="admin-btn-secondary cursor-target justify-start"
                     >
@@ -423,6 +435,10 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
               onNotify={notify}
               onDirtyChange={setIsDirty}
             />
+          )}
+
+          {activeTab === 'project-reviews' && (
+            <ProjectReviewsManager onNotify={notify} />
           )}
 
           {activeTab === 'services' && (

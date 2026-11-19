@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 import { withAdminDb, slugify } from '@/lib/cms/api-helpers'
 import { logAdminActivity, revalidatePublicSite } from '@/lib/cms/queries'
 
+function sanitizeText(val: unknown, maxLength = 1000): string {
+  if (typeof val !== 'string') return ''
+  return val
+    .trim()
+    .replace(/[<>]/g, '')
+    .slice(0, maxLength)
+}
+
 export async function GET() {
   const { db, errorResponse } = await withAdminDb()
   if (errorResponse || !db) return errorResponse!
@@ -30,8 +38,8 @@ export async function POST(request: Request) {
     id: `svc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     title,
     slug: slugify(String(body.slug || title)) || `service-${Date.now()}`,
-    shortDescription: String(body.shortDescription || ''),
-    fullDescription: String(body.fullDescription || ''),
+    shortDescription: sanitizeText(body.shortDescription, 600),
+    fullDescription: sanitizeText(body.fullDescription, 2000),
     imageUrl: String(body.imageUrl || ''),
     mediaType: (body.mediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
     videoUrl: String(body.videoUrl || ''),
@@ -83,8 +91,8 @@ export async function PATCH(request: Request) {
       $set: {
         title,
         slug: slugify(String(body.slug || title)),
-        shortDescription: String(body.shortDescription || ''),
-        fullDescription: String(body.fullDescription || ''),
+        shortDescription: sanitizeText(body.shortDescription, 600),
+        fullDescription: sanitizeText(body.fullDescription, 2000),
         imageUrl: String(body.imageUrl || ''),
         mediaType: (body.mediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
         videoUrl: String(body.videoUrl || ''),

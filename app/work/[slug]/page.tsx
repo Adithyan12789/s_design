@@ -6,6 +6,7 @@ import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ScrollReveal } from '@/components/motion/scroll-reveal'
+import { ProjectNavigationFeedbackGuard } from '@/components/project-navigation-feedback-guard'
 import { getPublishedProjectBySlug, getPublicSiteData } from '@/lib/cms/queries'
 
 export const dynamic = 'force-dynamic'
@@ -46,6 +47,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="project-detail-page">
+      {/* Exit Intent & Navigation Project Review Interceptor */}
+      <ProjectNavigationFeedbackGuard project={project} />
+
       {/* Top Header with Full Navigation Overlay */}
       <SiteHeaderNav
         showBackLink

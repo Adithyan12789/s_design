@@ -307,6 +307,53 @@ export type CmsActivityLog = {
   createdAt: string
 }
 
+export type CmsProjectReview = {
+  id: string
+  projectId: string
+  projectSlug: string
+  projectName: string
+  rating: number
+  feedback?: string
+  visitorId?: string
+  createdAt: string
+  updatedAt?: string
+}
+
+export type ProjectAnalyticsSummary = {
+  totalReviews: number
+  overallAverageRating: number
+  totalRatedProjects: number
+  totalProjects: number
+  highestRatedProject: {
+    id: string
+    title: string
+    slug: string
+    thumbnail: string
+    averageRating: number
+    reviewsCount: number
+  } | null
+  mostRatedProject: {
+    id: string
+    title: string
+    slug: string
+    thumbnail: string
+    averageRating: number
+    reviewsCount: number
+  } | null
+  projects: Array<{
+    id: string
+    title: string
+    slug: string
+    thumbnail: string
+    category: string
+    year: string
+    averageRating: number
+    reviewsCount: number
+    distribution: Record<1 | 2 | 3 | 4 | 5, number>
+    reviews: CmsProjectReview[]
+  }>
+}
+
 export type PublicSiteData = {
   projects: CmsProject[]
   services: CmsService[]

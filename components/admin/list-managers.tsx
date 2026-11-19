@@ -191,13 +191,30 @@ export function ServicesManager({
           </div>
 
           <div>
-            <label className="admin-label">Short Description (Shown on Homepage)</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="admin-label !mb-0">
+                Service Description (Expandable on Homepage)
+              </label>
+              {editing.shortDescription && (
+                <button
+                  type="button"
+                  onClick={() => setEditing({ ...editing, shortDescription: '' })}
+                  className="text-xs text-[#b68d54] hover:text-[#8d6934] transition-colors"
+                >
+                  Clear Description
+                </button>
+              )}
+            </div>
             <textarea
-              rows={2}
+              rows={3}
               value={editing.shortDescription}
               onChange={(e) => setEditing({ ...editing, shortDescription: e.target.value })}
+              placeholder="e.g. Private residences shaped around light, landscape, and quiet daily rituals."
               className="admin-textarea"
             />
+            <p className="text-[11px] text-[#7c7367] mt-1">
+              Visitors click this service on the website to expand and read this description. Leave blank to collapse without a description.
+            </p>
           </div>
 
           <div>
@@ -281,7 +298,13 @@ export function ServicesManager({
                     {s.status}
                   </span>
                 </div>
-                <p className="text-xs text-[#6b6358] line-clamp-1 mt-0.5">{s.shortDescription}</p>
+                <p className="text-xs text-[#6b6358] line-clamp-1 mt-0.5">
+                  {s.shortDescription ? (
+                    s.shortDescription
+                  ) : (
+                    <span className="italic text-[#a8a195]">No description set (click Edit to add)</span>
+                  )}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">

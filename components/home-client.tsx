@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUpRight } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { CinematicReviews } from '@/components/cinematic-reviews'
 import { FounderSection } from '@/components/founder-section'
@@ -185,6 +185,11 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [activeSection, setActiveSection] = useState<string>('')
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null)
+
+  const toggleService = useCallback((id: string) => {
+    setExpandedServiceId((prev) => (prev === id ? null : id))
+  }, [])
 
   const { projects, services, studioInfo, founder, testimonials, settings, homepage, navigation } = siteData
 
@@ -541,13 +546,53 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
 
         <ScrollReveal variant="stagger-children" stagger={0.1}>
           <div className="service-list">
-            {services.map((service, i) => (
-              <div className="service-row group cursor-target" data-crosshair-target key={service.id}>
-                <span>0{i + 1}</span>
-                <h3>{service.title}</h3>
-                <ArrowUpRight size={20} className="service-arrow" />
-              </div>
-            ))}
+            {services.map((service, i) => {
+              const isExpanded = expandedServiceId === service.id
+              const description = (service.shortDescription || service.fullDescription || '').trim()
+
+              return (
+                <div
+                  key={service.id}
+                  className={`service-row group cursor-target ${isExpanded ? 'is-expanded' : ''}`}
+                  data-crosshair-target
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
+                  aria-controls={`service-desc-${service.id}`}
+                  onClick={() => toggleService(service.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      toggleService(service.id)
+                    }
+                  }}
+                >
+                  <span className="service-index" aria-hidden="true">
+                    0{i + 1}
+                  </span>
+                  <div className="service-content-col">
+                    <h3 className="service-title">{service.title}</h3>
+                    {description && (
+                      <div
+                        id={`service-desc-${service.id}`}
+                        className={`service-description-collapse ${isExpanded ? 'is-expanded' : ''}`}
+                        aria-hidden={!isExpanded}
+                      >
+                        <div className="service-description-inner">
+                          <p className="service-description-text text-[#FFFFFF]">{description}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="service-toggle-col" aria-hidden="true">
+                    <ChevronDown
+                      size={20}
+                      className={`service-toggle-icon ${isExpanded ? 'is-expanded' : ''}`}
+                    />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </ScrollReveal>
       </section>

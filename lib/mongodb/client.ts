@@ -65,6 +65,9 @@ async function ensureIndexesAndSeed(db: Db): Promise<void> {
         db.collection('seo').createIndex({ pageKey: 1 }, { unique: true }),
         db.collection('media').createIndex({ publicId: 1 }, { unique: true }),
         db.collection('activityLogs').createIndex({ createdAt: -1 }),
+        db.collection('projectReviews').createIndex({ projectId: 1 }),
+        db.collection('projectReviews').createIndex({ visitorId: 1, projectId: 1 }),
+        db.collection('projectReviews').createIndex({ createdAt: -1 }),
       ])
 
       const now = new Date().toISOString()
