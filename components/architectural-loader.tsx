@@ -22,8 +22,8 @@ const ArchitecturalLoaderContext = createContext<ArchitecturalLoaderContextType>
 
 export const useArchitecturalLoader = () => useContext(ArchitecturalLoaderContext)
 
-// Target duration: exactly 7 seconds (7,000ms)
-const LOADER_DURATION_MS = 7000
+// Target duration: exactly 5 seconds (5,000ms)
+const LOADER_DURATION_MS = 5000
 
 export function ArchitecturalLoaderProvider({
   children,
@@ -35,12 +35,12 @@ export function ArchitecturalLoaderProvider({
 }) {
   const pathname = usePathname()
 
-  // Initial site entry loading state (7s duration)
+  // Initial site entry loading state (5s duration)
   const [initialLoading, setInitialLoading] = useState(true)
   const [initialExiting, setInitialExiting] = useState(false)
   const [initialProgress, setInitialProgress] = useState(0)
 
-  // Project navigation loading state (7s duration)
+  // Project navigation loading state (5s duration)
   const [projectLoading, setProjectLoading] = useState(false)
   const [projectExiting, setProjectExiting] = useState(false)
   const [projectProgress, setProjectProgress] = useState(0)
@@ -52,7 +52,7 @@ export function ArchitecturalLoaderProvider({
   const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // =========================================================================
-  // 1. Initial Website Entry: 10-Second Loading Experience
+  // 1. Initial Website Entry: 5-Second Loading Experience
   // =========================================================================
   useEffect(() => {
     const prefersReducedMotion =
@@ -103,7 +103,7 @@ export function ArchitecturalLoaderProvider({
   }, [])
 
   // =========================================================================
-  // 2. Project Navigation Loading: 10-Second Experience
+  // 2. Project Navigation Loading: 5-Second Experience
   // =========================================================================
   const startProjectLoading = useCallback(
     (slug: string) => {
@@ -137,7 +137,7 @@ export function ArchitecturalLoaderProvider({
           navAnimFrameRef.current = requestAnimationFrame(tickNav)
         } else {
           setProjectProgress(100)
-          // Minimum 7 seconds elapsed:
+          // Minimum 5 seconds elapsed:
           // Check if destination page is ready
           if (
             hasDestinationMountedRef.current ||
@@ -150,10 +150,10 @@ export function ArchitecturalLoaderProvider({
 
       navAnimFrameRef.current = requestAnimationFrame(tickNav)
 
-      // Safety fallback timeout: prevent permanently stuck loader (max 14s)
+      // Safety fallback timeout: prevent permanently stuck loader (max 10s)
       safetyTimeoutRef.current = setTimeout(() => {
         triggerProjectExit()
-      }, 14000)
+      }, 10000)
     },
     [triggerProjectExit]
   )
@@ -196,11 +196,11 @@ export function ArchitecturalLoaderProvider({
     if (pathname.startsWith('/work/')) {
       hasDestinationMountedRef.current = true
       const elapsed = performance.now() - navStartTimeRef.current
-      // If 10 seconds have ALREADY elapsed when the page finishes loading, exit now
+      // If 5 seconds have ALREADY elapsed when the page finishes loading, exit now
       if (elapsed >= LOADER_DURATION_MS) {
         triggerProjectExit()
       }
-      // Otherwise, tickNav will trigger exit as soon as it reaches 10s!
+      // Otherwise, tickNav will trigger exit as soon as it reaches 5s!
     }
   }, [pathname, projectLoading, triggerProjectExit])
 
@@ -221,7 +221,7 @@ export function ArchitecturalLoaderProvider({
     <ArchitecturalLoaderContext.Provider value={{ startProjectLoading, isLoading }}>
       {children}
 
-      {/* 1. INITIAL ENTRY LOADER (7s) */}
+      {/* 1. INITIAL ENTRY LOADER (5s) */}
       {initialLoading && (
         <div
           className={`minimal-loader-screen ${
@@ -250,7 +250,7 @@ export function ArchitecturalLoaderProvider({
         </div>
       )}
 
-      {/* 2. PROJECT NAVIGATION LOADER (7s) */}
+      {/* 2. PROJECT NAVIGATION LOADER (5s) */}
       {projectLoading && (
         <div
           className={`minimal-loader-screen ${

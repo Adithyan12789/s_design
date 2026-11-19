@@ -9,6 +9,7 @@ import type {
   CmsStudioInfo,
   CmsTestimonial,
   CmsWebsiteSettings,
+  ContactBotSettings,
   PublicSiteData,
 } from './types'
 
@@ -230,6 +231,29 @@ export const DEFAULT_TESTIMONIALS: CmsTestimonial[] = [
   },
 ]
 
+export const DEFAULT_CONTACT_BOT_SETTINGS: ContactBotSettings = {
+  instagram: {
+    enabled: true,
+    url: 'https://www.instagram.com/sdesigns.studio',
+  },
+  whatsapp: {
+    enabled: true,
+    value: '',
+  },
+  email: {
+    enabled: true,
+    value: 'hello@sdesigns.studio',
+  },
+  facebook: {
+    enabled: true,
+    url: '',
+  },
+  linkedin: {
+    enabled: true,
+    url: '',
+  },
+}
+
 export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
   studioName: 'S_DE_SIGN',
   studioSubtitle: 'ARCHITECTURE / STUDIO',
@@ -283,6 +307,7 @@ export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
   linkedinUrl: '#top',
   otherSocials: [],
   footerCopyright: '© 2024 S_Designs',
+  contactBot: DEFAULT_CONTACT_BOT_SETTINGS,
 }
 
 export const DEFAULT_HOMEPAGE: CmsHomepageContent = {

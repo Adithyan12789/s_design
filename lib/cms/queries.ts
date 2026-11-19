@@ -9,6 +9,7 @@ import {
   DEFAULT_SEO,
   DEFAULT_SERVICES,
   DEFAULT_SETTINGS,
+  DEFAULT_CONTACT_BOT_SETTINGS,
   DEFAULT_STUDIO_INFO,
   DEFAULT_TESTIMONIALS,
 } from './defaults'
@@ -48,6 +49,44 @@ function mergeSettings(doc: any): CmsWebsiteSettings {
     typography: {
       ...DEFAULT_SETTINGS.typography,
       ...(stripped.typography || {}),
+    },
+    contactBot: {
+      instagram: {
+        enabled: stripped.contactBot?.instagram?.enabled !== false,
+        url:
+          stripped.contactBot?.instagram?.url ??
+          stripped.instagramUrl ??
+          DEFAULT_CONTACT_BOT_SETTINGS.instagram.url,
+      },
+      whatsapp: {
+        enabled: stripped.contactBot?.whatsapp?.enabled !== false,
+        value:
+          stripped.contactBot?.whatsapp?.value ??
+          stripped.whatsapp ??
+          stripped.phone ??
+          DEFAULT_CONTACT_BOT_SETTINGS.whatsapp.value,
+      },
+      email: {
+        enabled: stripped.contactBot?.email?.enabled !== false,
+        value:
+          stripped.contactBot?.email?.value ??
+          stripped.email ??
+          DEFAULT_CONTACT_BOT_SETTINGS.email.value,
+      },
+      facebook: {
+        enabled: stripped.contactBot?.facebook?.enabled !== false,
+        url:
+          stripped.contactBot?.facebook?.url ??
+          stripped.facebookUrl ??
+          DEFAULT_CONTACT_BOT_SETTINGS.facebook.url,
+      },
+      linkedin: {
+        enabled: stripped.contactBot?.linkedin?.enabled !== false,
+        url:
+          stripped.contactBot?.linkedin?.url ??
+          stripped.linkedinUrl ??
+          DEFAULT_CONTACT_BOT_SETTINGS.linkedin.url,
+      },
     },
   }
 }

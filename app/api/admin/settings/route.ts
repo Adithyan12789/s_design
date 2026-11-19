@@ -98,6 +98,31 @@ export async function PATCH(request: Request) {
     linkedinUrl: String(body.linkedinUrl ?? ''),
     otherSocials: Array.isArray(body.otherSocials) ? body.otherSocials : [],
     footerCopyright: String(body.footerCopyright ?? '© 2024 S_Designs'),
+    contactBot:
+      body.contactBot && typeof body.contactBot === 'object'
+        ? {
+            instagram: {
+              enabled: body.contactBot.instagram?.enabled !== false,
+              url: String(body.contactBot.instagram?.url ?? body.instagramUrl ?? '').trim(),
+            },
+            whatsapp: {
+              enabled: body.contactBot.whatsapp?.enabled !== false,
+              value: String(body.contactBot.whatsapp?.value ?? body.whatsapp ?? body.phone ?? '').trim(),
+            },
+            email: {
+              enabled: body.contactBot.email?.enabled !== false,
+              value: String(body.contactBot.email?.value ?? body.email ?? '').trim(),
+            },
+            facebook: {
+              enabled: body.contactBot.facebook?.enabled !== false,
+              url: String(body.contactBot.facebook?.url ?? body.facebookUrl ?? '').trim(),
+            },
+            linkedin: {
+              enabled: body.contactBot.linkedin?.enabled !== false,
+              url: String(body.contactBot.linkedin?.url ?? body.linkedinUrl ?? '').trim(),
+            },
+          }
+        : undefined,
     updatedAt: now,
   }
 

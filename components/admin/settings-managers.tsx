@@ -1152,6 +1152,7 @@ export function ContactManager({
             value={form.instagramUrl}
             onChange={(e) => updateField('instagramUrl', e.target.value)}
             className="admin-input"
+            placeholder="https://instagram.com/sdesigns.studio"
           />
         </div>
         <div>
@@ -1161,15 +1162,7 @@ export function ContactManager({
             value={form.linkedinUrl}
             onChange={(e) => updateField('linkedinUrl', e.target.value)}
             className="admin-input"
-          />
-        </div>
-        <div>
-          <label className="admin-label">Pinterest URL</label>
-          <input
-            type="text"
-            value={form.pinterestUrl}
-            onChange={(e) => updateField('pinterestUrl', e.target.value)}
-            className="admin-input"
+            placeholder="https://linkedin.com/company/sdesigns"
           />
         </div>
         <div>
@@ -1179,6 +1172,17 @@ export function ContactManager({
             value={form.facebookUrl}
             onChange={(e) => updateField('facebookUrl', e.target.value)}
             className="admin-input"
+            placeholder="https://facebook.com/sdesigns.studio"
+          />
+        </div>
+        <div>
+          <label className="admin-label">Pinterest URL</label>
+          <input
+            type="text"
+            value={form.pinterestUrl}
+            onChange={(e) => updateField('pinterestUrl', e.target.value)}
+            className="admin-input"
+            placeholder="https://pinterest.com/sdesigns"
           />
         </div>
         <div className="sm:col-span-2">
@@ -1189,6 +1193,9 @@ export function ContactManager({
             onChange={(e) => updateField('footerCopyright', e.target.value)}
             className="admin-input"
           />
+          <p className="text-[11px] text-[#7c7367] mt-1.5">
+            Social URLs sync directly to the floating Contact Bot horizontal bar, website footer, and full navigation overlay.
+          </p>
         </div>
       </div>
     </form>

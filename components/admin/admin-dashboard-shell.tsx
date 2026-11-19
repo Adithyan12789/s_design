@@ -8,6 +8,7 @@ import {
   Compass,
   Info,
   MessageSquareQuote,
+  MessageSquare,
   Phone,
   Palette,
   Home,
@@ -44,6 +45,7 @@ import { ProjectsManager } from './projects-manager'
 import { ServicesManager, TestimonialsManager, NavigationManager } from './list-managers'
 import { FounderManager } from './founder-manager'
 import { ProjectReviewsManager } from './project-reviews-manager'
+import { ContactBotManager } from './contact-bot-manager'
 import {
   StudioManager,
   BrandingManager,
@@ -65,6 +67,7 @@ type SectionId =
   | 'testimonials'
   | 'founder'
   | 'contact'
+  | 'contact-bot'
   | 'branding'
   | 'typography'
   | 'navigation'
@@ -104,6 +107,7 @@ const NAV_ITEMS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: 'testimonials', label: 'Client Reviews', icon: MessageSquareQuote },
   { id: 'founder', label: 'Founder Section', icon: UserCheck },
   { id: 'contact', label: 'Contact', icon: Phone },
+  { id: 'contact-bot', label: 'Contact Bot / Social Links', icon: MessageSquare },
   { id: 'branding', label: 'Website Branding', icon: Palette },
   { id: 'typography', label: 'Typography & Sizing', icon: Type },
   { id: 'navigation', label: 'Navigation', icon: MenuIcon },
@@ -484,6 +488,15 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
 
           {activeTab === 'contact' && (
             <ContactManager
+              settings={settings}
+              onChange={setSettings}
+              onNotify={notify}
+              onDirtyChange={setIsDirty}
+            />
+          )}
+
+          {activeTab === 'contact-bot' && (
+            <ContactBotManager
               settings={settings}
               onChange={setSettings}
               onNotify={notify}

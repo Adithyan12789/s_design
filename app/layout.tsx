@@ -97,10 +97,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </SmoothScrollProvider>
         </ArchitecturalLoaderProvider>
         <ContactBot
+          contactBotSettings={data.settings.contactBot}
           email={data.settings.email}
           phone={data.settings.phone}
           whatsapp={data.settings.whatsapp}
           instagramUrl={data.settings.instagramUrl}
+          facebookUrl={data.settings.facebookUrl}
+          linkedinUrl={data.settings.linkedinUrl}
         />
         <CrosshairCursor />
         {process.env.NODE_ENV === 'production' && <Analytics />}

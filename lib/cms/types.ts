@@ -209,6 +209,30 @@ export type CmsWebsiteSettings = {
   linkedinUrl: string
   otherSocials: { label: string; url: string }[]
   footerCopyright: string
+  contactBot?: ContactBotSettings
+}
+
+export type ContactBotSettings = {
+  instagram: {
+    enabled: boolean
+    url: string
+  }
+  whatsapp: {
+    enabled: boolean
+    value: string
+  }
+  email: {
+    enabled: boolean
+    value: string
+  }
+  facebook: {
+    enabled: boolean
+    url: string
+  }
+  linkedin: {
+    enabled: boolean
+    url: string
+  }
 }
 
 export type CmsHomepageContent = {
