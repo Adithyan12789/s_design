@@ -566,6 +566,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
                       toggleService(service.id)
                     }
                   }}
+                  suppressHydrationWarning
                 >
                   <span className="service-index" aria-hidden="true">
                     0{i + 1}

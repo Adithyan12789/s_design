@@ -310,6 +310,7 @@ export function ContactBot({
             data-cursor-label={item.label}
             aria-label={item.label}
             tabIndex={isOpen ? 0 : -1}
+            suppressHydrationWarning
             style={
               {
                 '--item-index': index,
@@ -335,6 +336,7 @@ export function ContactBot({
         aria-expanded={isOpen}
         aria-controls="contact-bot-row"
         aria-label={isOpen ? 'Close Contact Menu' : 'Open Contact Menu'}
+        suppressHydrationWarning
       >
         <span className="contact-bot-trigger-bg" aria-hidden="true" />
         <span className="contact-bot-trigger-icon" aria-hidden="true">
