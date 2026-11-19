@@ -351,7 +351,7 @@ export const DEFAULT_HOMEPAGE: CmsHomepageContent = {
   initiateCtaHref: '#contact',
   servicesKicker: 'What we do',
   servicesNote: 'From first sketch to final detail.',
-  reviewsKicker: 'Client reviews',
+  reviewsKicker: 'Client Reviews',
   reviewsHeading1: '',
   reviewsHeading2: '',
   contactKicker: 'Begin a project',

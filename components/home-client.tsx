@@ -602,7 +602,11 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
       <CinematicReviews
         id="reviews"
         reviews={mappedReviews}
-        kicker={homepage.reviewsKicker || 'Client reviews'}
+        kicker={
+          homepage.reviewsKicker && homepage.reviewsKicker.toLowerCase() === 'client reviews'
+            ? 'Client Reviews'
+            : (homepage.reviewsKicker || 'Client Reviews')
+        }
         heading1={
           homepage.reviewsHeading1?.trim().toLowerCase() === 'quiet'
             ? ''

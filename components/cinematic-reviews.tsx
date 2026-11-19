@@ -46,7 +46,7 @@ const isVideoFile = (url?: string | null) => {
 export const CinematicReviews = React.memo(function CinematicReviews({
   id = 'reviews',
   reviews,
-  kicker = 'Client reviews',
+  kicker = 'Client Reviews',
   heading1 = '',
   heading2 = '',
 }: CinematicReviewsProps) {
@@ -247,8 +247,9 @@ export const CinematicReviews = React.memo(function CinematicReviews({
           <div className="reviews-left-panel">
             <header className="reviews-section-header">
               <h2 className="section-kicker reviews-section-kicker">
-                <span className="reviews-kicker-num">( 05 )</span>
-                <span className="reviews-kicker-title">{kicker}</span>
+                <span className="reviews-kicker-title">
+                  {kicker && kicker.toLowerCase() === 'client reviews' ? 'Client Reviews' : kicker}
+                </span>
               </h2>
               {showCustomHeading && (
                 <div className="reviews-custom-heading">
