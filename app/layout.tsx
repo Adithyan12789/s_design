@@ -4,6 +4,7 @@ import { SmoothScrollProvider } from '@/components/motion/smooth-scroll'
 import CrosshairCursor from '@/components/crosshair-cursor'
 import ClickSpark from '@/components/ClickSpark'
 import { ArchitecturalLoaderProvider } from '@/components/architectural-loader'
+import { ContactBot } from '@/components/contact-bot'
 import { getPublicSiteData } from '@/lib/cms/queries'
 import './globals.css'
 
@@ -95,6 +96,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </ClickSpark>
           </SmoothScrollProvider>
         </ArchitecturalLoaderProvider>
+        <ContactBot
+          email={data.settings.email}
+          phone={data.settings.phone}
+          whatsapp={data.settings.whatsapp}
+          instagramUrl={data.settings.instagramUrl}
+        />
         <CrosshairCursor />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

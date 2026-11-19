@@ -3518,4 +3518,294 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
 }
 
+/* ==========================================================================
+   Luxury Architectural Contact Bot (Floating Assistant & Expandable Menu)
+   ========================================================================== */
+
+.contact-bot-root {
+  position: fixed !important;
+  bottom: clamp(22px, 3.2vw, 34px);
+  right: clamp(22px, 3.2vw, 34px);
+  z-index: 9990 !important;
+  font-family: Arial, Helvetica, sans-serif;
+  user-select: none;
+}
+
+/* Floating Trigger Button */
+.contact-bot-trigger {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #181614;
+  border: 1px solid rgba(217, 182, 134, 0.42);
+  color: var(--bronze-light, #f1cf9e);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(217, 182, 134, 0.16);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0;
+}
+
+.contact-bot-trigger:hover,
+.contact-bot-root.is-open .contact-bot-trigger {
+  border-color: var(--bronze-light, #f1cf9e);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(217, 182, 134, 0.32);
+  color: #ffffff;
+}
+
+.contact-bot-trigger:focus-visible {
+  outline: 2px solid var(--bronze-light, #f1cf9e);
+  outline-offset: 4px;
+}
+
+.contact-bot-trigger-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-bot-root.is-open .contact-bot-trigger-icon {
+  transform: rotate(90deg);
+}
+
+/* Subtle Halo Pulse on Idle */
+.contact-bot-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 182, 134, 0.28);
+  pointer-events: none;
+  z-index: 1;
+  animation: contact-bot-halo 3.4s ease-out infinite;
+}
+
+.contact-bot-root.is-open .contact-bot-pulse {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes contact-bot-halo {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  65% {
+    transform: scale(1.32);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.32);
+    opacity: 0;
+  }
+}
+
+/* Expandable Menu Panel */
+.contact-bot-menu {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  right: 0;
+  width: clamp(285px, 86vw, 328px);
+  background: rgba(24, 22, 20, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(217, 182, 134, 0.28);
+  border-radius: 16px;
+  padding: 22px 20px 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(244, 239, 230, 0.05);
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+.contact-bot-menu.menu-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.contact-bot-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-bot-kicker {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--bronze, #d9b686);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.contact-bot-heading {
+  font-family: var(--font-display, Georgia, 'Times New Roman', serif);
+  font-size: 20px;
+  font-weight: 400;
+  color: #fbf9f4;
+  margin: 0 0 4px 0;
+  line-height: 1.15;
+}
+
+.contact-bot-sub {
+  font-size: 11.5px;
+  color: var(--muted, #a6a095);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.contact-bot-divider {
+  height: 1px;
+  background: rgba(244, 239, 230, 0.08);
+  margin: 15px 0 12px 0;
+}
+
+/* Staggered Contact Options */
+.contact-bot-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-bot-item {
+  display: grid;
+  grid-template-columns: 36px 1fr 18px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: rgba(244, 239, 230, 0.025);
+  border: 1px solid rgba(244, 239, 230, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.contact-bot-menu.menu-visible .contact-bot-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.contact-bot-menu.menu-visible .contact-bot-item:nth-child(1) {
+  transition-delay: 0.04s;
+}
+
+.contact-bot-menu.menu-visible .contact-bot-item:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.contact-bot-menu.menu-visible .contact-bot-item:nth-child(3) {
+  transition-delay: 0.12s;
+}
+
+.contact-bot-item:hover {
+  background: rgba(217, 182, 134, 0.09);
+  border-color: rgba(217, 182, 134, 0.32);
+  transform: translateX(3px);
+}
+
+.contact-bot-item:focus-visible {
+  outline: 2px solid var(--bronze-light, #f1cf9e);
+  outline-offset: 2px;
+}
+
+.contact-bot-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(217, 182, 134, 0.12);
+  color: var(--bronze-light, #f1cf9e);
+  border: 1px solid rgba(217, 182, 134, 0.24);
+  transition: all 0.25s ease;
+}
+
+.contact-bot-item:hover .contact-bot-icon-wrap {
+  background: rgba(217, 182, 134, 0.22);
+  color: #ffffff;
+  border-color: var(--bronze-light, #f1cf9e);
+}
+
+.contact-bot-item-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.contact-bot-item-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #fbf9f4;
+  line-height: 1.25;
+}
+
+.contact-bot-item-meta {
+  font-size: 10.5px;
+  color: var(--muted, #a6a095);
+  line-height: 1.35;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-bot-arrow {
+  color: var(--muted, #a6a095);
+  opacity: 0.6;
+  transition: all 0.25s ease;
+}
+
+.contact-bot-item:hover .contact-bot-arrow {
+  color: var(--bronze-light, #f1cf9e);
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .contact-bot-menu {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+  .contact-bot-item {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+  .contact-bot-pulse {
+    animation: none !important;
+  }
+}
+
+/* Mobile Viewport Safety */
+@media (max-width: 767px) {
+  .contact-bot-root {
+    bottom: 18px;
+    right: 18px;
+  }
+  .contact-bot-trigger {
+    width: 50px;
+    height: 50px;
+  }
+  .contact-bot-menu {
+    width: calc(100vw - 36px);
+    max-width: 320px;
+    padding: 18px 16px 16px;
+  }
+  .contact-bot-heading {
+    font-size: 18.5px;
+  }
+}
+
 
