@@ -16,6 +16,7 @@ import {
 import type { CmsService, CmsTestimonial, CmsNavItem, CmsProject, CmsMediaAsset } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
 import { MediaField } from './media-field'
+import { uploadClientMedia } from '@/lib/storage/client-upload'
 
 interface BaseListProps {
   onPickImage: (
@@ -379,14 +380,20 @@ export function TestimonialsManager({
     if (!files || files.length === 0 || !editing) return
     setUploadingVideo(true)
     try {
-      const fd = new FormData()
-      fd.append('file', files[0])
-      fd.append('altText', `${editing.clientName || 'Client'} testimonial video`)
-      const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Video upload failed')
-      const url = data.asset?.publicUrl || data.asset?.public_url || ''
-      setEditing((prev) => (prev ? { ...prev, videoUrl: url } : null))
+      const asset = await uploadClientMedia({
+        file: files[0],
+        altText: `${editing.clientName || 'Client'} testimonial video`,
+      })
+      const url = asset.publicUrl || ''
+      setEditing((prev) =>
+        prev
+          ? {
+              ...prev,
+              videoUrl: url,
+              posterImage: prev.posterImage || asset.posterUrl || '',
+            }
+          : null
+      )
       onNotify('Testimonial video uploaded.')
     } catch (err) {
       onNotify(err instanceof Error ? err.message : 'Video upload failed', 'error')

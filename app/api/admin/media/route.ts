@@ -32,6 +32,59 @@ export async function POST(request: Request) {
   if (errorResponse || !db || !actor) return errorResponse!
 
   try {
+    const contentType = request.headers.get('content-type') || ''
+
+    // 1. JSON payload: Direct Cloudinary registration or URL import
+    if (contentType.includes('application/json')) {
+      const body = await request.json()
+      const url = String(body.url || body.publicUrl || '').trim()
+      if (!url) {
+        return NextResponse.json({ error: 'Media URL is required.' }, { status: 400 })
+      }
+
+      const isVideo =
+        body.type === 'video' ||
+        Boolean(url.match(/\.(mp4|webm|mov|mkv|ogg)(\?.*)?$/i)) ||
+        url.includes('/video/upload/')
+
+      const fileName =
+        String(body.fileName || '').trim() ||
+        url.split('/').pop()?.split('?')[0] ||
+        `asset-${Date.now()}`
+
+      const now = new Date().toISOString()
+      const asset = {
+        id: `med-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        type: isVideo ? 'video' : 'image',
+        publicId: body.publicId || null,
+        storagePath: body.storagePath || url,
+        publicUrl: url,
+        posterUrl:
+          body.posterUrl ||
+          (isVideo && url.includes('cloudinary.com') ? url.replace(/\.[^.]+$/, '.jpg') : null),
+        fileName,
+        mimeType: body.mimeType || (isVideo ? 'video/mp4' : 'image/jpeg'),
+        fileSize: typeof body.fileSize === 'number' ? body.fileSize : 0,
+        width: typeof body.width === 'number' ? body.width : null,
+        height: typeof body.height === 'number' ? body.height : null,
+        duration: typeof body.duration === 'number' ? body.duration : null,
+        altText: String(body.altText || fileName.replace(/\.[^.]+$/, '')).trim(),
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      await db.collection('media').insertOne(asset)
+      await logAdminActivity(
+        actor.email,
+        'uploaded',
+        'media',
+        `${asset.type.toUpperCase()}: ${asset.fileName}`
+      )
+
+      return NextResponse.json({ asset })
+    }
+
+    // 2. Multipart FormData payload (Local or small buffer upload)
     const formData = await request.formData()
     const file = formData.get('file') as File | null
     const altText = (formData.get('altText') as string | null) || ''

@@ -21,6 +21,7 @@ import {
   Copy,
   RefreshCw,
   AlertTriangle,
+  Link2,
 } from 'lucide-react'
 import type {
   CmsStudioInfo,
@@ -32,6 +33,7 @@ import type {
 } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
 import { MediaField } from './media-field'
+import { uploadClientMedia, registerMediaUrl } from '@/lib/storage/client-upload'
 
 interface CommonProps {
   onPickImage: (
@@ -1814,6 +1816,9 @@ export function MediaLibraryManager({
   const [isDragging, setIsDragging] = useState(false)
   const [editingAsset, setEditingAsset] = useState<CmsMediaAsset | null>(null)
   const [replaceTarget, setReplaceTarget] = useState<CmsMediaAsset | null>(null)
+  const [showUrlImport, setShowUrlImport] = useState(false)
+  const [importUrl, setImportUrl] = useState('')
+  const [importingUrl, setImportingUrl] = useState(false)
   const [deleteWarning, setDeleteWarning] = useState<{
     asset: CmsMediaAsset
     usages: string[]
@@ -1855,29 +1860,15 @@ export function MediaLibraryManager({
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i]
         setUploadProgress(`Uploading (${i + 1}/${fileList.length}): ${file.name}`)
-        const fd = new FormData()
-        fd.append('file', file)
-        fd.append('altText', file.name.replace(/\.[^.]+$/, ''))
-        const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Upload failed')
-        const row = data.asset
-        added.push({
-          id: row.id,
-          storagePath: row.storagePath ?? row.storage_path,
-          publicUrl: row.publicUrl ?? row.public_url,
-          fileName: row.fileName ?? row.file_name,
-          mimeType: row.mimeType ?? row.mime_type,
-          fileSize: row.fileSize ?? row.file_size,
-          width: row.width ?? null,
-          height: row.height ?? null,
-          altText: row.altText ?? row.alt_text ?? '',
-          type: row.type ?? (row.mimeType?.startsWith('video/') ? 'video' : 'image'),
-          publicId: row.publicId ?? null,
-          posterUrl: row.posterUrl ?? null,
-          duration: row.duration ?? null,
-          createdAt: row.createdAt ?? row.created_at,
+        const mapped = await uploadClientMedia({
+          file,
+          onProgress: (info) => {
+            setUploadProgress(
+              `Uploading (${i + 1}/${fileList.length}): ${file.name} (${info.percent}%)`
+            )
+          },
         })
+        added.push(mapped)
       }
       onChange([...added, ...media])
       onNotify(`Uploaded ${added.length} media asset(s).`)
@@ -1889,6 +1880,24 @@ export function MediaLibraryManager({
     }
   }
 
+  async function handleImportUrl(e: React.FormEvent) {
+    e.preventDefault()
+    if (!importUrl.trim()) return
+    setImportingUrl(true)
+
+    try {
+      const asset = await registerMediaUrl({ url: importUrl.trim() })
+      onChange([asset, ...media])
+      onNotify('Media imported from URL.')
+      setImportUrl('')
+      setShowUrlImport(false)
+    } catch (err) {
+      onNotify(err instanceof Error ? err.message : 'Failed to import media from URL', 'error')
+    } finally {
+      setImportingUrl(false)
+    }
+  }
+
   async function handleReplace(files: FileList | null) {
     if (!replaceTarget || !files || files.length === 0) return
     const file = files[0]
@@ -1896,30 +1905,13 @@ export function MediaLibraryManager({
     setUploadProgress(`Replacing ${replaceTarget.fileName}...`)
 
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      fd.append('altText', replaceTarget.altText || file.name.replace(/\.[^.]+$/, ''))
-
-      const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Replace upload failed')
-      const row = data.asset
-      const replacement: CmsMediaAsset = {
-        id: row.id,
-        storagePath: row.storagePath ?? row.storage_path,
-        publicUrl: row.publicUrl ?? row.public_url,
-        fileName: row.fileName ?? row.file_name,
-        mimeType: row.mimeType ?? row.mime_type,
-        fileSize: row.fileSize ?? row.file_size,
-        width: row.width ?? null,
-        height: row.height ?? null,
-        altText: row.altText ?? row.alt_text ?? '',
-        type: row.type ?? (row.mimeType?.startsWith('video/') ? 'video' : 'image'),
-        publicId: row.publicId ?? null,
-        posterUrl: row.posterUrl ?? null,
-        duration: row.duration ?? null,
-        createdAt: row.createdAt ?? row.created_at,
-      }
+      const replacement = await uploadClientMedia({
+        file,
+        altText: replaceTarget.altText || file.name.replace(/\.[^.]+$/, ''),
+        onProgress: (info) => {
+          setUploadProgress(`Replacing: ${info.percent}%`)
+        },
+      })
 
       // Delete the previous asset now that it is replaced
       await fetch(`/api/admin/media?id=${encodeURIComponent(replaceTarget.id)}&force=true`, {
@@ -2006,6 +1998,15 @@ export function MediaLibraryManager({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowUrlImport((prev) => !prev)}
+            className="admin-btn-secondary"
+            title="Import media directly from URL (e.g. Cloudinary, Vimeo, S3, CDN)"
+          >
+            <Link2 className="w-4 h-4" />
+            Add via URL
+          </button>
           <input
             ref={fileRef}
             type="file"
@@ -2034,6 +2035,50 @@ export function MediaLibraryManager({
           </button>
         </div>
       </div>
+
+      {/* URL Import Form */}
+      {showUrlImport && (
+        <form
+          onSubmit={handleImportUrl}
+          className="p-3 bg-[#faf8f5] border border-[#e5decb] rounded-lg flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+        >
+          <div className="relative flex-1">
+            <Link2 className="w-4 h-4 text-[#8b8174] absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="url"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              placeholder="Paste video or image URL (https://...)"
+              required
+              className="admin-input pl-9 text-xs w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={importingUrl || !importUrl.trim()}
+            className="admin-btn-primary text-xs py-2 px-4 whitespace-nowrap"
+          >
+            {importingUrl ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              'Save URL'
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowUrlImport(false)
+              setImportUrl('')
+            }}
+            className="admin-btn-secondary text-xs py-2 px-3"
+          >
+            Cancel
+          </button>
+        </form>
+      )}
 
       {/* Hidden file input for Replace action */}
       <input

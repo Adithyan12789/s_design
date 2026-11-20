@@ -11,8 +11,10 @@ import {
   Loader2,
   Play,
   Film,
+  Link2,
 } from 'lucide-react'
 import type { CmsMediaAsset, MediaType } from '@/lib/cms/types'
+import { uploadClientMedia, registerMediaUrl } from '@/lib/storage/client-upload'
 
 interface MediaPickerModalProps {
   open: boolean
@@ -52,6 +54,9 @@ export function MediaPickerModal({
   const [uploadProgress, setUploadProgress] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [showUrlImport, setShowUrlImport] = useState(false)
+  const [importUrl, setImportUrl] = useState('')
+  const [importingUrl, setImportingUrl] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   if (!open) return null
@@ -90,32 +95,16 @@ export function MediaPickerModal({
       for (let i = 0; i < fileList.length; i++) {
         const file = fileList[i]
         setUploadProgress(`Uploading (${i + 1}/${fileList.length}): ${file.name}`)
-        const fd = new FormData()
-        fd.append('file', file)
-        fd.append('altText', file.name.replace(/\.[^.]+$/, ''))
 
-        const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Upload failed')
-        }
-        const row = data.asset
-        const mapped: CmsMediaAsset = {
-          id: row.id,
-          storagePath: row.storagePath ?? row.storage_path,
-          publicUrl: row.publicUrl ?? row.public_url,
-          fileName: row.fileName ?? row.file_name,
-          mimeType: row.mimeType ?? row.mime_type,
-          fileSize: row.fileSize ?? row.file_size,
-          width: row.width ?? null,
-          height: row.height ?? null,
-          altText: row.altText ?? row.alt_text ?? '',
-          type: row.type ?? (row.mimeType?.startsWith('video/') ? 'video' : 'image'),
-          publicId: row.publicId ?? null,
-          posterUrl: row.posterUrl ?? null,
-          duration: row.duration ?? null,
-          createdAt: row.createdAt ?? row.created_at,
-        }
+        const mapped = await uploadClientMedia({
+          file,
+          onProgress: (info) => {
+            setUploadProgress(
+              `Uploading (${i + 1}/${fileList.length}): ${file.name} (${info.percent}%)`
+            )
+          },
+        })
+
         onUploaded(mapped)
         lastUploaded = mapped
       }
@@ -129,6 +118,24 @@ export function MediaPickerModal({
     } finally {
       setUploading(false)
       setUploadProgress(null)
+    }
+  }
+
+  async function handleImportUrl(e: React.FormEvent) {
+    e.preventDefault()
+    if (!importUrl.trim()) return
+    setImportingUrl(true)
+    setError(null)
+
+    try {
+      const asset = await registerMediaUrl({ url: importUrl.trim() })
+      onUploaded(asset)
+      onSelect(asset.publicUrl, asset.altText, asset)
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to import media from URL')
+    } finally {
+      setImportingUrl(false)
     }
   }
 
@@ -224,6 +231,16 @@ export function MediaPickerModal({
             />
           </div>
 
+          <button
+            type="button"
+            onClick={() => setShowUrlImport((prev) => !prev)}
+            className="admin-btn-secondary text-xs py-2 px-3"
+            title="Import media directly from URL (e.g. Cloudinary, Vimeo, S3, or CDN)"
+          >
+            <Link2 className="w-3.5 h-3.5" />
+            Add via URL
+          </button>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -251,6 +268,50 @@ export function MediaPickerModal({
             )}
           </button>
         </div>
+
+        {/* URL Import Form */}
+        {showUrlImport && (
+          <form
+            onSubmit={handleImportUrl}
+            className="mx-4 mt-3 p-3 bg-[#faf8f5] border border-[#e5decb] rounded-lg flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+          >
+            <div className="relative flex-1">
+              <Link2 className="w-4 h-4 text-[#8b8174] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="url"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                placeholder="Paste video or image URL (https://...)"
+                required
+                className="admin-input pl-9 text-xs w-full"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={importingUrl || !importUrl.trim()}
+              className="admin-btn-bronze text-xs py-2 px-4 whitespace-nowrap"
+            >
+              {importingUrl ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                'Save URL'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowUrlImport(false)
+                setImportUrl('')
+              }}
+              className="admin-btn-secondary text-xs py-2 px-3"
+            >
+              Cancel
+            </button>
+          </form>
+        )}
 
         {/* Drag and Drop Zone */}
         <div
