@@ -64,7 +64,7 @@ function ShowcaseSlideVideo({
       loop
       playsInline
       preload="metadata"
-      className="w-full h-full object-cover pointer-events-none"
+      className="w-full h-full object-cover object-center pointer-events-none"
     />
   )
 }

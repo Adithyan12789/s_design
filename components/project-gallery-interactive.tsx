@@ -47,7 +47,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
                     loop
                     playsInline
                     preload="metadata"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                   <span className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded bg-black/75 text-white text-[11px] font-medium tracking-wider uppercase">
                     <Play className="w-3 h-3 fill-current" />
@@ -56,7 +56,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
                 </div>
               ) : (
                 <ProjectImage3D
-                  className="detail-gallery-image"
+                  className="detail-gallery-image aspect-[4/3] relative overflow-hidden"
                   src={image}
                   alt={`${title} detail ${index + 1}`}
                 />

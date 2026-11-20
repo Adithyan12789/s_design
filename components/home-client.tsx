@@ -91,7 +91,7 @@ function ApproachMediaVideo({
         preload="metadata"
         onError={() => setHasError(true)}
         aria-label={altText || 'Architectural design approach video'}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-center"
       />
     </ParallaxImage>
   )
@@ -137,7 +137,7 @@ function StudioMediaVideo({
   }, [videoUrl])
 
   return (
-    <div className="intro-parallax-stage relative overflow-hidden rounded-lg">
+    <div className="intro-parallax-stage relative overflow-hidden rounded-lg aspect-[4/3]">
       <video
         ref={videoRef}
         src={videoUrl}
@@ -147,7 +147,7 @@ function StudioMediaVideo({
         loop
         playsInline
         preload="metadata"
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-center"
       />
     </div>
   )
