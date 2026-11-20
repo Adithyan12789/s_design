@@ -54,10 +54,19 @@ export function MediaRenderer({
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [hasError, setHasError] = useState(false)
   const [isInView, setIsInView] = useState(!isBackground)
+  const [isPortrait, setIsPortrait] = useState(false)
 
   const isVideo = !hasError && isVideoSource(src, type)
   const shouldAutoPlay = autoPlay ?? isBackground
   const effectiveMuted = isBackground ? true : muted
+
+  const resolvedAspect =
+    aspectRatio ||
+    (!isVideo
+      ? '4 / 3'
+      : isPortrait
+      ? '9 / 16'
+      : '16 / 9')
 
   // Lazy-load and pause video when leaving viewport
   useEffect(() => {
@@ -100,7 +109,7 @@ export function MediaRenderer({
     <div
       ref={containerRef}
       className={`relative overflow-hidden ${className}`}
-      style={aspectRatio ? { aspectRatio } : undefined}
+      style={resolvedAspect ? { aspectRatio: resolvedAspect } : undefined}
     >
       {isVideo && src ? (
         <video
@@ -108,6 +117,12 @@ export function MediaRenderer({
           key={src}
           src={src}
           poster={poster}
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget
+            if (v.videoWidth && v.videoHeight) {
+              setIsPortrait(v.videoHeight > v.videoWidth)
+            }
+          }}
           autoPlay={shouldAutoPlay && isInView}
           muted={effectiveMuted}
           loop={loop}
@@ -115,7 +130,7 @@ export function MediaRenderer({
           controls={controls && !isBackground}
           preload={isBackground ? 'auto' : 'metadata'}
           onError={() => setHasError(true)}
-          className={`w-full h-full object-cover ${videoClassName}`}
+          className={`w-full h-full object-cover object-center ${videoClassName}`}
           aria-label={alt}
         />
       ) : (
@@ -128,7 +143,7 @@ export function MediaRenderer({
               setHasError(true)
             }
           }}
-          className={`w-full h-full object-cover ${imageClassName}`}
+          className={`w-full h-full object-cover object-center ${imageClassName}`}
         />
       )}
       {children}

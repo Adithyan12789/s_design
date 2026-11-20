@@ -62,14 +62,10 @@ export const CinematicReviews = React.memo(function CinematicReviews({
   const [isInViewport, setIsInViewport] = useState(true)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [videoErrorId, setVideoErrorId] = useState<string | null>(null)
+  const [isPortraitVideo, setIsPortraitVideo] = useState(false)
 
   const currentIndex = safeReviews.length > 0 ? activeIndex % safeReviews.length : 0
   const current = safeReviews[currentIndex]
-
-  // Clear error state whenever active testimonial changes
-  useEffect(() => {
-    setVideoErrorId(null)
-  }, [currentIndex])
 
   const rawVideo = current?.videoUrl?.trim() || ''
   const rawPoster = current?.posterImage?.trim() || ''
@@ -91,6 +87,16 @@ export const CinematicReviews = React.memo(function CinematicReviews({
     if (rawPoster && !isVideoFile(rawPoster)) return rawPoster
     return ''
   }, [current?.backgroundImage, rawPoster])
+
+  // Clear error state whenever active testimonial changes
+  useEffect(() => {
+    setVideoErrorId(null)
+    setIsPortraitVideo(false)
+    const video = videoRef.current
+    if (video && video.readyState >= 1 && video.videoWidth && video.videoHeight) {
+      setIsPortraitVideo(video.videoHeight > video.videoWidth)
+    }
+  }, [currentIndex, videoSrc])
 
   const hasVideo = Boolean(videoSrc && videoErrorId !== current?.id)
 
@@ -389,8 +395,16 @@ export const CinematicReviews = React.memo(function CinematicReviews({
           </div>
 
           {/* CENTER LAYER — Overlapping rectangular video testimonial card */}
-          <div className="reviews-video-stage">
-            <div className="reviews-video-card">
+          <div className={`reviews-video-stage ${isPortraitVideo ? 'is-portrait' : 'is-landscape'}`}>
+            <div
+              className={`reviews-video-card ${
+                !hasVideo
+                  ? 'image-card-fallback aspect-[4/3]'
+                  : isPortraitVideo
+                  ? 'video-portrait aspect-[9/16]'
+                  : 'video-landscape aspect-[16/9]'
+              }`}
+            >
               {hasVideo ? (
                 <>
                   <video
@@ -398,6 +412,12 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                     key={videoSrc}
                     src={videoSrc}
                     poster={posterSrc || undefined}
+                    onLoadedMetadata={(e) => {
+                      const v = e.currentTarget
+                      if (v.videoWidth && v.videoHeight) {
+                        setIsPortraitVideo(v.videoHeight > v.videoWidth)
+                      }
+                    }}
                     autoPlay
                     muted
                     playsInline

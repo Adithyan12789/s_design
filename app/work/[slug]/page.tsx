@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import { ProjectGalleryInteractive } from '@/components/project-gallery-interactive'
+import { DetailHeroMedia } from '@/components/detail-hero-media'
 import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
@@ -61,28 +62,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       {/* Hero Section: Two-Column Architectural Case Study Layout */}
       <section className="detail-hero">
-        <div className="detail-hero-media">
-          {project.mainMediaType === 'video' && project.mainVideoUrl ? (
-            <video
-              src={project.mainVideoUrl}
-              poster={project.mainPosterUrl || project.mainImage || undefined}
-              controls
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="detail-hero-photo w-full h-full object-cover"
-              aria-label={project.mainImageAlt || `${project.title} — ${project.location}`}
-            />
-          ) : (
-            <img
-              src={project.mainImage}
-              alt={project.mainImageAlt || `${project.title} — ${project.location}`}
-              className="detail-hero-photo"
-              loading="eager"
-            />
-          )}
-        </div>
+        <DetailHeroMedia
+          mediaType={project.mainMediaType}
+          videoUrl={project.mainVideoUrl}
+          posterUrl={project.mainPosterUrl || project.mainImage}
+          imageUrl={project.mainImage}
+          alt={project.mainImageAlt || `${project.title} — ${project.location}`}
+        />
 
         <div className="detail-hero-copy">
           <div className="detail-hero-index">

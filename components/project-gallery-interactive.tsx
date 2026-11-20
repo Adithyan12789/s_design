@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Maximize2, X, ChevronLeft, ChevronRight, Play } from 'lucide-react'
 import { ProjectImage3D } from '@/components/project-image-3d'
 import { isVideoSource } from '@/components/media-renderer'
@@ -8,6 +8,47 @@ import { isVideoSource } from '@/components/media-renderer'
 type ProjectGalleryInteractiveProps = {
   title: string
   images: string[]
+}
+
+function GalleryVideoCard({ src, alt }: { src: string; alt?: string }) {
+  const [isPortrait, setIsPortrait] = useState(false)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (video && video.readyState >= 1 && video.videoWidth && video.videoHeight) {
+      setIsPortrait(video.videoHeight > video.videoWidth)
+    }
+  }, [src])
+
+  return (
+    <div
+      className={`detail-gallery-image relative overflow-hidden bg-black ${
+        isPortrait ? 'aspect-[9/16]' : 'aspect-[16/9]'
+      }`}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onLoadedMetadata={(e) => {
+          const v = e.currentTarget
+          if (v.videoWidth && v.videoHeight) {
+            setIsPortrait(v.videoHeight > v.videoWidth)
+          }
+        }}
+        className="w-full h-full object-cover object-center"
+        aria-label={alt || 'Gallery video'}
+      />
+      <span className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded bg-black/75 text-white text-[11px] font-medium tracking-wider uppercase">
+        <Play className="w-3 h-3 fill-current" />
+        Video
+      </span>
+    </div>
+  )
 }
 
 export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInteractiveProps) {
@@ -40,20 +81,7 @@ export function ProjectGalleryInteractive({ title, images }: ProjectGalleryInter
               onClick={() => openLightbox(index)}
             >
               {isVid ? (
-                <div className="detail-gallery-image relative overflow-hidden bg-black aspect-[4/3]">
-                  <video
-                    src={image}
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    className="w-full h-full object-cover object-center"
-                  />
-                  <span className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded bg-black/75 text-white text-[11px] font-medium tracking-wider uppercase">
-                    <Play className="w-3 h-3 fill-current" />
-                    Video
-                  </span>
-                </div>
+                <GalleryVideoCard src={image} alt={`${title} detail video ${index + 1}`} />
               ) : (
                 <ProjectImage3D
                   className="detail-gallery-image aspect-[4/3] relative overflow-hidden"

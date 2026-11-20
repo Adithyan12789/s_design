@@ -31,10 +31,12 @@ function ShowcaseSlideVideo({
   videoUrl,
   posterUrl,
   isActive,
+  onOrientationChange,
 }: {
   videoUrl: string
   posterUrl?: string
   isActive: boolean
+  onOrientationChange?: (isPortrait: boolean) => void
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -45,6 +47,10 @@ function ShowcaseSlideVideo({
     video.muted = true
     video.defaultMuted = true
 
+    if (video.readyState >= 1 && onOrientationChange && video.videoWidth && video.videoHeight) {
+      onOrientationChange(video.videoHeight > video.videoWidth)
+    }
+
     if (isActive) {
       const playPromise = video.play()
       if (playPromise !== undefined) {
@@ -53,7 +59,7 @@ function ShowcaseSlideVideo({
     } else {
       video.pause()
     }
-  }, [isActive])
+  }, [isActive, onOrientationChange])
 
   return (
     <video
@@ -64,6 +70,12 @@ function ShowcaseSlideVideo({
       loop
       playsInline
       preload="metadata"
+      onLoadedMetadata={(e) => {
+        const v = e.currentTarget
+        if (v.videoWidth && v.videoHeight && onOrientationChange) {
+          onOrientationChange(v.videoHeight > v.videoWidth)
+        }
+      }}
       className="w-full h-full object-cover object-center pointer-events-none"
     />
   )
@@ -90,6 +102,7 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
   const activeIndexRef = useRef(0)
 
   const [activeIndex, setActiveIndex] = useState(0)
+  const [videoOrientations, setVideoOrientations] = useState<Record<string, 'landscape' | 'portrait'>>({})
 
   const projectsKey = useMemo(
     () => projects.map((p) => `${p.slug}-${p.mainMediaType}-${p.mainVideoUrl || ''}`).join('|'),
@@ -533,32 +546,54 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
                       data-cursor-label="View Project"
                       aria-label={`Explore ${project.title} in ${project.location}`}
                     >
-                      <div className="exhibition-frame-mask">
-                        <div
-                          ref={(el) => {
-                            primaryImgRefs.current[index] = el
-                          }}
-                          className="exhibition-frame-img overflow-hidden"
-                          style={
-                            project.mainMediaType !== 'video' || !project.mainVideoUrl
-                              ? { backgroundImage: `url(${project.image})` }
-                              : undefined
-                          }
-                        >
-                          {project.mainMediaType === 'video' && project.mainVideoUrl && (
-                            <ShowcaseSlideVideo
-                              videoUrl={project.mainVideoUrl}
-                              posterUrl={project.mainPosterUrl || project.image}
-                              isActive={index === activeIndex}
-                            />
-                          )}
-                        </div>
-                        <div className="exhibition-frame-vignette" />
-                        <div className="exhibition-hover-pill">
-                          <span>Open Case Study</span>
-                          <ArrowUpRight size={14} />
-                        </div>
-                      </div>
+                      {(() => {
+                        const isVideo = project.mainMediaType === 'video' && Boolean(project.mainVideoUrl)
+                        const isPortrait = videoOrientations[project.slug] === 'portrait'
+
+                        return (
+                          <div
+                            className={`exhibition-frame-mask ${
+                              !isVideo
+                                ? 'is-image-card'
+                                : isPortrait
+                                ? 'is-video-portrait'
+                                : 'is-video-landscape'
+                            }`}
+                          >
+                            <div
+                              ref={(el) => {
+                                primaryImgRefs.current[index] = el
+                              }}
+                              className="exhibition-frame-img overflow-hidden"
+                              style={
+                                !isVideo
+                                  ? { backgroundImage: `url(${project.image})` }
+                                  : undefined
+                              }
+                            >
+                              {isVideo && project.mainVideoUrl && (
+                                <ShowcaseSlideVideo
+                                  videoUrl={project.mainVideoUrl}
+                                  posterUrl={project.mainPosterUrl || project.image}
+                                  isActive={index === activeIndex}
+                                  onOrientationChange={(isPort) => {
+                                    setVideoOrientations((prev) =>
+                                      prev[project.slug] === (isPort ? 'portrait' : 'landscape')
+                                        ? prev
+                                        : { ...prev, [project.slug]: isPort ? 'portrait' : 'landscape' }
+                                    )
+                                  }}
+                                />
+                              )}
+                            </div>
+                            <div className="exhibition-frame-vignette" />
+                            <div className="exhibition-hover-pill">
+                              <span>Open Case Study</span>
+                              <ArrowUpRight size={14} />
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </Link>
 
                     {/* Secondary Offset Architectural Detail Photograph */}
