@@ -9,6 +9,7 @@ import React, {
   useState,
 } from 'react'
 import { usePathname } from 'next/navigation'
+import { ArchitecturalLoaderView } from '@/components/architectural-loader-view'
 
 interface ArchitecturalLoaderContextType {
   startProjectLoading: (slug: string, title?: string) => void
@@ -28,6 +29,7 @@ const LOADER_DURATION_MS = 5000
 export function ArchitecturalLoaderProvider({
   children,
   studioName = 'S_Designs',
+  studioSubtitle,
 }: {
   children: React.ReactNode
   studioName?: string
@@ -46,13 +48,14 @@ export function ArchitecturalLoaderProvider({
   const [projectProgress, setProjectProgress] = useState(0)
 
   const navStartTimeRef = useRef<number>(0)
+  const originPathRef = useRef<string>('')
   const hasDestinationMountedRef = useRef<boolean>(false)
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const navAnimFrameRef = useRef<number | null>(null)
   const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // =========================================================================
-  // 1. Initial Website Entry: 5-Second Loading Experience
+  // 1. Initial Website Entry: 5-Second Architectural Loading Experience
   // =========================================================================
   useEffect(() => {
     const prefersReducedMotion =
@@ -62,24 +65,34 @@ export function ArchitecturalLoaderProvider({
     const targetDuration = prefersReducedMotion ? 1200 : LOADER_DURATION_MS
     const startTime = performance.now()
     let animFrame: number
+    let exitTimer1: NodeJS.Timeout
+    let exitTimer2: NodeJS.Timeout
 
     const tick = (now: number) => {
       const elapsed = now - startTime
       const progressRatio = Math.min(1, elapsed / targetDuration)
-      const percent = Math.floor(progressRatio * 100)
-      setInitialProgress(percent)
+      const isDocumentReady =
+        typeof document !== 'undefined' &&
+        (document.readyState === 'complete' || document.readyState === 'interactive')
 
       if (elapsed < targetDuration) {
+        // Continuous smooth progress up to 98%
+        const percent = Math.floor(progressRatio * 98)
+        setInitialProgress(percent)
+        animFrame = requestAnimationFrame(tick)
+      } else if (!isDocumentReady) {
+        // 5 seconds elapsed but page is still completing hydration/loading
+        setInitialProgress(99)
         animFrame = requestAnimationFrame(tick)
       } else {
+        // Both 5s minimum AND page readiness are satisfied
         setInitialProgress(100)
-        // Brief pause at 100% then smooth fade exit
-        setTimeout(() => {
+        exitTimer1 = setTimeout(() => {
           setInitialExiting(true)
-          setTimeout(() => {
+          exitTimer2 = setTimeout(() => {
             setInitialLoading(false)
-          }, 700)
-        }, 160)
+          }, 750)
+        }, 180)
       }
     }
 
@@ -87,6 +100,8 @@ export function ArchitecturalLoaderProvider({
 
     return () => {
       if (animFrame) cancelAnimationFrame(animFrame)
+      if (exitTimer1) clearTimeout(exitTimer1)
+      if (exitTimer2) clearTimeout(exitTimer2)
     }
   }, [])
 
@@ -94,22 +109,25 @@ export function ArchitecturalLoaderProvider({
   const triggerProjectExit = useCallback(() => {
     if (exitTimeoutRef.current) return
     setProjectProgress(100)
-    setProjectExiting(true)
     exitTimeoutRef.current = setTimeout(() => {
-      setProjectLoading(false)
-      setProjectExiting(false)
-      exitTimeoutRef.current = null
-    }, 700)
+      setProjectExiting(true)
+      setTimeout(() => {
+        setProjectLoading(false)
+        setProjectExiting(false)
+        exitTimeoutRef.current = null
+      }, 750)
+    }, 180)
   }, [])
 
   // =========================================================================
-  // 2. Project Navigation Loading: 5-Second Experience
+  // 2. Project Navigation Loading: 5-Second Architectural Experience
   // =========================================================================
   const startProjectLoading = useCallback(
     (slug: string) => {
       const targetUrl = `/work/${slug}`
       if (window.location.pathname === targetUrl) return
 
+      originPathRef.current = window.location.pathname
       navStartTimeRef.current = performance.now()
       hasDestinationMountedRef.current = false
       setProjectExiting(false)
@@ -130,30 +148,35 @@ export function ArchitecturalLoaderProvider({
       const tickNav = (now: number) => {
         const elapsed = now - navStartTimeRef.current
         const progressRatio = Math.min(1, elapsed / targetDuration)
-        const percent = Math.floor(progressRatio * 100)
-        setProjectProgress(percent)
+        const isDestinationReady =
+          hasDestinationMountedRef.current ||
+          (window.location.pathname.startsWith('/work/') &&
+            window.location.pathname !== originPathRef.current)
 
         if (elapsed < targetDuration) {
+          // Progress scales continuously up to 98% until page is ready
+          const percent = Math.floor(
+            progressRatio * (isDestinationReady ? 100 : 98)
+          )
+          setProjectProgress(percent)
+          navAnimFrameRef.current = requestAnimationFrame(tickNav)
+        } else if (!isDestinationReady) {
+          // 5s elapsed, but destination page is still loading:
+          // Keep loader visible, show ongoing progress indicator at 99%, do NOT prematurely complete
+          setProjectProgress(99)
           navAnimFrameRef.current = requestAnimationFrame(tickNav)
         } else {
-          setProjectProgress(100)
-          // Minimum 5 seconds elapsed:
-          // Check if destination page is ready
-          if (
-            hasDestinationMountedRef.current ||
-            window.location.pathname.startsWith('/work/')
-          ) {
-            triggerProjectExit()
-          }
+          // Both 5s minimum AND destination readiness satisfied!
+          triggerProjectExit()
         }
       }
 
       navAnimFrameRef.current = requestAnimationFrame(tickNav)
 
-      // Safety fallback timeout: prevent permanently stuck loader (max 10s)
+      // Safety fallback timeout: prevent permanently stuck loader (max 12s)
       safetyTimeoutRef.current = setTimeout(() => {
         triggerProjectExit()
-      }, 10000)
+      }, 12000)
     },
     [triggerProjectExit]
   )
@@ -193,14 +216,17 @@ export function ArchitecturalLoaderProvider({
   useEffect(() => {
     if (!projectLoading) return
 
-    if (pathname.startsWith('/work/')) {
+    if (
+      pathname.startsWith('/work/') &&
+      pathname !== originPathRef.current
+    ) {
       hasDestinationMountedRef.current = true
       const elapsed = performance.now() - navStartTimeRef.current
-      // If 5 seconds have ALREADY elapsed when the page finishes loading, exit now
+      // If 5 seconds have ALREADY elapsed when destination page finishes loading, exit now
       if (elapsed >= LOADER_DURATION_MS) {
         triggerProjectExit()
       }
-      // Otherwise, tickNav will trigger exit as soon as it reaches 5s!
+      // Otherwise, tickNav will trigger exit smoothly as soon as it reaches 5s!
     }
   }, [pathname, projectLoading, triggerProjectExit])
 
@@ -221,62 +247,25 @@ export function ArchitecturalLoaderProvider({
     <ArchitecturalLoaderContext.Provider value={{ startProjectLoading, isLoading }}>
       {children}
 
-      {/* 1. INITIAL ENTRY LOADER (5s) */}
+      {/* 1. INITIAL WEBSITE ENTRY LOADER (5s) */}
       {initialLoading && (
-        <div
-          className={`minimal-loader-screen ${
-            initialExiting ? 'minimal-loader-exiting' : ''
-          }`}
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="minimal-loader-content">
-            <h1 className="minimal-loader-brand">{studioName || 'S_Designs'}</h1>
-
-            <div className="minimal-loader-track" aria-hidden="true">
-              <div
-                className="minimal-loader-fill"
-                style={{ width: `${initialProgress}%` }}
-              />
-            </div>
-
-            <div
-              className="minimal-loader-counter"
-              aria-label={`Loading ${initialProgress}%`}
-            >
-              {String(initialProgress).padStart(2, '0')}%
-            </div>
-          </div>
-        </div>
+        <ArchitecturalLoaderView
+          title={studioName || 'S_Designs'}
+          subtitle={studioSubtitle}
+          progress={initialProgress}
+          isExiting={initialExiting}
+        />
       )}
 
       {/* 2. PROJECT NAVIGATION LOADER (5s) */}
       {projectLoading && (
-        <div
-          className={`minimal-loader-screen ${
-            projectExiting ? 'minimal-loader-exiting' : ''
-          }`}
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="minimal-loader-content">
-            <h2 className="minimal-loader-brand">{studioName || 'S_Designs'}</h2>
-
-            <div className="minimal-loader-track" aria-hidden="true">
-              <div
-                className="minimal-loader-fill"
-                style={{ width: `${projectProgress}%` }}
-              />
-            </div>
-
-            <div
-              className="minimal-loader-counter"
-              aria-label={`Loading ${projectProgress}%`}
-            >
-              {String(projectProgress).padStart(2, '0')}%
-            </div>
-          </div>
-        </div>
+        <ArchitecturalLoaderView
+          title={studioName || 'S_Designs'}
+          subtitle={studioSubtitle}
+          progress={projectProgress}
+          isExiting={projectExiting}
+          isProject
+        />
       )}
     </ArchitecturalLoaderContext.Provider>
   )
