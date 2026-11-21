@@ -75,8 +75,8 @@ function ApproachMediaVideo({
 
   return (
     <ParallaxImage
-      className="statement-parallax-stage approach-video-stage video-portrait aspect-[9/16]"
-      aspectRatio="9 / 16"
+      className="statement-parallax-stage approach-video-stage video-portrait aspect-[5/7]"
+      aspectRatio="5 / 7"
       enableClipReveal
       parallaxSpeed={12}
       alt={altText || 'Our architectural approach'}
@@ -155,7 +155,7 @@ function StudioMediaVideo({
   return (
     <div
       className={`intro-parallax-stage studio-video-card relative overflow-hidden rounded-lg ${
-        isPortrait ? 'video-portrait aspect-[9/16]' : 'video-landscape aspect-[16/9]'
+        isPortrait ? 'video-portrait aspect-[5/7]' : 'video-landscape aspect-[16/9]'
       }`}
     >
       <video

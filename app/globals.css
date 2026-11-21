@@ -1167,10 +1167,10 @@ em { color: var(--bronze); font-style: italic; }
   .intro-parallax-stage.video-landscape { aspect-ratio: 16 / 9 !important; }
   .intro-parallax-stage.video-portrait,
   .intro-parallax-stage.studio-video-card {
-    aspect-ratio: 9 / 16 !important;
-    max-width: min(290px, 86vw);
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(320px, 84vw);
     height: auto;
-    max-height: min(515px, 75vh);
+    max-height: min(448px, 75vh);
     margin: 0 auto 28px;
   }
   .intro h2 { font-size: 52px; margin-bottom: 30px; }
@@ -1184,7 +1184,13 @@ em { color: var(--bronze); font-style: italic; }
   .statement-parallax-stage { width: 100%; max-width: 380px; margin: 0 auto; aspect-ratio: 4 / 3; max-height: 480px; }
   .statement-parallax-stage.video-landscape { aspect-ratio: 16 / 9 !important; }
   .statement-parallax-stage.approach-video-stage,
-  .statement-parallax-stage.video-portrait { aspect-ratio: 9 / 16 !important; max-width: 260px; max-height: 480px; }
+  .statement-parallax-stage.video-portrait {
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(320px, 84vw);
+    height: auto;
+    max-height: min(448px, 75vh);
+    margin: 0 auto;
+  }
   .statement-copy { min-height: 0; padding: 0; }
   .statement h2 { margin: 28px 0 24px; font-size: clamp(46px, 11vw, 72px); }
   .contact-layout { display: block; padding-top: 70px; }
@@ -1758,11 +1764,23 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 }
 .statement-parallax-stage.approach-video-stage,
 .statement-parallax-stage.video-portrait {
-  aspect-ratio: 9 / 16 !important;
+  aspect-ratio: 5 / 7 !important;
   width: 100%;
-  max-width: clamp(260px, 22vw, 340px);
-  max-height: 74vh;
+  max-width: 472.5px;
+  height: auto;
+  max-height: none;
   margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .statement-parallax-stage.approach-video-stage,
+  .statement-parallax-stage.video-portrait {
+    width: 472.5px;
+    height: 661.5px;
+    max-width: 472.5px;
+    max-height: 661.5px;
+    aspect-ratio: 5 / 7 !important;
+  }
 }
 .statement-parallax-stage.approach-video-stage video,
 .statement-parallax-stage.video-portrait video {
@@ -1795,9 +1813,9 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 }
 .intro-parallax-stage.video-portrait,
 .intro-parallax-stage.studio-video-card {
-  aspect-ratio: 9 / 16 !important;
+  aspect-ratio: 5 / 7 !important;
   width: 100%;
-  max-width: 372px;
+  max-width: 472.5px;
   height: auto;
   max-height: none;
 }
@@ -1805,11 +1823,11 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 @media (min-width: 1024px) {
   .intro-parallax-stage.video-portrait,
   .intro-parallax-stage.studio-video-card {
-    width: 372px;
+    width: 472.5px;
     height: 661.5px;
-    max-width: 372px;
+    max-width: 472.5px;
     max-height: 661.5px;
-    aspect-ratio: 9 / 16 !important;
+    aspect-ratio: 5 / 7 !important;
   }
 }
 
@@ -1837,9 +1855,11 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .statement-parallax-stage.approach-video-stage,
   .statement-parallax-stage.video-portrait {
-    aspect-ratio: 9 / 16 !important;
-    max-width: 290px;
-    max-height: 64vh;
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(400px, 88vw);
+    height: auto;
+    max-height: min(560px, 75vh);
+    margin: 0 auto;
   }
   .intro-parallax-stage {
     max-width: 380px;
@@ -1851,10 +1871,10 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .intro-parallax-stage.video-portrait,
   .intro-parallax-stage.studio-video-card {
-    aspect-ratio: 9 / 16 !important;
-    max-width: min(340px, 90vw);
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(400px, 88vw);
     height: auto;
-    max-height: min(604px, 75vh);
+    max-height: min(560px, 75vh);
   }
 }
 @media (max-width: 900px) {
@@ -1871,10 +1891,11 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .intro-parallax-stage.video-portrait,
   .intro-parallax-stage.studio-video-card {
-    aspect-ratio: 9 / 16 !important;
-    max-width: min(340px, 90vw);
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(370px, 86vw);
     height: auto;
-    max-height: min(604px, 75vh);
+    max-height: min(518px, 75vh);
+    margin: 0 auto;
   }
   .statement-parallax-stage {
     width: 100%;
@@ -1888,26 +1909,30 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
   .statement-parallax-stage.approach-video-stage,
   .statement-parallax-stage.video-portrait {
-    aspect-ratio: 9 / 16 !important;
-    max-width: 280px;
-    max-height: 500px;
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(370px, 86vw);
+    height: auto;
+    max-height: min(518px, 75vh);
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 480px) {
   .intro-parallax-stage.video-portrait,
   .intro-parallax-stage.studio-video-card {
-    aspect-ratio: 9 / 16 !important;
-    max-width: min(260px, 82vw);
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(280px, 82vw);
     height: auto;
-    max-height: min(462px, 75vh);
+    max-height: min(392px, 75vh);
     margin: 0 auto 24px;
   }
   .statement-parallax-stage.approach-video-stage,
   .statement-parallax-stage.video-portrait {
-    aspect-ratio: 9 / 16 !important;
-    max-width: 240px;
-    max-height: 430px;
+    aspect-ratio: 5 / 7 !important;
+    max-width: min(280px, 82vw);
+    height: auto;
+    max-height: min(392px, 75vh);
+    margin: 0 auto;
   }
 }
 
