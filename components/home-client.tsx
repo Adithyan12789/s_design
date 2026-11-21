@@ -30,21 +30,6 @@ function ApproachMediaVideo({
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [hasError, setHasError] = useState(false)
-  const [isPortrait, setIsPortrait] = useState(false)
-
-  const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const v = e.currentTarget
-    if (v.videoWidth && v.videoHeight) {
-      setIsPortrait(v.videoHeight > v.videoWidth)
-    }
-  }
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (video && video.readyState >= 1 && video.videoWidth && video.videoHeight) {
-      setIsPortrait(video.videoHeight > video.videoWidth)
-    }
-  }, [videoUrl])
 
   useEffect(() => {
     const video = videoRef.current
@@ -90,7 +75,8 @@ function ApproachMediaVideo({
 
   return (
     <ParallaxImage
-      className={`statement-parallax-stage ${isPortrait ? 'video-portrait aspect-[9/16]' : 'video-landscape aspect-[16/9]'}`}
+      className="statement-parallax-stage approach-video-stage video-portrait aspect-[9/16]"
+      aspectRatio="9 / 16"
       enableClipReveal
       parallaxSpeed={12}
       alt={altText || 'Our architectural approach'}
@@ -99,7 +85,6 @@ function ApproachMediaVideo({
         ref={videoRef}
         src={videoUrl}
         poster={posterUrl || fallbackImageUrl || undefined}
-        onLoadedMetadata={handleLoadedMetadata}
         autoPlay
         muted
         loop
