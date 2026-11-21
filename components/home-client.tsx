@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, Volume2, VolumeX } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
 import { CinematicReviews } from '@/components/cinematic-reviews'
 import { FounderSection } from '@/components/founder-section'
@@ -17,6 +17,40 @@ import type { PublicSiteData, CmsNavItem } from '@/lib/cms/types'
 
 const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'founder', 'contact'] as const
 
+function VideoMuteButton({
+  isMuted,
+  isVisible,
+  onToggle,
+  label,
+}: {
+  isMuted: boolean
+  isVisible: boolean
+  onToggle: (e: React.MouseEvent<HTMLButtonElement>) => void
+  label: string
+}) {
+  return (
+    <div className={`video-audio-toggle ${isVisible ? 'is-visible' : ''}`}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={isMuted ? `Unmute ${label}` : `Mute ${label}`}
+        aria-pressed={!isMuted}
+        title={isMuted ? 'Unmute' : 'Mute'}
+        className="video-audio-toggle-btn"
+      >
+        {isMuted ? (
+          <VolumeX className="w-4 h-4 text-[#f5f1e9]/80" />
+        ) : (
+          <Volume2 className="w-4 h-4 text-[#d9b686]" />
+        )}
+      </button>
+      <span className="video-audio-tooltip" role="tooltip">
+        {isMuted ? 'Unmute' : 'Mute'}
+      </span>
+    </div>
+  )
+}
+
 function ApproachMediaVideo({
   videoUrl,
   posterUrl,
@@ -30,33 +64,93 @@ function ApproachMediaVideo({
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [hasError, setHasError] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+  const userMutePreferenceRef = useRef<boolean | null>(null)
+
+  const handleToggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const video = videoRef.current
+    if (!video) return
+    const nextMuted = !video.muted
+    userMutePreferenceRef.current = nextMuted
+    video.muted = nextMuted
+    setIsMuted(nextMuted)
+    if (video.paused) {
+      video.play().catch(() => {})
+    }
+  }
 
   useEffect(() => {
     const video = videoRef.current
     if (!video || hasError) return
 
-    video.muted = true
-    video.defaultMuted = true
+    const handleOtherVideo = (e: Event) => {
+      const customEvent = e as CustomEvent<{ id: string }>
+      if (customEvent.detail?.id !== 'our-approach') {
+        video.pause()
+        setIsActive(false)
+      }
+    }
+    window.addEventListener('sdesign:activevideo', handleOtherVideo)
+
+    const handleVolumeChange = () => {
+      setIsMuted(video.muted)
+    }
+    video.addEventListener('volumechange', handleVolumeChange)
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const playPromise = video.play()
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {})
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            window.dispatchEvent(
+              new CustomEvent('sdesign:activevideo', { detail: { id: 'our-approach' } })
+            )
+            if (userMutePreferenceRef.current === true) {
+              video.muted = true
+              setIsMuted(true)
+              video.play().catch(() => {})
+              setIsActive(true)
+            } else {
+              video.muted = false
+              setIsMuted(false)
+              const playPromise = video.play()
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    setIsActive(true)
+                    setIsMuted(false)
+                  })
+                  .catch(() => {
+                    // Browser blocked autoplay with sound -> fallback to muted
+                    video.muted = true
+                    setIsMuted(true)
+                    video
+                      .play()
+                      .then(() => {
+                        setIsActive(true)
+                      })
+                      .catch(() => {})
+                  })
+              } else {
+                setIsActive(true)
+              }
             }
-          } else {
+          } else if (!entry.isIntersecting || entry.intersectionRatio < 0.5) {
             video.pause()
+            setIsActive(false)
           }
         }
       },
-      { threshold: 0.15 }
+      { threshold: [0, 0.5] }
     )
 
     observer.observe(video)
 
     return () => {
+      window.removeEventListener('sdesign:activevideo', handleOtherVideo)
+      video.removeEventListener('volumechange', handleVolumeChange)
       observer.disconnect()
     }
   }, [hasError, videoUrl])
@@ -80,16 +174,24 @@ function ApproachMediaVideo({
       enableClipReveal
       parallaxSpeed={12}
       alt={altText || 'Our architectural approach'}
+      overlay={
+        <VideoMuteButton
+          isMuted={isMuted}
+          isVisible={isActive}
+          onToggle={handleToggleMute}
+          label="Our Approach video"
+        />
+      }
     >
       <video
         ref={videoRef}
         src={videoUrl}
         poster={posterUrl || fallbackImageUrl || undefined}
-        autoPlay
-        muted
         loop
         playsInline
         preload="metadata"
+        disablePictureInPicture
+        controlsList="nodownload nofullscreen noremoteplayback"
         onError={() => setHasError(true)}
         aria-label={altText || 'Architectural design approach video'}
         className="w-full h-full object-cover object-center"
@@ -107,6 +209,23 @@ function StudioMediaVideo({
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [isPortrait, setIsPortrait] = useState(true)
+  const [isMuted, setIsMuted] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+  const userMutePreferenceRef = useRef<boolean | null>(null)
+
+  const handleToggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const video = videoRef.current
+    if (!video) return
+    const nextMuted = !video.muted
+    userMutePreferenceRef.current = nextMuted
+    video.muted = nextMuted
+    setIsMuted(nextMuted)
+    if (video.paused) {
+      video.play().catch(() => {})
+    }
+  }
 
   const handleLoadedMetadata = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const v = e.currentTarget
@@ -126,28 +245,71 @@ function StudioMediaVideo({
     const video = videoRef.current
     if (!video) return
 
-    video.muted = true
-    video.defaultMuted = true
+    const handleOtherVideo = (e: Event) => {
+      const customEvent = e as CustomEvent<{ id: string }>
+      if (customEvent.detail?.id !== 'studio-note') {
+        video.pause()
+        setIsActive(false)
+      }
+    }
+    window.addEventListener('sdesign:activevideo', handleOtherVideo)
+
+    const handleVolumeChange = () => {
+      setIsMuted(video.muted)
+    }
+    video.addEventListener('volumechange', handleVolumeChange)
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const playPromise = video.play()
-            if (playPromise !== undefined) {
-              playPromise.catch(() => {})
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            window.dispatchEvent(
+              new CustomEvent('sdesign:activevideo', { detail: { id: 'studio-note' } })
+            )
+            if (userMutePreferenceRef.current === true) {
+              video.muted = true
+              setIsMuted(true)
+              video.play().catch(() => {})
+              setIsActive(true)
+            } else {
+              video.muted = false
+              setIsMuted(false)
+              const playPromise = video.play()
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    setIsActive(true)
+                    setIsMuted(false)
+                  })
+                  .catch(() => {
+                    // Browser blocked autoplay with sound -> fallback to muted
+                    video.muted = true
+                    setIsMuted(true)
+                    video
+                      .play()
+                      .then(() => {
+                        setIsActive(true)
+                      })
+                      .catch(() => {})
+                  })
+              } else {
+                setIsActive(true)
+              }
             }
-          } else {
+          } else if (!entry.isIntersecting || entry.intersectionRatio < 0.5) {
             video.pause()
+            setIsActive(false)
           }
         }
       },
-      { threshold: 0.15 }
+      { threshold: [0, 0.5] }
     )
 
     observer.observe(video)
 
     return () => {
+      window.removeEventListener('sdesign:activevideo', handleOtherVideo)
+      video.removeEventListener('volumechange', handleVolumeChange)
       observer.disconnect()
     }
   }, [videoUrl])
@@ -163,12 +325,18 @@ function StudioMediaVideo({
         src={videoUrl}
         poster={posterUrl || undefined}
         onLoadedMetadata={handleLoadedMetadata}
-        autoPlay
-        muted
         loop
         playsInline
         preload="metadata"
+        disablePictureInPicture
+        controlsList="nodownload nofullscreen noremoteplayback"
         className="w-full h-full object-cover object-center"
+      />
+      <VideoMuteButton
+        isMuted={isMuted}
+        isVisible={isActive}
+        onToggle={handleToggleMute}
+        label="Studio Note video"
       />
     </div>
   )

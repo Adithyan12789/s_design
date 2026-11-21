@@ -14,6 +14,7 @@ type ParallaxImageProps = {
   parallaxSpeed?: number
   enableClipReveal?: boolean
   children?: React.ReactNode
+  overlay?: React.ReactNode
 }
 
 export function ParallaxImage({
@@ -24,6 +25,7 @@ export function ParallaxImage({
   parallaxSpeed = 15,
   enableClipReveal = true,
   children,
+  overlay,
 }: ParallaxImageProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const imageRef = useRef<HTMLDivElement | null>(null)
@@ -105,6 +107,7 @@ export function ParallaxImage({
       >
         {children}
       </div>
+      {overlay}
     </div>
   )
 }
