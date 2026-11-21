@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
-import { ProjectGalleryInteractive } from '@/components/project-gallery-interactive'
+import {
+  ProjectGalleryInteractive,
+  type ProjectGalleryPlate,
+} from '@/components/project-gallery-interactive'
 import { DetailHeroMedia } from '@/components/detail-hero-media'
 import { BrandLogo } from '@/components/brand-logo'
 import { SiteHeaderNav } from '@/components/site-header-nav'
@@ -9,6 +12,7 @@ import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { ProjectNavigationFeedbackGuard } from '@/components/project-navigation-feedback-guard'
 import { getPublishedProjectBySlug, getPublicSiteData } from '@/lib/cms/queries'
+import { isVideoSource, getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,10 +45,53 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const nextProject = allProjects[nextIndex]
   const prevProject = allProjects[prevIndex]
 
-  const allGalleryImages = [
-    project.mainImage,
-    ...project.galleryImages.map((img) => img.url).filter(Boolean),
-  ].filter(Boolean)
+  const plates: ProjectGalleryPlate[] = []
+
+  // Main hero media (if video or image)
+  if (project.mainMediaType === 'video' && project.mainVideoUrl) {
+    plates.push({
+      id: 'main-media',
+      url: project.mainVideoUrl,
+      type: 'video',
+      posterUrl:
+        project.mainPosterUrl ||
+        getCloudinaryVideoThumbnail(project.mainVideoUrl, 1.5) ||
+        (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
+      altText: project.mainImageAlt || `${project.title} presentation video`,
+    })
+  } else if (project.mainImage) {
+    const isVid = isVideoSource(project.mainImage)
+    plates.push({
+      id: 'main-media',
+      url: project.mainImage,
+      type: isVid ? 'video' : 'image',
+      posterUrl: isVid
+        ? project.mainPosterUrl || getCloudinaryVideoThumbnail(project.mainImage, 1.5)
+        : null,
+      altText: project.mainImageAlt || `${project.title} primary view`,
+    })
+  }
+
+  // Project Gallery Plates
+  project.galleryImages.forEach((item, idx) => {
+    if (!item?.url) return
+    // Avoid duplicating main media if exact same URL
+    if (plates.some((p) => p.url === item.url)) return
+
+    const isVid = item.type === 'video' || isVideoSource(item.url)
+    plates.push({
+      id: item.id || `gallery-${idx}`,
+      url: item.url,
+      type: isVid ? 'video' : 'image',
+      posterUrl:
+        item.posterUrl ||
+        (isVid ? getCloudinaryVideoThumbnail(item.url, 1.5) : null) ||
+        (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
+      altText: item.altText || `${project.title} plate ${idx + 1}`,
+    })
+  })
+
+  const allGalleryImages = plates.map((p) => p.url)
 
   return (
     <main className="project-detail-page">
@@ -130,7 +177,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </div>
           <span className="section-note">Click any plate for high-resolution inspection</span>
         </div>
-        <ProjectGalleryInteractive title={project.title} images={allGalleryImages} />
+        <ProjectGalleryInteractive
+          title={project.title}
+          plates={plates}
+          images={allGalleryImages}
+          fallbackImage={project.mainImage}
+        />
       </section>
 
       {/* Next Project Teaser Showcase Card */}

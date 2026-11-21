@@ -20,6 +20,7 @@ import {
 import type { CmsProject, CmsProjectGalleryItem, CmsMediaAsset } from '@/lib/cms/types'
 import { ImageField } from './media-picker-modal'
 import { MediaField } from './media-field'
+import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 interface ProjectsManagerProps {
   projects: CmsProject[]
@@ -190,6 +191,8 @@ export function ProjectsManager({
         asset?.type === 'video' ||
         asset?.mimeType?.startsWith('video/') ||
         /\.(mp4|webm|mov|ogg|m4v)$/i.test(url)
+      const autoPoster =
+        asset?.posterUrl || (isVid ? getCloudinaryVideoThumbnail(url, 1.5) : null)
       setEditing((prev) =>
         prev
           ? {
@@ -202,7 +205,7 @@ export function ProjectsManager({
                   url,
                   altText: alt || prev.title,
                   type: isVid ? 'video' : 'image',
-                  posterUrl: asset?.posterUrl || null,
+                  posterUrl: autoPoster,
                   duration: asset?.duration || null,
                   displayOrder: prev.galleryImages.length,
                 },
@@ -511,7 +514,13 @@ export function ProjectsManager({
                                 value={img.url}
                                 onChange={(e) => {
                                   const next = [...editing.galleryImages]
-                                  next[idx] = { ...img, url: e.target.value }
+                                  const newUrl = e.target.value
+                                  const autoPoster = isVid ? getCloudinaryVideoThumbnail(newUrl, 1.5) : null
+                                  next[idx] = {
+                                    ...img,
+                                    url: newUrl,
+                                    posterUrl: autoPoster || img.posterUrl,
+                                  }
                                   setEditing({ ...editing, galleryImages: next })
                                 }}
                                 className="admin-input text-xs flex-1"
@@ -523,11 +532,14 @@ export function ProjectsManager({
                                   onPickImage(
                                     (url, _alt, asset) => {
                                       const next = [...editing.galleryImages]
+                                      const autoPoster =
+                                        asset?.posterUrl ||
+                                        (isVid ? getCloudinaryVideoThumbnail(url, 1.5) : null)
                                       next[idx] = {
                                         ...img,
                                         url,
                                         type: isVid ? 'video' : 'image',
-                                        posterUrl: asset?.posterUrl || img.posterUrl,
+                                        posterUrl: autoPoster || (isVid ? img.posterUrl : null),
                                       }
                                       setEditing({ ...editing, galleryImages: next })
                                     },

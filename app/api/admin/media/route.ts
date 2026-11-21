@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { withAdminDb } from '@/lib/cms/api-helpers'
 import { logAdminActivity } from '@/lib/cms/queries'
 import { uploadMediaBuffer, deleteMediaAsset, type UploadedMediaResult } from '@/lib/storage/cloudinary'
+import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         publicUrl: url,
         posterUrl:
           body.posterUrl ||
-          (isVideo && url.includes('cloudinary.com') ? url.replace(/\.[^.]+$/, '.jpg') : null),
+          (isVideo ? getCloudinaryVideoThumbnail(url, 1.5) || (url.includes('cloudinary.com') ? url.replace(/\.[^.]+$/, '.jpg') : null) : null),
         fileName,
         mimeType: body.mimeType || (isVideo ? 'video/mp4' : 'image/jpeg'),
         fileSize: typeof body.fileSize === 'number' ? body.fileSize : 0,
@@ -109,7 +110,10 @@ export async function POST(request: Request) {
       publicId: uploaded.publicId,
       storagePath: uploaded.storagePath,
       publicUrl: uploaded.url,
-      posterUrl: customPosterUrl || uploaded.posterUrl,
+      posterUrl:
+        customPosterUrl ||
+        uploaded.posterUrl ||
+        (uploaded.type === 'video' ? getCloudinaryVideoThumbnail(uploaded.url, 1.5) : null),
       fileName: uploaded.fileName,
       mimeType: uploaded.mimeType,
       fileSize: uploaded.fileSize,

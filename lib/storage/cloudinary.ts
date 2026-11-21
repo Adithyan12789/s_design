@@ -129,10 +129,16 @@ export async function uploadMediaBuffer({
 
     let posterUrl: string | null = null
     if (isVideo) {
-      // Cloudinary automatically provides JPG snapshot posters from videos
-      posterUrl = result.secure_url
+      // Cloudinary automatically provides JPG snapshot posters from videos at representative 1.5s frame
+      const rawPoster = result.secure_url
         ? result.secure_url.replace(/\.[^.]+$/, '.jpg')
         : cld.url(result.public_id, { resource_type: 'video', format: 'jpg', secure: true })
+
+      if (rawPoster && rawPoster.includes('/upload/')) {
+        posterUrl = rawPoster.replace('/upload/', '/upload/so_1.5,f_jpg,q_auto/')
+      } else {
+        posterUrl = rawPoster
+      }
     }
 
     return {

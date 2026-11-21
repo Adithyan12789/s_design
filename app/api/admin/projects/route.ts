@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { withAdminDb, slugify } from '@/lib/cms/api-helpers'
 import { logAdminActivity, revalidatePublicSite } from '@/lib/cms/queries'
 import type { CmsProjectGalleryItem } from '@/lib/cms/types'
+import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 function normalizeGallery(
   projectId: string,
@@ -10,18 +11,31 @@ function normalizeGallery(
   if (!Array.isArray(galleryImages)) return []
   return galleryImages
     .filter((img): img is Record<string, unknown> => Boolean(img && typeof img === 'object' && img.url))
-    .map((img, idx) => ({
-      id: typeof img.id === 'string' && !img.id.startsWith('temp-')
-        ? img.id
-        : `img-${Date.now()}-${idx}`,
-      projectId,
-      url: String(img.url),
-      altText: String(img.altText || ''),
-      type: (img.type === 'video' ? 'video' : 'image') as 'image' | 'video',
-      posterUrl: img.posterUrl ? String(img.posterUrl) : null,
-      duration: typeof img.duration === 'number' ? img.duration : null,
-      displayOrder: typeof img.displayOrder === 'number' ? img.displayOrder : idx,
-    }))
+    .map((img, idx) => {
+      const url = String(img.url).trim()
+      const isVid =
+        img.type === 'video' ||
+        Boolean(url.match(/\.(mp4|webm|mov|mkv|ogg|m4v)($|\?)/i)) ||
+        url.includes('/video/upload/')
+
+      let posterUrl = img.posterUrl ? String(img.posterUrl).trim() : null
+      if (isVid && !posterUrl) {
+        posterUrl = getCloudinaryVideoThumbnail(url, 1.5) || null
+      }
+
+      return {
+        id: typeof img.id === 'string' && !img.id.startsWith('temp-')
+          ? img.id
+          : `img-${Date.now()}-${idx}`,
+        projectId,
+        url,
+        altText: String(img.altText || ''),
+        type: (isVid ? 'video' : 'image') as 'image' | 'video',
+        posterUrl,
+        duration: typeof img.duration === 'number' ? img.duration : null,
+        displayOrder: typeof img.displayOrder === 'number' ? img.displayOrder : idx,
+      }
+    })
 }
 
 export async function GET() {
@@ -59,6 +73,11 @@ export async function POST(request: Request) {
   const count = await db.collection('projects').countDocuments()
   const id = `proj-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
   const now = new Date().toISOString()
+  const mainVideoUrl = String(body.mainVideoUrl || '').trim()
+  let mainPosterUrl = String(body.mainPosterUrl || '').trim()
+  if (mainVideoUrl && !mainPosterUrl) {
+    mainPosterUrl = getCloudinaryVideoThumbnail(mainVideoUrl, 1.5) || ''
+  }
 
   const doc = {
     id,
@@ -76,8 +95,8 @@ export async function POST(request: Request) {
     mainImage: String(body.mainImage || ''),
     mainImageAlt: String(body.mainImageAlt || title),
     mainMediaType: (body.mainMediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
-    mainVideoUrl: String(body.mainVideoUrl || ''),
-    mainPosterUrl: String(body.mainPosterUrl || ''),
+    mainVideoUrl,
+    mainPosterUrl,
     thumbnailImage: String(body.thumbnailImage || body.mainImage || ''),
     details: Array.isArray(body.details) ? body.details.map(String) : [],
     galleryImages: normalizeGallery(id, body.galleryImages),
@@ -150,8 +169,8 @@ export async function PATCH(request: Request) {
     mainImage: String(body.mainImage || ''),
     mainImageAlt: String(body.mainImageAlt || title),
     mainMediaType: (body.mainMediaType === 'video' ? 'video' : 'image') as 'image' | 'video',
-    mainVideoUrl: String(body.mainVideoUrl || ''),
-    mainPosterUrl: String(body.mainPosterUrl || ''),
+    mainVideoUrl: String(body.mainVideoUrl || '').trim(),
+    mainPosterUrl: String(body.mainPosterUrl || '').trim() || (body.mainVideoUrl ? getCloudinaryVideoThumbnail(String(body.mainVideoUrl), 1.5) : ''),
     thumbnailImage: String(body.thumbnailImage || ''),
     details: Array.isArray(body.details) ? body.details.map(String) : [],
     galleryImages: normalizeGallery(id, body.galleryImages),

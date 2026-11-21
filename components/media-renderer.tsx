@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { isVideoSource } from '@/lib/storage/video-thumbnails'
+export { isVideoSource } from '@/lib/storage/video-thumbnails'
 
 export interface MediaRendererProps {
   src?: string | null
@@ -19,17 +21,6 @@ export interface MediaRendererProps {
   aspectRatio?: string
   fallbackSrc?: string
   children?: React.ReactNode
-}
-
-export function isVideoSource(src?: string | null, type?: 'image' | 'video'): boolean {
-  if (type === 'video') return true
-  if (type === 'image') return false
-  if (!src) return false
-  return Boolean(
-    src.match(/\.(mp4|webm|mov|mkv|ogg)($|\?)/i) ||
-      src.includes('/video/upload/') ||
-      src.startsWith('data:video/')
-  )
 }
 
 export function MediaRenderer({

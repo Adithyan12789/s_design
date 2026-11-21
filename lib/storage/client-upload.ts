@@ -1,4 +1,5 @@
 import type { CmsMediaAsset } from '@/lib/cms/types'
+import { getCloudinaryVideoThumbnail, captureVideoFileThumbnailBlob } from '@/lib/storage/video-thumbnails'
 
 export interface UploadProgressInfo {
   percent: number
@@ -96,10 +97,11 @@ export async function uploadClientMedia({
       xhr.send(fd)
     })
 
-    const videoPoster =
-      isVideo && cldResult.secure_url
-        ? cldResult.secure_url.replace(/\.[^.]+$/, '.jpg')
-        : null
+    let videoPoster: string | null = null
+    if (isVideo) {
+      const rawUrl = cldResult.secure_url || cldResult.url
+      videoPoster = getCloudinaryVideoThumbnail(rawUrl, 1.5) || (rawUrl ? rawUrl.replace(/\.[^.]+$/, '.jpg') : null)
+    }
 
     // Register asset in MongoDB Atlas via small JSON payload
     const registerRes = await fetch('/api/admin/media', {
@@ -138,9 +140,24 @@ export async function uploadClientMedia({
   }
 
   // Path C: File <= 4.5MB -> Upload through internal API route
+  let localVideoPoster: string | null = null
+  if (isVideo) {
+    try {
+      const snap = await captureVideoFileThumbnailBlob(file, 1.5)
+      if (snap?.dataUrl) {
+        localVideoPoster = snap.dataUrl
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
   const fd = new FormData()
   fd.append('file', file)
   fd.append('altText', cleanAlt)
+  if (localVideoPoster) {
+    fd.append('posterUrl', localVideoPoster)
+  }
 
   const res = await fetch('/api/admin/media', {
     method: 'POST',
@@ -186,7 +203,7 @@ export async function registerMediaUrl({
       url: cleanUrl,
       altText,
       type: isVideo ? 'video' : 'image',
-      posterUrl,
+      posterUrl: posterUrl || (isVideo ? getCloudinaryVideoThumbnail(cleanUrl, 1.5) : null),
     }),
   })
 

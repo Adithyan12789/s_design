@@ -8,6 +8,7 @@ import {
   Film,
 } from 'lucide-react'
 import type { CmsMediaAsset, MediaType } from '@/lib/cms/types'
+import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 export interface MediaFieldProps {
   label: string
@@ -205,8 +206,13 @@ export function MediaField({
                   type="text"
                   value={videoUrl}
                   onChange={(e) => {
+                    const newUrl = e.target.value
                     onMediaTypeChange?.('video')
-                    onVideoUrlChange?.(e.target.value)
+                    onVideoUrlChange?.(newUrl)
+                    if (onPosterUrlChange && newUrl) {
+                      const autoThumb = getCloudinaryVideoThumbnail(newUrl, 1.5)
+                      if (autoThumb) onPosterUrlChange(autoThumb)
+                    }
                   }}
                   placeholder="https://res.cloudinary.com/.../video.mp4 or /uploads/..."
                   className="admin-input text-xs"
@@ -223,8 +229,9 @@ export function MediaField({
                         onVideoUrlChange?.(url)
                         if (asset?.publicId) onPublicIdChange?.(asset.publicId)
                         if (asset?.altText || _alt) onAltChange?.(asset?.altText || _alt || '')
-                        if (asset?.posterUrl && !posterUrl) {
-                          onPosterUrlChange?.(asset.posterUrl)
+                        const newPoster = asset?.posterUrl || getCloudinaryVideoThumbnail(url, 1.5)
+                        if (newPoster && onPosterUrlChange) {
+                          onPosterUrlChange(newPoster)
                         }
                       },
                       'video'

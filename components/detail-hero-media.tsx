@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
 
 interface DetailHeroMediaProps {
   mediaType?: 'image' | 'video'
@@ -20,6 +21,11 @@ export function DetailHeroMedia({
   const [isPortrait, setIsPortrait] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const isVideo = mediaType === 'video' && Boolean(videoUrl)
+  const resolvedPoster =
+    posterUrl ||
+    (videoUrl ? getCloudinaryVideoThumbnail(videoUrl, 1.5) : null) ||
+    imageUrl ||
+    undefined
 
   useEffect(() => {
     const video = videoRef.current
@@ -42,7 +48,7 @@ export function DetailHeroMedia({
         <video
           ref={videoRef}
           src={videoUrl}
-          poster={posterUrl || imageUrl || undefined}
+          poster={resolvedPoster}
           controls
           autoPlay
           muted
