@@ -613,7 +613,7 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
                             </div>
                             <div className="exhibition-frame-vignette" />
                             <div className="exhibition-hover-pill">
-                              <span>Open Case Study</span>
+                              <span>Open Project</span>
                               <ArrowUpRight size={14} />
                             </div>
                           </div>

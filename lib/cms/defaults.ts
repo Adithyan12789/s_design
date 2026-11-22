@@ -31,6 +31,13 @@ export const DEFAULT_PROJECTS: CmsProject[] = staticProjects.map((p, idx) => ({
   mainImageAlt: `${p.title} — ${p.location}`,
   thumbnailImage: p.image,
   details: p.details,
+  featuresSectionNumber: '( 01 )',
+  featuresSectionHeading: 'Project Features',
+  featuresHeading: 'Designed for',
+  featuresAccentHeading: 'quiet living.',
+  featuresDescription: '',
+  featuresSupportingText:
+    'Every detail was developed through physical mockups and light studies on site, ensuring a seamless dialogue between built geometry and the surrounding landscape.',
   galleryImages: p.gallery.map((url, gIdx) => ({
     id: `default-${p.slug}-img-${gIdx}`,
     projectId: `default-${p.slug}`,

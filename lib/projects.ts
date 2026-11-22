@@ -16,6 +16,12 @@ export type Project = {
   mainMediaType?: 'image' | 'video'
   mainVideoUrl?: string
   mainPosterUrl?: string
+  featuresSectionNumber?: string
+  featuresSectionHeading?: string
+  featuresHeading?: string
+  featuresAccentHeading?: string
+  featuresDescription?: string
+  featuresSupportingText?: string
   galleryItems?: {
     id?: string
     url: string

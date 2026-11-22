@@ -93,6 +93,41 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   const allGalleryImages = plates.map((p) => p.url)
 
+  // (01) Project Features Dynamic Content
+  const rawSecNum = (project.featuresSectionNumber || '').trim()
+  const sectionNumber = rawSecNum
+    ? (rawSecNum.startsWith('(') ? rawSecNum : `( ${rawSecNum} )`)
+    : '( 01 )'
+  const sectionHeading = (project.featuresSectionHeading || '').trim() || 'Project Features'
+
+  const rawHeading1 = (project.featuresHeading || '').trim()
+  const rawHeading2 = (project.featuresAccentHeading || '').trim()
+
+  const headingLines: Array<{ text: string; isAccent?: boolean }> = []
+  if (rawHeading1) {
+    const lines = rawHeading1.split('\n').map((l) => l.trim()).filter(Boolean)
+    lines.forEach((l) => headingLines.push({ text: l }))
+  }
+  if (rawHeading2) {
+    headingLines.push({ text: rawHeading2, isAccent: true })
+  }
+  if (headingLines.length === 0) {
+    headingLines.push(
+      { text: 'Designed for' },
+      { text: 'quiet living.', isAccent: true }
+    )
+  }
+
+  const leadDescription =
+    (project.featuresDescription || '').trim() ||
+    project.fullDescription ||
+    project.shortDescription
+
+  const supportingDescription =
+    project.featuresSupportingText !== undefined && project.featuresSupportingText.trim() !== ''
+      ? project.featuresSupportingText.trim()
+      : 'Every detail was developed through physical mockups and light studies on site, ensuring a seamless dialogue between built geometry and the surrounding landscape.'
+
   return (
     <main className="project-detail-page">
       {/* Exit Intent & Navigation Project Review Interceptor */}
@@ -144,26 +179,36 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      {/* Project Note & Narrative */}
+      {/* Project Note & Narrative / Project Features */}
       <section className="detail-intro section-pad">
         <div className="section-kicker">
-          ( 01 ) <span>Project Features</span>
+          {sectionNumber} <span>{sectionHeading}</span>
         </div>
         <div className="detail-intro-grid">
-          <StaggeredHeading
-            tag="h2"
-            lines={[
-              { text: 'Designed for' },
-              { text: 'quiet living.', isAccent: true },
-            ]}
-          />
+          <div className="detail-intro-heading-col">
+            <StaggeredHeading
+              tag="h2"
+              lines={headingLines}
+            />
+            {project.details && project.details.length > 0 && (
+              <ScrollReveal delay={0.1}>
+                <ul className="detail-features-highlights" aria-label="Key Highlights">
+                  {project.details.map((point, pIdx) => (
+                    <li key={pIdx} className="detail-highlight-item">
+                      <span className="detail-highlight-bullet" aria-hidden="true" />
+                      <span className="detail-highlight-text">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollReveal>
+            )}
+          </div>
           <div className="detail-intro-copy-block">
             <ScrollReveal delay={0.15}>
-              <p className="lead-paragraph">{project.fullDescription || project.shortDescription}</p>
-              <p className="sub-paragraph">
-                Every detail was developed through physical mockups and light studies on site,
-                ensuring a seamless dialogue between built geometry and the surrounding landscape.
-              </p>
+              <p className="lead-paragraph">{leadDescription}</p>
+              {supportingDescription && (
+                <p className="sub-paragraph">{supportingDescription}</p>
+              )}
             </ScrollReveal>
           </div>
         </div>

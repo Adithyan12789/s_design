@@ -53,6 +53,12 @@ export type CmsProject = {
   seoTitle: string
   seoDescription: string
   updatedAt: string
+  featuresSectionNumber?: string
+  featuresSectionHeading?: string
+  featuresHeading?: string
+  featuresAccentHeading?: string
+  featuresDescription?: string
+  featuresSupportingText?: string
 }
 
 export type CmsService = {

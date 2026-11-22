@@ -54,6 +54,12 @@ function emptyProject(order: number): CmsProject {
     mainPosterUrl: '',
     thumbnailImage: '',
     details: [],
+    featuresSectionNumber: '( 01 )',
+    featuresSectionHeading: 'Project Features',
+    featuresHeading: '',
+    featuresAccentHeading: '',
+    featuresDescription: '',
+    featuresSupportingText: '',
     galleryImages: [],
     displayOrder: order,
     status: 'published',
@@ -77,7 +83,16 @@ export function ProjectsManager({
   const [detailsText, setDetailsText] = useState('')
 
   function openEditor(project: CmsProject) {
-    setEditing({ ...project, galleryImages: [...project.galleryImages] })
+    setEditing({
+      ...project,
+      featuresSectionNumber: project.featuresSectionNumber ?? '( 01 )',
+      featuresSectionHeading: project.featuresSectionHeading ?? 'Project Features',
+      featuresHeading: project.featuresHeading ?? '',
+      featuresAccentHeading: project.featuresAccentHeading ?? '',
+      featuresDescription: project.featuresDescription ?? '',
+      featuresSupportingText: project.featuresSupportingText ?? '',
+      galleryImages: [...project.galleryImages],
+    })
     setDetailsText((project.details || []).join('\n'))
     onDirtyChange(true)
   }
@@ -355,6 +370,68 @@ export function ProjectsManager({
                   className="admin-textarea"
                 />
               </div>
+            </div>
+
+            {/* (01) Project Features Section Content */}
+            <div className="admin-card p-6 space-y-5">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358]">
+                  (01) Project Features Section
+                </h3>
+                <p className="text-xs text-[#7c7367] mt-0.5">
+                  Manage the headings, key highlights, and supporting narrative for this project&apos;s Features section.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="admin-label">Section Number</label>
+                  <input
+                    type="text"
+                    value={editing.featuresSectionNumber ?? ''}
+                    onChange={(e) => setEditing({ ...editing, featuresSectionNumber: e.target.value })}
+                    placeholder="( 01 )"
+                    className="admin-input"
+                  />
+                  <p className="text-[11px] text-[#7c7367] mt-1">Default: ( 01 )</p>
+                </div>
+                <div>
+                  <label className="admin-label">Section Heading</label>
+                  <input
+                    type="text"
+                    value={editing.featuresSectionHeading ?? ''}
+                    onChange={(e) => setEditing({ ...editing, featuresSectionHeading: e.target.value })}
+                    placeholder="Project Features"
+                    className="admin-input"
+                  />
+                  <p className="text-[11px] text-[#7c7367] mt-1">Default: Project Features</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="admin-label">Main Heading Line 1</label>
+                  <input
+                    type="text"
+                    value={editing.featuresHeading ?? ''}
+                    onChange={(e) => setEditing({ ...editing, featuresHeading: e.target.value })}
+                    placeholder="Designed for"
+                    className="admin-input"
+                  />
+                  <p className="text-[11px] text-[#7c7367] mt-1">Default: Designed for</p>
+                </div>
+                <div>
+                  <label className="admin-label">Main Heading Line 2 (Accent)</label>
+                  <input
+                    type="text"
+                    value={editing.featuresAccentHeading ?? ''}
+                    onChange={(e) => setEditing({ ...editing, featuresAccentHeading: e.target.value })}
+                    placeholder="quiet living."
+                    className="admin-input"
+                  />
+                  <p className="text-[11px] text-[#7c7367] mt-1">Default: quiet living.</p>
+                </div>
+              </div>
 
               <div>
                 <label className="admin-label">Key Architectural Highlights (one per line)</label>
@@ -362,8 +439,40 @@ export function ProjectsManager({
                   rows={4}
                   value={detailsText}
                   onChange={(e) => setDetailsText(e.target.value)}
+                  placeholder="Thoughtfully designed residential spaces.&#10;Natural lighting and ventilation.&#10;Premium materials and finishes."
                   className="admin-textarea font-mono text-xs"
                 />
+                <p className="text-[11px] text-[#7c7367] mt-1">
+                  Rendered as minimal bullet points directly below the main heading on the live Project Details page.
+                </p>
+              </div>
+
+              <div>
+                <label className="admin-label">Features Lead Narrative (Optional)</label>
+                <textarea
+                  rows={3}
+                  value={editing.featuresDescription ?? ''}
+                  onChange={(e) => setEditing({ ...editing, featuresDescription: e.target.value })}
+                  placeholder="Leave empty to use the Full Architectural Story / Short Description"
+                  className="admin-textarea"
+                />
+                <p className="text-[11px] text-[#7c7367] mt-1">
+                  Optional override for the primary narrative block in this section.
+                </p>
+              </div>
+
+              <div>
+                <label className="admin-label">Features Supporting Description</label>
+                <textarea
+                  rows={3}
+                  value={editing.featuresSupportingText ?? ''}
+                  onChange={(e) => setEditing({ ...editing, featuresSupportingText: e.target.value })}
+                  placeholder="Every detail was developed through physical mockups and light studies on site, ensuring a seamless dialogue between built geometry and the surrounding landscape."
+                  className="admin-textarea"
+                />
+                <p className="text-[11px] text-[#7c7367] mt-1">
+                  Secondary architectural note displayed below the lead narrative.
+                </p>
               </div>
             </div>
 
@@ -916,6 +1025,12 @@ function mapApiProject(row: Record<string, unknown>): CmsProject {
     mainImageAlt: String(row.main_image_alt || ''),
     thumbnailImage: String(row.thumbnail_image || ''),
     details: Array.isArray(row.details) ? row.details.map(String) : [],
+    featuresSectionNumber: String(row.features_section_number || row.featuresSectionNumber || ''),
+    featuresSectionHeading: String(row.features_section_heading || row.featuresSectionHeading || ''),
+    featuresHeading: String(row.features_heading || row.featuresHeading || ''),
+    featuresAccentHeading: String(row.features_accent_heading || row.featuresAccentHeading || ''),
+    featuresDescription: String(row.features_description || row.featuresDescription || ''),
+    featuresSupportingText: String(row.features_supporting_text || row.featuresSupportingText || ''),
     galleryImages: images,
     displayOrder: Number(row.display_order ?? 0),
     status: row.status === 'draft' ? 'draft' : 'published',
