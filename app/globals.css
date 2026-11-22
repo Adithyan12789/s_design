@@ -136,7 +136,7 @@ em { color: var(--bronze); font-style: italic; }
 }
 .reviews-section-header .section-kicker .reviews-kicker-title,
 .reviews-section-kicker .reviews-kicker-title {
-  color: #fbf9f4;
+  color: var(--bronze, #d9b686);
   margin-left: 0;
   font-family: var(--font-display, Georgia, 'Times New Roman', serif);
   font-size: var(--font-size-reviews-heading, clamp(24px, 2.75vw, 41px));
@@ -150,7 +150,10 @@ em { color: var(--bronze); font-style: italic; }
   font-size: var(--font-size-reviews-heading, clamp(40px, 4.8vw, 68px));
   line-height: 0.94;
   letter-spacing: -0.04em;
-  color: #fbf9f4;
+  color: var(--bronze, #d9b686);
+}
+.reviews-custom-heading {
+  color: var(--bronze, #d9b686);
 }
 .reviews-section-header h2 em {
   color: var(--bronze-light);
