@@ -15,6 +15,7 @@ export interface ProjectGalleryPlate {
   type?: 'image' | 'video'
   posterUrl?: string | null
   altText?: string
+  aspectRatio?: number
 }
 
 type ProjectGalleryInteractiveProps = {
@@ -34,7 +35,7 @@ function GalleryVideoCard({
   onOpenLightbox?: () => void
 }) {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isPortrait, setIsPortrait] = useState(false)
+  const [aspectRatio, setAspectRatio] = useState<number | null>(plate.aspectRatio || null)
   const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -70,14 +71,19 @@ function GalleryVideoCard({
 
   return (
     <div
-      className={`gallery-video-card-container w-full relative overflow-hidden bg-[#141311] ${
-        isPortrait
-          ? 'aspect-[9/16] max-w-[380px] mx-auto rounded-md'
-          : 'aspect-[16/9] rounded-md'
-      }`}
+      className="gallery-video-card-container w-full relative overflow-hidden bg-[#141311] rounded-md"
+      style={{
+        aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
+        maxHeight: 'min(78vh, 840px)',
+      }}
     >
       <video
-        ref={videoRef}
+        ref={(vEl) => {
+          videoRef.current = vEl
+          if (vEl && vEl.videoWidth && vEl.videoHeight && !aspectRatio) {
+            setAspectRatio(vEl.videoWidth / vEl.videoHeight)
+          }
+        }}
         src={plate.url}
         poster={resolvedPoster || undefined}
         controls={isPlaying}
@@ -86,11 +92,14 @@ function GalleryVideoCard({
         onLoadedMetadata={(e) => {
           const v = e.currentTarget
           if (v.videoWidth && v.videoHeight) {
-            setIsPortrait(v.videoHeight > v.videoWidth)
+            setAspectRatio(v.videoWidth / v.videoHeight)
           }
         }}
         onEnded={() => setIsPlaying(false)}
         className="w-full h-full object-cover object-center block"
+        style={{
+          aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
+        }}
         aria-label={plate.altText || 'Project video'}
       />
 
@@ -102,8 +111,19 @@ function GalleryVideoCard({
         >
           {resolvedPoster ? (
             <img
+              ref={(imgEl) => {
+                if (imgEl && imgEl.complete && imgEl.naturalWidth && !aspectRatio) {
+                  setAspectRatio(imgEl.naturalWidth / imgEl.naturalHeight)
+                }
+              }}
               src={resolvedPoster}
               alt={plate.altText || 'Video thumbnail'}
+              onLoad={(e) => {
+                const { naturalWidth, naturalHeight } = e.currentTarget
+                if (naturalWidth && naturalHeight && !aspectRatio) {
+                  setAspectRatio(naturalWidth / naturalHeight)
+                }
+              }}
               className="absolute inset-0 w-full h-full object-cover object-center"
               loading="lazy"
             />
@@ -199,9 +219,10 @@ export function ProjectGalleryInteractive({
                 />
               ) : (
                 <ProjectImage3D
-                  className="detail-gallery-image aspect-[4/3] relative overflow-hidden"
+                  className="detail-gallery-image relative overflow-hidden"
                   src={item.url}
                   alt={item.altText || `${title} detail ${index + 1}`}
+                  aspectRatio={item.aspectRatio}
                 />
               )}
               <div
