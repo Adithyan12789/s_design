@@ -204,12 +204,17 @@ export function ProjectGalleryInteractive({
         {visibleItems.map((item, index) => {
           const itemKey = item.id || item.url || `gallery-item-${index}`
           const isVid = item.type === 'video' || isVideoSource(item.url)
+          const isEven = index % 2 === 0
+          const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
+
           return (
             <div
               key={itemKey}
-              className="gallery-item-wrapper group cursor-pointer cursor-target"
+              className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
               data-crosshair-target
               data-cursor-label={isVid ? 'Play' : 'Expand'}
+              data-alignment={isEven ? 'left' : 'right'}
+              data-index={index}
               onClick={() => openLightbox(index)}
             >
               {isVid ? (
