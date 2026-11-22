@@ -9,6 +9,7 @@ type ProjectImage3DProps = {
   priority?: boolean
   aspectRatio?: number
   onError?: () => void
+  onDimensionsDetected?: (width: number, height: number) => void
 }
 
 export function ProjectImage3D({
@@ -16,7 +17,9 @@ export function ProjectImage3D({
   alt,
   className = '',
   priority = false,
+  aspectRatio,
   onError,
+  onDimensionsDetected,
 }: ProjectImage3DProps) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
 
@@ -27,6 +30,8 @@ export function ProjectImage3D({
     setTilt({ x: (0.5 - y) * 8, y: (x - 0.5) * 10 })
   }
 
+  const hasRatio = typeof aspectRatio === 'number' && aspectRatio > 0
+
   return (
     <div
       className={`project-image-3d ${className}`}
@@ -35,15 +40,29 @@ export function ProjectImage3D({
       style={{
         '--image-tilt-x': `${tilt.x}deg`,
         '--image-tilt-y': `${tilt.y}deg`,
+        aspectRatio: hasRatio ? `${aspectRatio}` : undefined,
+        height: hasRatio ? '100%' : 'auto',
       } as React.CSSProperties}
     >
-      <div className="project-image-3d__frame">
+      <div
+        className="project-image-3d__frame"
+        style={{
+          aspectRatio: hasRatio ? `${aspectRatio}` : undefined,
+          height: hasRatio ? '100%' : 'auto',
+        }}
+      >
         <img
           src={src}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           onError={onError}
-          className="w-full h-auto block object-cover object-center"
+          onLoad={(e) => {
+            const { naturalWidth, naturalHeight } = e.currentTarget
+            if (naturalWidth && naturalHeight) {
+              onDimensionsDetected?.(naturalWidth, naturalHeight)
+            }
+          }}
+          className={`w-full block object-contain object-center ${hasRatio ? 'h-full' : 'h-auto'}`}
         />
         <span className="project-image-3d__shine" aria-hidden="true" />
       </div>

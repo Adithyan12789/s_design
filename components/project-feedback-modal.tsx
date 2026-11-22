@@ -132,6 +132,7 @@ export function ProjectFeedbackModal({
           onClick={() => onClose(false)}
           className="absolute top-4 right-4 z-10 p-2 rounded-full text-[#8e8578] hover:text-[#f4efe6] hover:bg-white/5 transition-colors cursor-target"
           aria-label="Close dialog"
+          suppressHydrationWarning
         >
           <X className="w-4 h-4" />
         </button>

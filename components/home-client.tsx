@@ -29,7 +29,7 @@ function VideoMuteButton({
   label: string
 }) {
   return (
-    <div className={`video-audio-toggle ${isVisible ? 'is-visible' : ''}`}>
+    <div className={`video-audio-toggle ${isVisible ? 'is-visible' : ''}`} suppressHydrationWarning>
       <button
         type="button"
         onClick={onToggle}
@@ -37,6 +37,7 @@ function VideoMuteButton({
         aria-pressed={!isMuted}
         title={isMuted ? 'Unmute' : 'Mute'}
         className="video-audio-toggle-btn"
+        suppressHydrationWarning
       >
         {isMuted ? (
           <VolumeX className="w-4 h-4 text-[#f5f1e9]/80" />
@@ -44,7 +45,7 @@ function VideoMuteButton({
           <Volume2 className="w-4 h-4 text-[#d9b686]" />
         )}
       </button>
-      <span className="video-audio-tooltip" role="tooltip">
+      <span className="video-audio-tooltip" role="tooltip" suppressHydrationWarning>
         {isMuted ? 'Unmute' : 'Mute'}
       </span>
     </div>
