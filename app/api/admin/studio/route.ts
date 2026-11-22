@@ -42,6 +42,8 @@ export async function PATCH(request: Request) {
     teamMembers: Array.isArray(body.teamMembers) ? body.teamMembers : [],
     extraSections: Array.isArray(body.extraSections) ? body.extraSections : [],
     ...(body.founder ? { founder: body.founder } : {}),
+    ...(body.studioHeadingSize !== undefined ? { studioHeadingSize: String(body.studioHeadingSize) } : {}),
+    ...(body.studioSubheadingSize !== undefined ? { studioSubheadingSize: String(body.studioSubheadingSize) } : {}),
     updatedAt: now,
   }
 

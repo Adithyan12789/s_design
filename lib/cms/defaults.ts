@@ -284,6 +284,7 @@ export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
     heroTitleSize: 'clamp(62px, 9.5vw, 145px)',
     heroSubtitleSize: '14px',
     studioHeadingSize: 'clamp(42px, 5.3vw, 78px)',
+    studioSubheadingSize: 'clamp(42px, 5.3vw, 78px)',
     studioBodySize: '14px',
     workTitleSize: 'clamp(25px, 2.4vw, 36px)',
     workDescSize: 'clamp(13px, 1.05vw, 15px)',

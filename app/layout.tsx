@@ -52,7 +52,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   if (brandColors?.bronzeLight) bodyStyle['--bronze-light'] = brandColors.bronzeLight
   if (typography?.heroTitleSize) bodyStyle['--font-size-hero-title'] = typography.heroTitleSize
   if (typography?.heroSubtitleSize) bodyStyle['--font-size-hero-subtitle'] = typography.heroSubtitleSize
-  if (typography?.studioHeadingSize) bodyStyle['--font-size-studio-heading'] = typography.studioHeadingSize
+  const studioHeading = typography?.studioHeadingSize || (data.studioInfo as unknown as Record<string, string>)?.studioHeadingSize
+  const studioSubheading = typography?.studioSubheadingSize || (data.studioInfo as unknown as Record<string, string>)?.studioSubheadingSize
+  if (studioHeading) bodyStyle['--font-size-studio-heading'] = studioHeading
+  if (studioSubheading) bodyStyle['--font-size-studio-subheading'] = studioSubheading
   if (typography?.studioBodySize) bodyStyle['--font-size-studio-body'] = typography.studioBodySize
   if (typography?.workTitleSize) bodyStyle['--font-size-work-title'] = typography.workTitleSize
   if (typography?.workDescSize) bodyStyle['--font-size-work-desc'] = typography.workDescSize

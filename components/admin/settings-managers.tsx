@@ -132,6 +132,43 @@ export function StudioManager({
           </div>
         </div>
 
+        {/* Studio Note Typography & Sizing */}
+        <div className="bg-[#faf8f5] p-4 rounded-lg border border-[#e6dfd3] space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-[#b68d54]" />
+              Studio Note Typography &amp; Sizing
+            </h4>
+            <span className="text-[11px] text-[#7c7367]">
+              Independent sizing for Heading &amp; Subheading
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <SizingControl
+              label="Main Heading Font Size"
+              sublabel="Line 1 ('Architecture is the art of')"
+              value={form.studioHeadingSize}
+              defaultValue="clamp(42px, 5.3vw, 78px)"
+              min={32}
+              max={96}
+              step={2}
+              unit="px"
+              onChange={(val) => updateField('studioHeadingSize', val)}
+            />
+            <SizingControl
+              label="Subheading Font Size"
+              sublabel="Accent line 2 ('making room for life.')"
+              value={form.studioSubheadingSize}
+              defaultValue="clamp(42px, 5.3vw, 78px)"
+              min={28}
+              max={96}
+              step={2}
+              unit="px"
+              onChange={(val) => updateField('studioSubheadingSize', val)}
+            />
+          </div>
+        </div>
+
         <div>
           <label className="admin-label">Studio Note / Intro Quote</label>
           <textarea
@@ -566,6 +603,7 @@ export function TypographyManager({
         heroTitleSize: 'clamp(62px, 9.5vw, 145px)',
         heroSubtitleSize: '14px',
         studioHeadingSize: 'clamp(42px, 5.3vw, 78px)',
+        studioSubheadingSize: 'clamp(42px, 5.3vw, 78px)',
         studioBodySize: '14px',
         workTitleSize: 'clamp(25px, 2.4vw, 36px)',
         workDescSize: 'clamp(13px, 1.05vw, 15px)',
@@ -589,6 +627,7 @@ export function TypographyManager({
         heroTitleSize: 'clamp(48px, 7vw, 108px)',
         heroSubtitleSize: '13px',
         studioHeadingSize: 'clamp(34px, 4.2vw, 60px)',
+        studioSubheadingSize: 'clamp(34px, 4.2vw, 60px)',
         studioBodySize: '13px',
         workTitleSize: 'clamp(20px, 1.9vw, 28px)',
         workDescSize: '13px',
@@ -612,6 +651,7 @@ export function TypographyManager({
         heroTitleSize: 'clamp(72px, 11vw, 168px)',
         heroSubtitleSize: '16px',
         studioHeadingSize: 'clamp(50px, 6.4vw, 92px)',
+        studioSubheadingSize: 'clamp(50px, 6.4vw, 92px)',
         studioBodySize: '15.5px',
         workTitleSize: 'clamp(30px, 3vw, 46px)',
         workDescSize: '15.5px',
@@ -789,10 +829,10 @@ export function TypographyManager({
           <Sliders className="w-4 h-4 text-[#b68d54]" />
           ( 01 ) Studio Note Typography
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <SizingControl
-            label="Studio Heading Font Size"
-            sublabel="Editorial title on right side"
+            label="Main Heading Font Size"
+            sublabel="Title line 1 ('Architecture is the art of')"
             value={typo.studioHeadingSize}
             defaultValue="clamp(42px, 5.3vw, 78px)"
             min={32}
@@ -800,6 +840,17 @@ export function TypographyManager({
             step={2}
             unit="px"
             onChange={(val) => updateTypo('studioHeadingSize', val)}
+          />
+          <SizingControl
+            label="Subheading Font Size"
+            sublabel="Accent line 2 ('making room for life.')"
+            value={typo.studioSubheadingSize}
+            defaultValue="clamp(42px, 5.3vw, 78px)"
+            min={28}
+            max={96}
+            step={2}
+            unit="px"
+            onChange={(val) => updateTypo('studioSubheadingSize', val)}
           />
           <SizingControl
             label="Studio Description Text Size"

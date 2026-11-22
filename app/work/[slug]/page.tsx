@@ -191,7 +191,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               lines={headingLines}
             />
             {project.details && project.details.length > 0 && (
-              <ScrollReveal delay={0.1}>
+              <ScrollReveal delay={0.1} className="detail-features-highlights-wrap">
                 <ul className="detail-features-highlights" aria-label="Key Highlights">
                   {project.details.map((point, pIdx) => (
                     <li key={pIdx} className="detail-highlight-item">

@@ -139,6 +139,8 @@ export type CmsStudioInfo = {
   teamMembers: StudioTeamMember[]
   extraSections: StudioExtraSection[]
   founder?: CmsFounderInfo
+  studioHeadingSize?: string
+  studioSubheadingSize?: string
 }
 
 export type CmsTestimonial = {
@@ -166,6 +168,7 @@ export type CmsTypographySettings = {
   heroTitleSize?: string
   heroSubtitleSize?: string
   studioHeadingSize?: string
+  studioSubheadingSize?: string
   studioBodySize?: string
   workTitleSize?: string
   workDescSize?: string
