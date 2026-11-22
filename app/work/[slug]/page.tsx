@@ -121,7 +121,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div className="detail-hero-index">
             <span>PROJECT / {project.year}</span>
             <span>
-              CASE STUDY {String(safeIndex + 1).padStart(2, '0')} OF{' '}
+              PROJECT NO. {String(safeIndex + 1).padStart(2, '0')} OF{' '}
               {String(allProjects.length).padStart(2, '0')}
             </span>
           </div>
@@ -147,7 +147,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       {/* Project Note & Narrative */}
       <section className="detail-intro section-pad">
         <div className="section-kicker">
-          ( 01 ) <span>Architectural Intent</span>
+          ( 01 ) <span>Project Features</span>
         </div>
         <div className="detail-intro-grid">
           <StaggeredHeading
