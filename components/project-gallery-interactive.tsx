@@ -28,24 +28,17 @@ type ProjectGalleryInteractiveProps = {
 function GalleryVideoCard({
   plate,
   fallbackImage,
-  aspectRatio,
   onOpenLightbox,
   onMediaError,
-  onDimensionsDetected,
-  onPlayingChange,
 }: {
   plate: ProjectGalleryPlate
   fallbackImage?: string
-  aspectRatio?: number
   onOpenLightbox?: () => void
   onMediaError?: () => void
-  onDimensionsDetected?: (width: number, height: number) => void
-  onPlayingChange?: (isPlaying: boolean) => void
 }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const playerRef = useRef<HTMLVideoElement | null>(null)
 
   // 1. Explicit posterUrl -> 2. Cloudinary 1.5s snapshot -> 3. Auto-extracted canvas frame -> 4. Fallback project image
   const resolvedPoster =
@@ -72,59 +65,29 @@ function GalleryVideoCard({
   const handlePlayClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsPlaying(true)
-    onPlayingChange?.(true)
-  }
-
-  useEffect(() => {
-    if (isPlaying && playerRef.current) {
-      playerRef.current.play().catch(() => {})
-    }
-  }, [isPlaying])
-
-  const handleLoadedMeta = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const v = e.currentTarget
-    if (v.videoWidth && v.videoHeight) {
-      onDimensionsDetected?.(v.videoWidth, v.videoHeight)
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {})
     }
   }
-
-  const handlePosterLoaded = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget
-    if (img.naturalWidth && img.naturalHeight) {
-      onDimensionsDetected?.(img.naturalWidth, img.naturalHeight)
-    }
-  }
-
-  const hasRatio = typeof aspectRatio === 'number' && aspectRatio > 0
 
   return (
-    <div
-      className="gallery-video-card-container w-full relative overflow-hidden rounded-md"
-      style={{
-        aspectRatio: hasRatio ? `${aspectRatio}` : undefined,
-        height: hasRatio ? '100%' : 'auto',
-      }}
-    >
+    <div className="gallery-video-card-container w-full relative overflow-hidden rounded-md">
       {isPlaying ? (
         <video
-          ref={playerRef}
+          ref={videoRef}
           src={plate.url}
           poster={resolvedPoster || undefined}
           controls
           autoPlay
           playsInline
-          onEnded={() => {
-            setIsPlaying(false)
-            onPlayingChange?.(false)
-          }}
+          onEnded={() => setIsPlaying(false)}
           onError={onMediaError}
-          onLoadedMetadata={handleLoadedMeta}
-          className={`w-full block object-contain object-center ${hasRatio ? 'h-full' : 'h-auto'}`}
+          className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
           aria-label={plate.altText || 'Project video'}
         />
       ) : (
         <div
-          className={`relative w-full cursor-pointer group/thumb ${hasRatio ? 'h-full' : 'h-auto'}`}
+          className="relative w-full cursor-pointer group/thumb"
           onClick={handlePlayClick}
         >
           {resolvedPoster ? (
@@ -132,8 +95,7 @@ function GalleryVideoCard({
               src={resolvedPoster}
               alt={plate.altText || 'Video thumbnail'}
               onError={onMediaError}
-              onLoad={handlePosterLoaded}
-              className={`w-full block object-contain object-center ${hasRatio ? 'h-full' : 'h-auto'}`}
+              className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
               loading="lazy"
             />
           ) : (
@@ -144,8 +106,7 @@ function GalleryVideoCard({
               muted
               playsInline
               onError={onMediaError}
-              onLoadedMetadata={handleLoadedMeta}
-              className={`w-full block object-contain object-center ${hasRatio ? 'h-full' : 'h-auto'}`}
+              className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
               aria-label={plate.altText || 'Project video'}
             />
           )}
@@ -185,10 +146,6 @@ export function ProjectGalleryInteractive({
 }: ProjectGalleryInteractiveProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [failedItemKeys, setFailedItemKeys] = useState<Set<string>>(new Set())
-  const [mediaDimensions, setMediaDimensions] = useState<
-    Record<string, { width: number; height: number; aspectRatio: number }>
-  >({})
-  const [playingVideoKeys, setPlayingVideoKeys] = useState<Set<string>>(new Set())
 
   // Normalize items to unified ProjectGalleryPlate[] format & filter out invalid / empty URLs
   const items: ProjectGalleryPlate[] = useMemo(() => {
@@ -227,62 +184,6 @@ export function ProjectGalleryInteractive({
     })
   }
 
-  const handleDimensionsDetected = (key: string, width: number, height: number) => {
-    if (!width || !height || width <= 0 || height <= 0) return
-    const ratio = width / height
-    setMediaDimensions((prev) => {
-      const existing = prev[key]
-      if (
-        existing &&
-        Math.abs(existing.aspectRatio - ratio) < 0.005 &&
-        existing.width === width &&
-        existing.height === height
-      ) {
-        return prev
-      }
-      return {
-        ...prev,
-        [key]: { width, height, aspectRatio: ratio },
-      }
-    })
-  }
-
-  // Pre-load natural dimensions for image and video posters
-  useEffect(() => {
-    visibleItems.forEach((item, idx) => {
-      const mediaKey = item.id || item.url || `media-${idx}`
-      const isVid = item.type === 'video' || isVideoSource(item.url)
-
-      if (item.aspectRatio && item.aspectRatio > 0) {
-        handleDimensionsDetected(mediaKey, item.aspectRatio * 1000, 1000)
-      }
-
-      if (!isVid && item.url) {
-        const img = new Image()
-        img.src = item.url
-        img.onload = () => {
-          if (img.naturalWidth && img.naturalHeight) {
-            handleDimensionsDetected(mediaKey, img.naturalWidth, img.naturalHeight)
-          }
-        }
-      } else if (isVid) {
-        const poster =
-          item.posterUrl ||
-          getCloudinaryVideoThumbnail(item.url, 1.5) ||
-          null
-        if (poster) {
-          const img = new Image()
-          img.src = poster
-          img.onload = () => {
-            if (img.naturalWidth && img.naturalHeight) {
-              handleDimensionsDetected(mediaKey, img.naturalWidth, img.naturalHeight)
-            }
-          }
-        }
-      }
-    })
-  }, [visibleItems])
-
   const openLightbox = (index: number) => setLightboxIndex(index)
   const closeLightbox = () => setLightboxIndex(null)
 
@@ -296,149 +197,55 @@ export function ProjectGalleryInteractive({
     setLightboxIndex((lightboxIndex - 1 + visibleItems.length) % visibleItems.length)
   }
 
-  const leftItems = useMemo(
-    () =>
-      visibleItems
-        .map((item, idx) => ({ item, index: idx }))
-        .filter(({ index }) => index % 2 === 0),
-    [visibleItems]
-  )
-  const rightItems = useMemo(
-    () =>
-      visibleItems
-        .map((item, idx) => ({ item, index: idx }))
-        .filter(({ index }) => index % 2 === 1),
-    [visibleItems]
-  )
-
-  const getMediaWrapperStyles = (
-    dim?: { width: number; height: number; aspectRatio: number },
-    isEven: boolean = true
-  ): React.CSSProperties => {
-    if (!dim || !dim.aspectRatio || dim.aspectRatio <= 0) {
-      return {
-        width: '100%',
-        maxWidth: '100%',
-        height: 'auto',
-      }
-    }
-
-    const { aspectRatio, width: naturalW } = dim
-    const maxDesktopHeight = 'min(72vh, 720px)'
-
-    // Landscape media (ratio >= 1.15)
-    if (aspectRatio >= 1.15) {
-      const hasSmallNaturalWidth = naturalW > 0 && naturalW < 600
-      return {
-        width: hasSmallNaturalWidth ? `min(100%, ${naturalW}px)` : '100%',
-        maxWidth: '100%',
-        aspectRatio: `${aspectRatio}`,
-        height: 'auto',
-      }
-    }
-
-    // Portrait (ratio < 0.9) or Square / Neutral (0.9 <= ratio < 1.15)
-    // Derive width naturally from the max desktop height and the exact aspect ratio
-    const naturalWidthConstraint =
-      naturalW > 0 && naturalW < 720
-        ? `min(100%, ${naturalW}px, calc(${maxDesktopHeight} * ${aspectRatio}))`
-        : `min(100%, calc(${maxDesktopHeight} * ${aspectRatio}))`
-
-    return {
-      width: naturalWidthConstraint,
-      maxWidth: '100%',
-      aspectRatio: `${aspectRatio}`,
-      height: 'auto',
-    }
-  }
-
-  const renderGalleryItem = (
-    item: ProjectGalleryPlate,
-    index: number,
-    keyPrefix: string
-  ) => {
-    const itemKey = `${keyPrefix}-${item.id || item.url || index}`
-    const mediaKey = item.id || item.url || `media-${index}`
-    const isVid = item.type === 'video' || isVideoSource(item.url)
-    const isEven = index % 2 === 0
-    const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
-    const dim =
-      mediaDimensions[mediaKey] ||
-      (item.aspectRatio ? { width: 0, height: 0, aspectRatio: item.aspectRatio } : undefined)
-    const itemStyle = getMediaWrapperStyles(dim, isEven)
-    const isPlayingVideo = playingVideoKeys.has(mediaKey)
-
-    return (
-      <div
-        key={itemKey}
-        className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
-        data-crosshair-target
-        data-cursor-label={isVid ? 'Play' : 'Expand'}
-        data-alignment={isEven ? 'left' : 'right'}
-        data-index={index}
-        style={itemStyle}
-        onClick={() => openLightbox(index)}
-      >
-        {isVid ? (
-          <GalleryVideoCard
-            plate={item}
-            fallbackImage={fallbackImage}
-            aspectRatio={dim?.aspectRatio}
-            onOpenLightbox={() => openLightbox(index)}
-            onMediaError={() => handleMediaError(item.id || item.url || `item-${index}`)}
-            onDimensionsDetected={(w, h) => handleDimensionsDetected(mediaKey, w, h)}
-            onPlayingChange={(playing) => {
-              setPlayingVideoKeys((prev) => {
-                const next = new Set(prev)
-                if (playing) next.add(mediaKey)
-                else next.delete(mediaKey)
-                return next
-              })
-            }}
-          />
-        ) : (
-          <ProjectImage3D
-            className="detail-gallery-image relative overflow-hidden"
-            src={item.url}
-            alt={item.altText || `${title} detail ${index + 1}`}
-            aspectRatio={dim?.aspectRatio}
-            onError={() => handleMediaError(item.id || item.url || `item-${index}`)}
-            onDimensionsDetected={(w, h) => handleDimensionsDetected(mediaKey, w, h)}
-          />
-        )}
-        {!isPlayingVideo && (
-          <div
-            className="gallery-expand-hint"
-            onClick={(e) => {
-              e.stopPropagation()
-              openLightbox(index)
-            }}
-          >
-            <Maximize2 size={15} />
-            <span>{isVid ? 'Full view' : 'Expand view'}</span>
-          </div>
-        )}
-      </div>
-    )
-  }
-
   if (visibleItems.length === 0) return null
 
   return (
     <>
-      {/* Desktop / Tablet Two-Column Independent Vertical Flow */}
-      <div className="detail-gallery-grid detail-gallery-desktop">
-        <div className="detail-gallery-col detail-gallery-col-left">
-          {leftItems.map(({ item, index }) => renderGalleryItem(item, index, 'left'))}
-        </div>
-        <div className="detail-gallery-col detail-gallery-col-right">
-          {rightItems.map(({ item, index }) => renderGalleryItem(item, index, 'right'))}
-        </div>
-      </div>
+      <div className="detail-gallery-grid">
+        {visibleItems.map((item, index) => {
+          const itemKey = item.id || item.url || `gallery-item-${index}`
+          const isVid = item.type === 'video' || isVideoSource(item.url)
+          const isEven = index % 2 === 0
+          const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
 
-      {/* Mobile Single-Column Sequential Flow */}
-      <div className="detail-gallery-grid detail-gallery-mobile">
-        {visibleItems.map((item, index) => renderGalleryItem(item, index, 'mobile'))}
+          return (
+            <div
+              key={itemKey}
+              className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
+              data-crosshair-target
+              data-cursor-label={isVid ? 'Play' : 'Expand'}
+              data-alignment={isEven ? 'left' : 'right'}
+              data-index={index}
+              onClick={() => openLightbox(index)}
+            >
+              {isVid ? (
+                <GalleryVideoCard
+                  plate={item}
+                  fallbackImage={fallbackImage}
+                  onOpenLightbox={() => openLightbox(index)}
+                  onMediaError={() => handleMediaError(itemKey)}
+                />
+              ) : (
+                <ProjectImage3D
+                  className="detail-gallery-image relative overflow-hidden"
+                  src={item.url}
+                  alt={item.altText || `${title} detail ${index + 1}`}
+                  onError={() => handleMediaError(itemKey)}
+                />
+              )}
+              <div
+                className="gallery-expand-hint"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openLightbox(index)
+                }}
+              >
+                <Maximize2 size={15} />
+                <span>{isVid ? 'Full view' : 'Expand view'}</span>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Full-screen Lightbox Modal */}

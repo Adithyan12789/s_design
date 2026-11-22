@@ -196,6 +196,7 @@ function ApproachMediaVideo({
         onError={() => setHasError(true)}
         aria-label={altText || 'Architectural design approach video'}
         className="w-full h-full object-cover object-center"
+        suppressHydrationWarning
       />
     </ParallaxImage>
   )
@@ -332,6 +333,7 @@ function StudioMediaVideo({
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
         className="w-full h-full object-cover object-center"
+        suppressHydrationWarning
       />
       <VideoMuteButton
         isMuted={isMuted}

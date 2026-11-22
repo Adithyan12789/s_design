@@ -97,6 +97,7 @@ export function ParallaxImage({
       ref={containerRef}
       className={`parallax-image-container ${className}`}
       style={{ aspectRatio }}
+      suppressHydrationWarning
     >
       <div
         ref={imageRef}
@@ -104,6 +105,7 @@ export function ParallaxImage({
         style={src ? { backgroundImage: `url(${src})` } : undefined}
         role={src ? 'img' : undefined}
         aria-label={src ? alt : undefined}
+        suppressHydrationWarning
       >
         {children}
       </div>
