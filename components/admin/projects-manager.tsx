@@ -676,8 +676,8 @@ export function ProjectsManager({
                 />
               </div>
               <ImageField
-                label="Secondary Inset Thumbnail (Image Only)"
-                description="Compact square preview used across portfolio indexes."
+                label="Secondary Project Image / Detail Photograph"
+                description="The secondary offset image displayed in the Homepage Works section and portfolio indexes."
                 value={editing.thumbnailImage}
                 onChange={(url) => setEditing({ ...editing, thumbnailImage: url })}
                 onOpenPicker={() =>

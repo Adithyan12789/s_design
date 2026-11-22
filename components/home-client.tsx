@@ -387,6 +387,7 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
     title: p.title,
     meta: p.meta,
     image: p.mainImage,
+    thumbnailImage: p.thumbnailImage,
     size: p.size,
     location: p.location,
     year: p.year,

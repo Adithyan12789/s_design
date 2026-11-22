@@ -3,6 +3,7 @@ export type Project = {
   title: string
   meta: string
   image: string
+  thumbnailImage?: string
   size: 'large' | 'small'
   location: string
   year: string

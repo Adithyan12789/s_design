@@ -504,7 +504,32 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
           >
             {projects.map((project, index) => {
               const aspectClass = SLIDE_ASPECTS[index % SLIDE_ASPECTS.length]
-              const secondaryImage = project.gallery[0] || project.image
+
+              // Find first non-video gallery image or fallback poster if gallery item is a video
+              const firstGalleryImage = (() => {
+                if (project.galleryItems && project.galleryItems.length > 0) {
+                  const imgItem = project.galleryItems.find(
+                    (item) => item.type === 'image' || !item.url.match(/\.(mp4|webm|mov|mkv|ogg|m4v)($|\?)/i)
+                  )
+                  if (imgItem?.url) return imgItem.url
+                  const vidItem = project.galleryItems.find((item) => item.posterUrl)
+                  if (vidItem?.posterUrl) return vidItem.posterUrl
+                }
+                const nonVid = project.gallery?.find((url) => !url.match(/\.(mp4|webm|mov|mkv|ogg|m4v)($|\?)/i))
+                return nonVid || project.gallery?.[0] || null
+              })()
+
+              // Priority for secondary offset detail photograph:
+              // 1. Explicit thumbnailImage / secondary photograph from Admin Panel (if set and not video)
+              // 2. First non-video gallery image / poster
+              // 3. Fallback to main project image
+              const secondaryImage =
+                (project.thumbnailImage && !project.thumbnailImage.match(/\.(mp4|webm|mov|mkv|ogg|m4v)($|\?)/i)
+                  ? project.thumbnailImage
+                  : null) ||
+                firstGalleryImage ||
+                project.image
+
               const isEven = index % 2 === 0
 
               return (
