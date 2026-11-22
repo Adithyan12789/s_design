@@ -48,10 +48,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const plates: ProjectGalleryPlate[] = []
 
   // Main hero media (if video or image)
-  if (project.mainMediaType === 'video' && project.mainVideoUrl) {
+  if (project.mainMediaType === 'video' && project.mainVideoUrl && project.mainVideoUrl.trim()) {
     plates.push({
       id: 'main-media',
-      url: project.mainVideoUrl,
+      url: project.mainVideoUrl.trim(),
       type: 'video',
       posterUrl:
         project.mainPosterUrl ||
@@ -59,11 +59,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
       altText: project.mainImageAlt || `${project.title} presentation video`,
     })
-  } else if (project.mainImage) {
+  } else if (project.mainImage && project.mainImage.trim()) {
     const isVid = isVideoSource(project.mainImage)
     plates.push({
       id: 'main-media',
-      url: project.mainImage,
+      url: project.mainImage.trim(),
       type: isVid ? 'video' : 'image',
       posterUrl: isVid
         ? project.mainPosterUrl || getCloudinaryVideoThumbnail(project.mainImage, 1.5)
@@ -74,18 +74,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   // Project Gallery Plates
   project.galleryImages.forEach((item, idx) => {
-    if (!item?.url) return
+    if (!item?.url || !item.url.trim()) return
+    const trimmedUrl = item.url.trim()
     // Avoid duplicating main media if exact same URL
-    if (plates.some((p) => p.url === item.url)) return
+    if (plates.some((p) => p.url === trimmedUrl)) return
 
-    const isVid = item.type === 'video' || isVideoSource(item.url)
+    const isVid = item.type === 'video' || isVideoSource(trimmedUrl)
     plates.push({
       id: item.id || `gallery-${idx}`,
-      url: item.url,
+      url: trimmedUrl,
       type: isVid ? 'video' : 'image',
       posterUrl:
         item.posterUrl ||
-        (isVid ? getCloudinaryVideoThumbnail(item.url, 1.5) : null) ||
+        (isVid ? getCloudinaryVideoThumbnail(trimmedUrl, 1.5) : null) ||
         (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
       altText: item.altText || `${project.title} plate ${idx + 1}`,
     })

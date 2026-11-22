@@ -8,6 +8,7 @@ type ProjectImage3DProps = {
   className?: string
   priority?: boolean
   aspectRatio?: number
+  onError?: () => void
 }
 
 export function ProjectImage3D({
@@ -15,10 +16,9 @@ export function ProjectImage3D({
   alt,
   className = '',
   priority = false,
-  aspectRatio: initialAspectRatio,
+  onError,
 }: ProjectImage3DProps) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [aspectRatio, setAspectRatio] = useState<number | null>(initialAspectRatio || null)
 
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -35,34 +35,19 @@ export function ProjectImage3D({
       style={{
         '--image-tilt-x': `${tilt.x}deg`,
         '--image-tilt-y': `${tilt.y}deg`,
-        aspectRatio: aspectRatio ? `${aspectRatio}` : undefined,
       } as React.CSSProperties}
     >
-      <div className="project-image-3d__depth" aria-hidden="true" />
-      <div
-        className="project-image-3d__frame"
-        style={{ aspectRatio: aspectRatio ? `${aspectRatio}` : undefined }}
-      >
+      <div className="project-image-3d__frame">
         <img
-          ref={(imgEl) => {
-            if (imgEl && imgEl.complete && imgEl.naturalWidth && !aspectRatio) {
-              setAspectRatio(imgEl.naturalWidth / imgEl.naturalHeight)
-            }
-          }}
           src={src}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
-          onLoad={(e) => {
-            const { naturalWidth, naturalHeight } = e.currentTarget
-            if (naturalWidth && naturalHeight) {
-              setAspectRatio(naturalWidth / naturalHeight)
-            }
-          }}
+          onError={onError}
           className="w-full h-auto block object-cover object-center"
-          style={{ aspectRatio: aspectRatio ? `${aspectRatio}` : undefined }}
         />
         <span className="project-image-3d__shine" aria-hidden="true" />
       </div>
     </div>
   )
 }
+
