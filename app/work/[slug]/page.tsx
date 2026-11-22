@@ -132,7 +132,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             lines={[{ text: project.title }]}
           />
           <p className="detail-hero-meta">{project.meta}</p>
-          <p className="detail-hero-desc">{project.fullDescription || project.shortDescription}</p>
+          <p className="detail-hero-desc">{project.shortDescription || project.fullDescription}</p>
           <div className="detail-hero-actions">
             <div className="detail-hero-scroll">
               Scroll to explore <span>↓</span>
