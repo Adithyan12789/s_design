@@ -196,55 +196,87 @@ export function ProjectGalleryInteractive({
     setLightboxIndex((lightboxIndex - 1 + visibleItems.length) % visibleItems.length)
   }
 
+  const leftItems = useMemo(
+    () =>
+      visibleItems
+        .map((item, idx) => ({ item, index: idx }))
+        .filter(({ index }) => index % 2 === 0),
+    [visibleItems]
+  )
+  const rightItems = useMemo(
+    () =>
+      visibleItems
+        .map((item, idx) => ({ item, index: idx }))
+        .filter(({ index }) => index % 2 === 1),
+    [visibleItems]
+  )
+
+  const renderGalleryItem = (
+    item: ProjectGalleryPlate,
+    index: number,
+    keyPrefix: string
+  ) => {
+    const itemKey = `${keyPrefix}-${item.id || item.url || index}`
+    const isVid = item.type === 'video' || isVideoSource(item.url)
+    const isEven = index % 2 === 0
+    const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
+
+    return (
+      <div
+        key={itemKey}
+        className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
+        data-crosshair-target
+        data-cursor-label={isVid ? 'Play' : 'Expand'}
+        data-alignment={isEven ? 'left' : 'right'}
+        data-index={index}
+        onClick={() => openLightbox(index)}
+      >
+        {isVid ? (
+          <GalleryVideoCard
+            plate={item}
+            fallbackImage={fallbackImage}
+            onOpenLightbox={() => openLightbox(index)}
+            onMediaError={() => handleMediaError(item.id || item.url || `item-${index}`)}
+          />
+        ) : (
+          <ProjectImage3D
+            className="detail-gallery-image relative overflow-hidden"
+            src={item.url}
+            alt={item.altText || `${title} detail ${index + 1}`}
+            onError={() => handleMediaError(item.id || item.url || `item-${index}`)}
+          />
+        )}
+        <div
+          className="gallery-expand-hint"
+          onClick={(e) => {
+            e.stopPropagation()
+            openLightbox(index)
+          }}
+        >
+          <Maximize2 size={15} />
+          <span>{isVid ? 'Full view' : 'Expand view'}</span>
+        </div>
+      </div>
+    )
+  }
+
   if (visibleItems.length === 0) return null
 
   return (
     <>
-      <div className="detail-gallery-grid">
-        {visibleItems.map((item, index) => {
-          const itemKey = item.id || item.url || `gallery-item-${index}`
-          const isVid = item.type === 'video' || isVideoSource(item.url)
-          const isEven = index % 2 === 0
-          const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
+      {/* Desktop / Tablet Two-Column Independent Vertical Flow */}
+      <div className="detail-gallery-grid detail-gallery-desktop">
+        <div className="detail-gallery-col detail-gallery-col-left">
+          {leftItems.map(({ item, index }) => renderGalleryItem(item, index, 'left'))}
+        </div>
+        <div className="detail-gallery-col detail-gallery-col-right">
+          {rightItems.map(({ item, index }) => renderGalleryItem(item, index, 'right'))}
+        </div>
+      </div>
 
-          return (
-            <div
-              key={itemKey}
-              className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
-              data-crosshair-target
-              data-cursor-label={isVid ? 'Play' : 'Expand'}
-              data-alignment={isEven ? 'left' : 'right'}
-              data-index={index}
-              onClick={() => openLightbox(index)}
-            >
-              {isVid ? (
-                <GalleryVideoCard
-                  plate={item}
-                  fallbackImage={fallbackImage}
-                  onOpenLightbox={() => openLightbox(index)}
-                  onMediaError={() => handleMediaError(itemKey)}
-                />
-              ) : (
-                <ProjectImage3D
-                  className="detail-gallery-image relative overflow-hidden"
-                  src={item.url}
-                  alt={item.altText || `${title} detail ${index + 1}`}
-                  onError={() => handleMediaError(itemKey)}
-                />
-              )}
-              <div
-                className="gallery-expand-hint"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  openLightbox(index)
-                }}
-              >
-                <Maximize2 size={15} />
-                <span>{isVid ? 'Full view' : 'Expand view'}</span>
-              </div>
-            </div>
-          )
-        })}
+      {/* Mobile Single-Column Sequential Flow */}
+      <div className="detail-gallery-grid detail-gallery-mobile">
+        {visibleItems.map((item, index) => renderGalleryItem(item, index, 'mobile'))}
       </div>
 
       {/* Full-screen Lightbox Modal */}
