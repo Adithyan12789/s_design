@@ -1062,10 +1062,33 @@ em { color: var(--bronze); font-style: italic; }
 @keyframes detail-title { from { opacity: 0; transform: translateY(34px); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); } }
 @keyframes detail-atmosphere { to { transform: scale(1.08) rotate(4deg); opacity: .42; } }
 .detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 24px;
   background: linear-gradient(180deg, rgba(18, 18, 17, 0.88), transparent);
   backdrop-filter: blur(12px);
   padding: 24px max(4.8vw, calc((100vw - 1720px) / 2));
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 20;
   width: 100%;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  transition: color 0.25s ease;
+  white-space: nowrap;
+}
+.back-link:hover {
+  color: var(--ink);
 }
 
 .detail-hero {

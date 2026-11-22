@@ -50,7 +50,7 @@ export function SiteHeaderNav({
           darkLogoUrl={settings?.darkLogoUrl}
         />
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6 shrink-0">
           {showBackLink && (
             <Link className="back-link cursor-target" data-cursor-label="Back" href={backHref}>
               <ArrowLeft size={15} /> {backLabel}
