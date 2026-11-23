@@ -4135,26 +4135,6 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
 }
 
 /* ==========================================================================
-   Splash Cursor Hero-Contained Layering & Integration
-   ========================================================================== */
-.splash-cursor-contained {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
-  overflow: hidden !important;
-}
-
-.splash-cursor-canvas {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none !important;
-}
-
-/* ==========================================================================
    Minimal Luxury Loading Experience (S_Designs Warm Ivory & Bronze)
    ========================================================================== */
 
