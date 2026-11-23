@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const ogImage = homeSeo?.ogImage || favicon
 
   return {
-    metadataBase: new URL('https://sdesigns.studio'),
+    metadataBase: new URL('https://sdesign.co.in'),
     title,
     description,
     generator: 'v0.app',

@@ -292,6 +292,7 @@ export function revalidatePublicSite(slug?: string) {
     revalidatePath('/work')
     revalidatePath('/work', 'page')
     revalidatePath('/work', 'layout')
+    revalidatePath('/sitemap.xml')
     if (slug) {
       revalidatePath(`/work/${slug}`)
       revalidatePath(`/work/${slug}`, 'page')
