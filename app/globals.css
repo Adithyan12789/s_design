@@ -2569,6 +2569,8 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   padding: 0 5vw;
   text-align: center;
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .brand-datum-ruler {
   display: flex;

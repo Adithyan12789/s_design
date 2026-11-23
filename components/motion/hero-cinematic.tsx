@@ -67,7 +67,7 @@ export const HeroCinematic = React.memo(function HeroCinematic({
       if (headerEl) gsap.set(headerEl, { y: 0, opacity: 1 })
       gsap.set(imageEl, { scale: 1.0, opacity: 1 })
       gsap.set(contentRef.current, { opacity: 1 })
-      gsap.set(brandRevealRef.current, { opacity: 1 })
+      gsap.set(brandRevealRef.current, { autoAlpha: 0 })
       return
     }
 
@@ -100,7 +100,7 @@ export const HeroCinematic = React.memo(function HeroCinematic({
       gsap.set(overlayRef.current, { opacity: 0 })
       gsap.set(lightSweepRef.current, { xPercent: -130, opacity: 0 })
       gsap.set(svgEl, { opacity: 0 })
-      gsap.set(brandRevealRef.current, { opacity: 0, y: 35 })
+      gsap.set(brandRevealRef.current, { autoAlpha: 0, y: 35, scale: 1 })
       gsap.set(contentRef.current, { opacity: 0 })
       if (headerEl) {
         gsap.set(headerEl, { y: -30, opacity: 0 })
@@ -248,8 +248,9 @@ export const HeroCinematic = React.memo(function HeroCinematic({
       tl.to(
         brandRevealRef.current,
         {
-          opacity: 1,
+          autoAlpha: 1,
           y: 0,
+          scale: 1,
           duration: 1.6,
           ease: 'power3.out',
         },
@@ -257,15 +258,16 @@ export const HeroCinematic = React.memo(function HeroCinematic({
       )
 
       // STAGE 7: Supporting Headline, Description & Exploratory CTA (7.4 -> 9.4)
-      // Transition from oversized brand emblem to full editorial hero message
+      // Transition from oversized brand emblem to full editorial hero message:
+      // Completely hides S_DE_SIGN (autoAlpha: 0 sets opacity to 0 and visibility: hidden)
       tl.to(
         brandRevealRef.current,
         {
-          scale: 0.94,
-          opacity: 0.18,
-          y: -25,
-          duration: 1.6,
-          ease: 'power2.out',
+          scale: 0.92,
+          autoAlpha: 0,
+          y: -30,
+          duration: 1.4,
+          ease: 'power2.inOut',
         },
         7.4
       )
