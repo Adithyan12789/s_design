@@ -382,7 +382,6 @@ export const HeroCinematic = React.memo(function HeroCinematic({
         <div
           ref={imageRef}
           className="story-hero-bg overflow-hidden"
-          style={!isVideo || !activeVideoUrl ? { backgroundImage: `url(${optimizedImageUrl})` } : undefined}
           role="img"
           aria-label="Contemporary minimalist architectural concrete residence"
         >
