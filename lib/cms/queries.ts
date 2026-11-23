@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { revalidatePath } from 'next/cache'
 import { getMongoDb } from '@/lib/mongodb/client'
 import {
@@ -91,7 +92,19 @@ function mergeSettings(doc: any): CmsWebsiteSettings {
   }
 }
 
-export async function getPublicSiteData(): Promise<PublicSiteData> {
+let memoryCache: { data: PublicSiteData; timestamp: number } | null = null
+const CACHE_TTL_MS = 30_000 // 30 seconds TTL for high-throughput concurrency
+
+export function invalidatePublicSiteCache() {
+  memoryCache = null
+}
+
+async function fetchPublicSiteData(): Promise<PublicSiteData> {
+  const now = Date.now()
+  if (memoryCache && now - memoryCache.timestamp < CACHE_TTL_MS) {
+    return memoryCache.data
+  }
+
   const db = await getMongoDb()
   if (!db) {
     return DEFAULT_PUBLIC_SITE_DATA
@@ -133,7 +146,7 @@ export async function getPublicSiteData(): Promise<PublicSiteData> {
     const studioInfo = studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO
     const founder: CmsFounderInfo = studioInfo.founder || DEFAULT_FOUNDER_INFO
 
-    return {
+    const result: PublicSiteData = {
       projects: projectDocs.map((d) => stripMongoId<CmsProject>(d)),
       services: serviceDocs.map((d) => stripMongoId<CmsService>(d)),
       studioInfo,
@@ -144,13 +157,18 @@ export async function getPublicSiteData(): Promise<PublicSiteData> {
       navigation: navDocs.map((d) => stripMongoId<CmsNavItem>(d)),
       seo: seoMap,
     }
+
+    memoryCache = { data: result, timestamp: now }
+    return result
   } catch (err) {
     console.error('[CMS] Failed loading public site data:', err instanceof Error ? err.message : err)
-    return DEFAULT_PUBLIC_SITE_DATA
+    return memoryCache ? memoryCache.data : DEFAULT_PUBLIC_SITE_DATA
   }
 }
 
-export async function getPublishedProjectBySlug(slug: string): Promise<{
+export const getPublicSiteData = cache(fetchPublicSiteData)
+
+async function fetchPublishedProjectBySlug(slug: string): Promise<{
   project: CmsProject | null
   allProjects: CmsProject[]
 }> {
@@ -175,6 +193,8 @@ export async function getPublishedProjectBySlug(slug: string): Promise<{
     return { project, allProjects: DEFAULT_PROJECTS }
   }
 }
+
+export const getPublishedProjectBySlug = cache(fetchPublishedProjectBySlug)
 
 export async function getAdminOverviewData() {
   const db = await getMongoDb()

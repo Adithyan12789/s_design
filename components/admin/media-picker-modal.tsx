@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, DragEvent } from 'react'
+import { useState, useRef, useMemo, DragEvent } from 'react'
+import { useDebounce } from '@/lib/hooks/use-debounce'
 import {
   Upload,
   X,
@@ -50,6 +51,7 @@ export function MediaPickerModal({
 }: MediaPickerModalProps) {
   const [filterTab, setFilterTab] = useState<'all' | 'image' | 'video'>(defaultFilter)
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 280)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -59,8 +61,6 @@ export function MediaPickerModal({
   const [importingUrl, setImportingUrl] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  if (!open) return null
-
   const isVideoAsset = (m: CmsMediaAsset) => {
     return (
       m.type === 'video' ||
@@ -69,19 +69,23 @@ export function MediaPickerModal({
     )
   }
 
-  const filtered = media.filter((m) => {
-    const isVid = isVideoAsset(m)
-    if (filterTab === 'image' && isVid) return false
-    if (filterTab === 'video' && !isVid) return false
+  const filtered = useMemo(() => {
+    return media.filter((m) => {
+      const isVid = isVideoAsset(m)
+      if (filterTab === 'image' && isVid) return false
+      if (filterTab === 'video' && !isVid) return false
 
-    const q = search.toLowerCase().trim()
-    if (!q) return true
-    return (
-      m.fileName.toLowerCase().includes(q) ||
-      m.altText.toLowerCase().includes(q) ||
-      m.publicUrl.toLowerCase().includes(q)
-    )
-  })
+      const q = debouncedSearch.toLowerCase().trim()
+      if (!q) return true
+      return (
+        m.fileName.toLowerCase().includes(q) ||
+        m.altText.toLowerCase().includes(q) ||
+        m.publicUrl.toLowerCase().includes(q)
+      )
+    })
+  }, [media, filterTab, debouncedSearch])
+
+  if (!open) return null
 
   async function handleUpload(files: FileList | File[] | null) {
     if (!files || files.length === 0) return

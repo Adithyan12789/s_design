@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, DragEvent } from 'react'
+import { useState, useRef, useMemo, DragEvent } from 'react'
+import { useDebounce } from '@/lib/hooks/use-debounce'
 import {
   Save,
   Plus,
@@ -1862,6 +1863,7 @@ export function MediaLibraryManager({
 }) {
   const [filterTab, setFilterTab] = useState<'all' | 'image' | 'video'>('all')
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 280)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -1886,19 +1888,21 @@ export function MediaLibraryManager({
     )
   }
 
-  const filtered = media.filter((m) => {
-    const isVid = isVideoAsset(m)
-    if (filterTab === 'image' && isVid) return false
-    if (filterTab === 'video' && !isVid) return false
+  const filtered = useMemo(() => {
+    return media.filter((m) => {
+      const isVid = isVideoAsset(m)
+      if (filterTab === 'image' && isVid) return false
+      if (filterTab === 'video' && !isVid) return false
 
-    const q = search.toLowerCase().trim()
-    if (!q) return true
-    return (
-      m.fileName.toLowerCase().includes(q) ||
-      m.altText.toLowerCase().includes(q) ||
-      m.publicUrl.toLowerCase().includes(q)
-    )
-  })
+      const q = debouncedSearch.toLowerCase().trim()
+      if (!q) return true
+      return (
+        m.fileName.toLowerCase().includes(q) ||
+        m.altText.toLowerCase().includes(q) ||
+        m.publicUrl.toLowerCase().includes(q)
+      )
+    })
+  }, [media, filterTab, debouncedSearch])
 
   async function handleUpload(files: FileList | File[] | null) {
     if (!files || files.length === 0) return

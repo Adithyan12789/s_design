@@ -424,7 +424,7 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                     muted
                     playsInline
                     loop
-                    preload="auto"
+                    preload="metadata"
                     controls
                     controlsList="nodownload"
                     onContextMenu={(e) => e.preventDefault()}

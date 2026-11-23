@@ -1,19 +1,37 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { ArrowUpRight, ChevronDown, Volume2, VolumeX } from 'lucide-react'
 import { BrandLogo } from '@/components/brand-logo'
-import { CinematicReviews } from '@/components/cinematic-reviews'
-import { FounderSection } from '@/components/founder-section'
+import { ReviewsSectionSkeleton, FounderSectionSkeleton } from '@/components/ui/skeleton'
 import { WorkHorizontalShowcase } from '@/components/work-horizontal-showcase'
 import { HeroCinematic } from '@/components/motion/hero-cinematic'
 import { StaggeredHeading } from '@/components/motion/staggered-heading'
 import { ParallaxImage } from '@/components/motion/parallax-image'
 import { ScrollReveal } from '@/components/motion/scroll-reveal'
-import { FullNavOverlay } from '@/components/motion/full-nav-overlay'
 import { HamburgerButton } from '@/components/motion/hamburger-button'
 import type { Project } from '@/lib/projects'
 import type { PublicSiteData, CmsNavItem } from '@/lib/cms/types'
+
+const FullNavOverlay = dynamic(
+  () => import('@/components/motion/full-nav-overlay').then((mod) => mod.FullNavOverlay),
+  { ssr: false }
+)
+
+const CinematicReviews = dynamic(
+  () => import('@/components/cinematic-reviews').then((mod) => mod.CinematicReviews),
+  {
+    loading: () => <ReviewsSectionSkeleton />,
+  }
+)
+
+const FounderSection = dynamic(
+  () => import('@/components/founder-section').then((mod) => mod.FounderSection),
+  {
+    loading: () => <FounderSectionSkeleton />,
+  }
+)
 
 const SECTION_IDS = ['studio', 'selected-work', 'services', 'reviews', 'founder', 'contact'] as const
 

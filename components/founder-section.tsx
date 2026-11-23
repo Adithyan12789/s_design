@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { ArrowUpRight } from 'lucide-react'
@@ -29,6 +29,28 @@ export const FounderSection = React.memo(function FounderSection({
   const sectionRef = useRef<HTMLElement | null>(null)
   const imageRef = useRef<HTMLDivElement | null>(null)
   const contentRef = useRef<HTMLDivElement | null>(null)
+  const [isNearViewport, setIsNearViewport] = useState(false)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsNearViewport(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setIsNearViewport(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px' }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // If section is explicitly hidden by administrator in Admin Panel, do not render
   if (founder && founder.visible === false) {
@@ -126,33 +148,35 @@ export const FounderSection = React.memo(function FounderSection({
   return (
     <section ref={sectionRef} className="founder-section" id={id} suppressHydrationWarning>
       <div className="founder-aeroshards-bg absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-35" aria-hidden="true">
-        <AeroShards
-          shardColor="#7A5C38"
-          accentColor="#9E8055"
-          placement="full"
-          material="glass"
-          markers="plus"
-          count={380}
-          depthOfField={0.82}
-          vignette={0.45}
-          mouseInteraction={true}
-          pulseOnClick={true}
-          holdToGather={true}
-          lightMode={false}
-          shardSize={0.85}
-          spread={1}
-          twist={1}
-          billow={1}
-          speed={0.55}
-          scale={0.95}
-          glow={0.06}
-          grain={0.02}
-          intro={true}
-          mouseStrength={0.35}
-          parallax={0.3}
-          paused={false}
-          dpr={1.5}
-        />
+        {isNearViewport && (
+          <AeroShards
+            shardColor="#7A5C38"
+            accentColor="#9E8055"
+            placement="full"
+            material="glass"
+            markers="plus"
+            count={380}
+            depthOfField={0.82}
+            vignette={0.45}
+            mouseInteraction={true}
+            pulseOnClick={true}
+            holdToGather={true}
+            lightMode={false}
+            shardSize={0.85}
+            spread={1}
+            twist={1}
+            billow={1}
+            speed={0.55}
+            scale={0.95}
+            glow={0.06}
+            grain={0.02}
+            intro={true}
+            mouseStrength={0.35}
+            parallax={0.3}
+            paused={false}
+            dpr={1.5}
+          />
+        )}
       </div>
 
       <div className="founder-ambient-glow" aria-hidden="true" />
