@@ -11,7 +11,7 @@ import './globals.css'
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getPublicSiteData()
   const homeSeo = data.seo.home
-  const title = homeSeo?.seoTitle || `${data.settings.studioName} — ${data.settings.tagline}`
+  const title = homeSeo?.seoTitle || `${data.settings.studioName} — Architecture`
   const description =
     homeSeo?.metaDescription ||
     'S_Designs is an independent architecture studio creating quiet, considered spaces for living, working and gathering.'
@@ -43,6 +43,16 @@ export const viewport: Viewport = { colorScheme: 'light', themeColor: '#f1eee7',
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const data = await getPublicSiteData()
   const { brandColors, typography } = data.settings
+  const homeSeo = data.seo?.home
+  const organizationJson = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: data.settings.studioName,
+    url: 'https://sdesign.co.in',
+    logo: homeSeo?.ogImage || data.settings.faviconUrl || '/s-design-logo.jpg',
+    sameAs: ['https://instagram.com/', 'https://linkedin.com/'],
+    areaServed: 'Chennai, India',
+  })
 
   const bodyStyle: Record<string, string> = {}
   if (brandColors?.ivory) bodyStyle['--ivory'] = brandColors.ivory
@@ -114,6 +124,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning style={bodyStyle as React.CSSProperties}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: organizationJson }}
+        />
+        <h1 className="sr-only">{data.settings.studioName} Architecture</h1>
         <ArchitecturalLoaderProvider
           studioName={data.settings.studioName}
           studioSubtitle={data.settings.studioSubtitle}

@@ -24,8 +24,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   ])
   return project
     ? {
-        title: project.seoTitle || `${project.title} — ${siteData.settings.studioName} Architecture`,
+        title: project.seoTitle || `${project.title} — ${project.category || ''} Architecture — S_Designs`,
         description: project.seoDescription || project.shortDescription || project.fullDescription,
+        canonical: new URL(`/work/${project.slug}`, "https://sdesign.co.in").toString(),
+        openGraph: {
+          title: project.seoTitle || project.title,
+          description: project.seoDescription || project.shortDescription,
+          images: [project.mainImage || "/placeholder.jpg"],
+          type: "website",
+        },
       }
     : { title: `Project — ${siteData.settings.studioName}` }
 }
@@ -37,6 +44,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     getPublicSiteData(),
   ])
   if (!project || allProjects.length === 0) notFound()
+
+  const projectDesc = project.shortDescription || project.fullDescription || ''
+  const projectJsonString = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": project.title,
+    "description": projectDesc,
+    "author": { "@type": "Organization", "name": siteData.settings.studioName },
+    "url": new URL(`/work/${project.slug}`, "https://sdesign.co.in").toString(),
+    "image": project.mainImage || "/placeholder.jpg",
+    "datePublished": project.updatedAt ? new Date(project.updatedAt).toISOString() : new Date().toISOString()
+  }, null, 2)
 
   const index = allProjects.findIndex((item) => item.slug === project.slug)
   const safeIndex = index === -1 ? 0 : index
@@ -167,6 +186,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             animateOnInit
             lines={[{ text: project.title }]}
           />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: projectJsonString }}
+          />
           <p className="detail-hero-meta">{project.meta}</p>
           <p className="detail-hero-desc">{project.shortDescription || project.fullDescription}</p>
           <div className="detail-hero-actions">
@@ -248,7 +271,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <p>{nextProject.location} — {nextProject.type}</p>
             <div className="next-actions">
               <Link href={`/work/${nextProject.slug}`} className="submit-button cursor-target" data-cursor-label="Next">
-                <span>View {nextProject.title}</span>
+                <span>View {nextProject.title}{nextProject.category ? ` ${nextProject.category} project` : ' project'}</span>
                 <ArrowRight size={17} />
               </Link>
               <Link href="/#selected-work" className="text-link cursor-target">
@@ -272,7 +295,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         />
         <div className="project-pager-nav">
           <Link href={`/work/${prevProject.slug}`} className="pager-link cursor-target" data-cursor-label="Previous">
-            <ArrowLeft size={14} /> Previous: {prevProject.title}
+            <ArrowLeft size={14} /> Previous: {prevProject.title}{prevProject.category ? ` ${prevProject.category} project` : ' project'}
           </Link>
           <span className="dot">/</span>
           <Link href={`/work/${nextProject.slug}`} className="pager-link cursor-target" data-cursor-label="Next">

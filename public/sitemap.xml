@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.sitemap.org/schemas/sitemap/1.1">
+  <!-- Homepage -->
+  <url>
+    <loc>https://sdesign.co.in/</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!-- Static pages (add if needed) -->
+  <!-- Example:
+  <url>
+    <loc>https://sdesign.co.in/#contact</loc>
+    <priority>0.8</priority>
+  </url>
+  -->
+  <!-- Dynamic project pages will be appended by running: node scripts/sitemap.js -->
+</urlset>
