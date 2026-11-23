@@ -75,6 +75,38 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   if (typography?.reviewsClientHeadingSize) bodyStyle['--font-size-reviews-client'] = typography.reviewsClientHeadingSize
   if (typography?.reviewsDescSize) bodyStyle['--font-size-reviews-desc'] = typography.reviewsDescSize
   if (typography?.reviewsCenterCardScale) bodyStyle['--scale-reviews-card'] = typography.reviewsCenterCardScale
+  if (typography?.founderHeadingSize) bodyStyle['--font-size-founder-heading'] = typography.founderHeadingSize
+  const founderAbout = typography?.founderAboutSize || typography?.founderBodySize
+  if (founderAbout) bodyStyle['--font-size-founder-body'] = founderAbout
+  const founderWeight = typography?.founderAboutWeight || typography?.founderBodyWeight
+  if (founderWeight) bodyStyle['--font-weight-founder-body'] = String(founderWeight)
+  const founderLineHeight = typography?.founderAboutLineHeight || typography?.founderBodyLineHeight
+  if (founderLineHeight) bodyStyle['--line-height-founder-body'] = String(founderLineHeight)
+  const founderLetterSpacing = typography?.founderAboutLetterSpacing || typography?.founderBodyLetterSpacing
+  if (founderLetterSpacing) bodyStyle['--letter-spacing-founder-body'] = String(founderLetterSpacing)
+  if (typography?.founderQuoteSize) bodyStyle['--font-size-founder-quote'] = typography.founderQuoteSize
+
+  if (typography?.founderStat1NumberSize) bodyStyle['--font-size-founder-stat1-number'] = typography.founderStat1NumberSize
+  if (typography?.founderStat1NumberWeight) bodyStyle['--font-weight-founder-stat1-number'] = String(typography.founderStat1NumberWeight)
+  if (typography?.founderStat1NumberLineHeight) bodyStyle['--line-height-founder-stat1-number'] = String(typography.founderStat1NumberLineHeight)
+  if (typography?.founderStat1LabelSize) bodyStyle['--font-size-founder-stat1-label'] = typography.founderStat1LabelSize
+  if (typography?.founderStat1LabelWeight) bodyStyle['--font-weight-founder-stat1-label'] = String(typography.founderStat1LabelWeight)
+  if (typography?.founderStat1LabelLineHeight) bodyStyle['--line-height-founder-stat1-label'] = String(typography.founderStat1LabelLineHeight)
+
+  if (typography?.founderStat2NumberSize) bodyStyle['--font-size-founder-stat2-number'] = typography.founderStat2NumberSize
+  if (typography?.founderStat2NumberWeight) bodyStyle['--font-weight-founder-stat2-number'] = String(typography.founderStat2NumberWeight)
+  if (typography?.founderStat2NumberLineHeight) bodyStyle['--line-height-founder-stat2-number'] = String(typography.founderStat2NumberLineHeight)
+  if (typography?.founderStat2LabelSize) bodyStyle['--font-size-founder-stat2-label'] = typography.founderStat2LabelSize
+  if (typography?.founderStat2LabelWeight) bodyStyle['--font-weight-founder-stat2-label'] = String(typography.founderStat2LabelWeight)
+  if (typography?.founderStat2LabelLineHeight) bodyStyle['--line-height-founder-stat2-label'] = String(typography.founderStat2LabelLineHeight)
+
+  if (typography?.founderStat3NumberSize) bodyStyle['--font-size-founder-stat3-number'] = typography.founderStat3NumberSize
+  if (typography?.founderStat3NumberWeight) bodyStyle['--font-weight-founder-stat3-number'] = String(typography.founderStat3NumberWeight)
+  if (typography?.founderStat3NumberLineHeight) bodyStyle['--line-height-founder-stat3-number'] = String(typography.founderStat3NumberLineHeight)
+  if (typography?.founderStat3LabelSize) bodyStyle['--font-size-founder-stat3-label'] = typography.founderStat3LabelSize
+  if (typography?.founderStat3LabelWeight) bodyStyle['--font-weight-founder-stat3-label'] = String(typography.founderStat3LabelWeight)
+  if (typography?.founderStat3LabelLineHeight) bodyStyle['--line-height-founder-stat3-label'] = String(typography.founderStat3LabelLineHeight)
+
   if (typography?.contactHeadingSize) bodyStyle['--font-size-contact-heading'] = typography.contactHeadingSize
   if (typography?.contactBodySize) bodyStyle['--font-size-contact-body'] = typography.contactBodySize
   if (typography?.kickerSize) bodyStyle['--font-size-kicker'] = typography.kickerSize

@@ -183,6 +183,34 @@ export type CmsTypographySettings = {
   reviewsClientHeadingSize?: string
   reviewsDescSize?: string
   reviewsCenterCardScale?: string
+  founderHeadingSize?: string
+  founderAboutSize?: string
+  founderAboutWeight?: string
+  founderAboutLineHeight?: string
+  founderAboutLetterSpacing?: string
+  founderQuoteSize?: string
+  founderStat1NumberSize?: string
+  founderStat1NumberWeight?: string
+  founderStat1NumberLineHeight?: string
+  founderStat1LabelSize?: string
+  founderStat1LabelWeight?: string
+  founderStat1LabelLineHeight?: string
+  founderStat2NumberSize?: string
+  founderStat2NumberWeight?: string
+  founderStat2NumberLineHeight?: string
+  founderStat2LabelSize?: string
+  founderStat2LabelWeight?: string
+  founderStat2LabelLineHeight?: string
+  founderStat3NumberSize?: string
+  founderStat3NumberWeight?: string
+  founderStat3NumberLineHeight?: string
+  founderStat3LabelSize?: string
+  founderStat3LabelWeight?: string
+  founderStat3LabelLineHeight?: string
+  founderBodySize?: string
+  founderBodyWeight?: string
+  founderBodyLineHeight?: string
+  founderBodyLetterSpacing?: string
   contactHeadingSize?: string
   contactBodySize?: string
   kickerSize?: string
@@ -243,6 +271,8 @@ export type ContactBotSettings = {
     url: string
   }
 }
+
+export type CmsContactBotSettings = ContactBotSettings
 
 export type CmsHomepageContent = {
   heroEyebrow: string

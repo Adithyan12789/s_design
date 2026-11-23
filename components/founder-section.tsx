@@ -228,9 +228,13 @@ export const FounderSection = React.memo(function FounderSection({
 
             <div className="founder-profile-stats">
               {statsList.map((st, i) => (
-                <div key={i} className="founder-profile-stat">
-                  <span className="founder-profile-stat-number">{st.value}</span>
-                  <span className="founder-profile-stat-label">{st.label}</span>
+                <div key={i} className={`founder-profile-stat founder-stat-${i + 1}`}>
+                  <span className={`founder-profile-stat-number founder-stat-number-${i + 1}`}>
+                    {st.value}
+                  </span>
+                  <span className={`founder-profile-stat-label founder-stat-label-${i + 1}`}>
+                    {st.label}
+                  </span>
                 </div>
               ))}
             </div>

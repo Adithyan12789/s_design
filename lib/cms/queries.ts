@@ -280,6 +280,7 @@ export async function logAdminActivity(
 
 export function revalidatePublicSite(slug?: string) {
   try {
+    invalidatePublicSiteCache()
     revalidatePath('/')
     revalidatePath('/', 'page')
     revalidatePath('/', 'layout')

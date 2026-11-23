@@ -2,13 +2,13 @@
 
 import React from 'react'
 import dynamic from 'next/dynamic'
-import type { CmsContactBotSettings } from '@/lib/cms/types'
+import type { ContactBotSettings } from '@/lib/cms/types'
 
 const CrosshairCursor = dynamic(() => import('@/components/crosshair-cursor'), { ssr: false })
 const ContactBot = dynamic(() => import('@/components/contact-bot').then((mod) => mod.ContactBot), { ssr: false })
 
 interface SiteAccessoriesProps {
-  contactBotSettings?: CmsContactBotSettings
+  contactBotSettings?: ContactBotSettings
   email?: string
   phone?: string
   whatsapp?: string

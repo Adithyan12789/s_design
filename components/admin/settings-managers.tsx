@@ -573,6 +573,76 @@ function SizingControl({
   )
 }
 
+function WeightControl({
+  label,
+  sublabel,
+  value,
+  defaultValue = '400',
+  onChange,
+}: {
+  label: string
+  sublabel?: string
+  value?: string
+  defaultValue?: string
+  onChange: (val: string) => void
+}) {
+  const currentVal = value || defaultValue
+  const weights = [
+    { label: '300 — Light', value: '300' },
+    { label: '400 — Regular / Normal', value: '400' },
+    { label: '500 — Medium', value: '500' },
+    { label: '600 — Semi Bold', value: '600' },
+    { label: '700 — Bold', value: '700' },
+  ]
+
+  return (
+    <div className="bg-[#faf8f5] p-3.5 rounded-lg border border-[#e6dfd3] flex flex-col justify-between gap-2.5">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <label className="text-xs font-semibold text-[#1c1a17] leading-tight block">{label}</label>
+          {sublabel && (
+            <span className="text-[11px] text-[#7c7367] leading-tight block mt-0.5">
+              {sublabel}
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange(defaultValue)}
+          className="text-[10px] text-[#b68d54] hover:underline shrink-0"
+          title="Reset to default"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <select
+          value={currentVal}
+          onChange={(e) => onChange(e.target.value)}
+          className="admin-input text-xs flex-1 font-mono py-1 px-2 bg-white"
+        >
+          {weights.map((w) => (
+            <option key={w.value} value={w.value}>
+              {w.label}
+            </option>
+          ))}
+          {!weights.some((w) => w.value === currentVal) && (
+            <option value={currentVal}>{currentVal} (Custom)</option>
+          )}
+        </select>
+        <input
+          type="text"
+          value={currentVal}
+          onChange={(e) => onChange(e.target.value)}
+          className="admin-input text-xs w-20 text-center font-mono py-1 px-1.5"
+          placeholder={defaultValue}
+        />
+      </div>
+    </div>
+  )
+}
+
 /* ===========================
    TYPOGRAPHY & SIZING MANAGER
    =========================== */
@@ -618,6 +688,30 @@ export function TypographyManager({
         reviewsClientHeadingSize: '16px',
         reviewsDescSize: '14.5px',
         reviewsCenterCardScale: '1',
+        founderHeadingSize: 'clamp(32px, 3.2vw, 56px)',
+        founderAboutSize: 'clamp(14.5px, 1.05vw, 16px)',
+        founderAboutWeight: '400',
+        founderAboutLineHeight: '1.75',
+        founderAboutLetterSpacing: '0px',
+        founderQuoteSize: 'clamp(14px, 1vw, 15.5px)',
+        founderStat1NumberSize: 'clamp(24px, 2.2vw, 36px)',
+        founderStat1NumberWeight: '700',
+        founderStat1NumberLineHeight: '1',
+        founderStat1LabelSize: 'clamp(9px, 0.72vw, 10.5px)',
+        founderStat1LabelWeight: '500',
+        founderStat1LabelLineHeight: '1.35',
+        founderStat2NumberSize: 'clamp(24px, 2.2vw, 36px)',
+        founderStat2NumberWeight: '700',
+        founderStat2NumberLineHeight: '1',
+        founderStat2LabelSize: 'clamp(9px, 0.72vw, 10.5px)',
+        founderStat2LabelWeight: '500',
+        founderStat2LabelLineHeight: '1.35',
+        founderStat3NumberSize: 'clamp(24px, 2.2vw, 36px)',
+        founderStat3NumberWeight: '700',
+        founderStat3NumberLineHeight: '1',
+        founderStat3LabelSize: 'clamp(9px, 0.72vw, 10.5px)',
+        founderStat3LabelWeight: '500',
+        founderStat3LabelLineHeight: '1.35',
         contactHeadingSize: 'clamp(62px, 8vw, 118px)',
         contactBodySize: '14px',
         kickerSize: '10px',
@@ -642,6 +736,30 @@ export function TypographyManager({
         reviewsClientHeadingSize: '14px',
         reviewsDescSize: '13px',
         reviewsCenterCardScale: '0.88',
+        founderHeadingSize: 'clamp(26px, 2.6vw, 44px)',
+        founderAboutSize: '13.5px',
+        founderAboutWeight: '400',
+        founderAboutLineHeight: '1.65',
+        founderAboutLetterSpacing: '0px',
+        founderQuoteSize: '13px',
+        founderStat1NumberSize: 'clamp(20px, 1.8vw, 30px)',
+        founderStat1NumberWeight: '700',
+        founderStat1NumberLineHeight: '1',
+        founderStat1LabelSize: '9px',
+        founderStat1LabelWeight: '500',
+        founderStat1LabelLineHeight: '1.3',
+        founderStat2NumberSize: 'clamp(20px, 1.8vw, 30px)',
+        founderStat2NumberWeight: '700',
+        founderStat2NumberLineHeight: '1',
+        founderStat2LabelSize: '9px',
+        founderStat2LabelWeight: '500',
+        founderStat2LabelLineHeight: '1.3',
+        founderStat3NumberSize: 'clamp(20px, 1.8vw, 30px)',
+        founderStat3NumberWeight: '700',
+        founderStat3NumberLineHeight: '1',
+        founderStat3LabelSize: '9px',
+        founderStat3LabelWeight: '500',
+        founderStat3LabelLineHeight: '1.3',
         contactHeadingSize: 'clamp(50px, 6.5vw, 92px)',
         contactBodySize: '13px',
         kickerSize: '9px',
@@ -666,6 +784,30 @@ export function TypographyManager({
         reviewsClientHeadingSize: '19px',
         reviewsDescSize: '16px',
         reviewsCenterCardScale: '1.12',
+        founderHeadingSize: 'clamp(38px, 3.8vw, 64px)',
+        founderAboutSize: '16.5px',
+        founderAboutWeight: '500',
+        founderAboutLineHeight: '1.85',
+        founderAboutLetterSpacing: '0.01em',
+        founderQuoteSize: '16px',
+        founderStat1NumberSize: 'clamp(28px, 2.6vw, 42px)',
+        founderStat1NumberWeight: '800',
+        founderStat1NumberLineHeight: '1',
+        founderStat1LabelSize: '11px',
+        founderStat1LabelWeight: '600',
+        founderStat1LabelLineHeight: '1.4',
+        founderStat2NumberSize: 'clamp(28px, 2.6vw, 42px)',
+        founderStat2NumberWeight: '800',
+        founderStat2NumberLineHeight: '1',
+        founderStat2LabelSize: '11px',
+        founderStat2LabelWeight: '600',
+        founderStat2LabelLineHeight: '1.4',
+        founderStat3NumberSize: 'clamp(28px, 2.6vw, 42px)',
+        founderStat3NumberWeight: '800',
+        founderStat3NumberLineHeight: '1',
+        founderStat3LabelSize: '11px',
+        founderStat3LabelWeight: '600',
+        founderStat3LabelLineHeight: '1.4',
         contactHeadingSize: 'clamp(74px, 9.5vw, 138px)',
         contactBodySize: '15.5px',
         kickerSize: '11px',
@@ -1050,11 +1192,305 @@ export function TypographyManager({
         </div>
       </div>
 
-      {/* SECTION 8: ( 06 ) CONTACT SECTION */}
+      {/* SECTION 8: ( 06 ) FOUNDER ABOUT SECTION */}
       <div className="admin-card p-6 space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
           <Sliders className="w-4 h-4 text-[#b68d54]" />
-          ( 06 ) Contact Section Typography
+          ( 06 ) Founder About Section Typography
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <SizingControl
+            label="Founder Heading Font Size"
+            sublabel="Section title ('Behind the Vision')"
+            value={typo.founderHeadingSize}
+            defaultValue="clamp(32px, 3.2vw, 56px)"
+            min={24}
+            max={72}
+            step={1}
+            unit="px"
+            onChange={(val) => updateTypo('founderHeadingSize', val)}
+          />
+          <SizingControl
+            label="About Text Font Size"
+            sublabel="Founder bio / about paragraph"
+            value={typo.founderAboutSize}
+            defaultValue="clamp(14.5px, 1.05vw, 16px)"
+            min={11}
+            max={26}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('founderAboutSize', val)}
+          />
+          <WeightControl
+            label="About Text Font Weight"
+            sublabel="Thickness (300 light, 400 normal, 500 medium)"
+            value={typo.founderAboutWeight}
+            defaultValue="400"
+            onChange={(val) => updateTypo('founderAboutWeight', val)}
+          />
+          <SizingControl
+            label="About Text Line Height"
+            sublabel="Line spacing multiplier (e.g. 1.75)"
+            value={typo.founderAboutLineHeight}
+            defaultValue="1.75"
+            min={1.1}
+            max={2.5}
+            step={0.05}
+            unit=""
+            onChange={(val) => updateTypo('founderAboutLineHeight', val)}
+          />
+          <SizingControl
+            label="About Text Letter Spacing"
+            sublabel="Character tracking (e.g. 0px, 0.5px)"
+            value={typo.founderAboutLetterSpacing}
+            defaultValue="0px"
+            min={-2}
+            max={4}
+            step={0.1}
+            unit="px"
+            onChange={(val) => updateTypo('founderAboutLetterSpacing', val)}
+          />
+          <SizingControl
+            label="Founder Quote Font Size"
+            sublabel="Italicized quote block paragraph"
+            value={typo.founderQuoteSize}
+            defaultValue="clamp(14px, 1vw, 15.5px)"
+            min={11}
+            max={24}
+            step={0.5}
+            unit="px"
+            onChange={(val) => updateTypo('founderQuoteSize', val)}
+          />
+        </div>
+
+        {/* Founder Statistics Typography */}
+        <div className="pt-5 border-t border-[#dfd7c9] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#7a5a2d] flex items-center gap-1.5">
+              Founder Profile Statistics Typography
+            </h4>
+            <span className="text-[11px] text-[#7c7367]">
+              Independent styling for each of the 3 statistics
+            </span>
+          </div>
+
+          {/* Stat 1: Years of Experience */}
+          <div className="p-4 rounded-lg bg-[#faf8f5] border border-[#e6dfd3] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#1c1a17]">
+                Statistic 1: Years of Experience (e.g. "4+ Years of Experience")
+              </span>
+              <span className="text-[11px] text-[#b68d54] font-medium font-mono">Stat #1</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <SizingControl
+                label="Number / Value Font Size"
+                sublabel="Stat 1 value (e.g. 4+)"
+                value={typo.founderStat1NumberSize}
+                defaultValue="clamp(24px, 2.2vw, 36px)"
+                min={16}
+                max={60}
+                step={1}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat1NumberSize', val)}
+              />
+              <WeightControl
+                label="Number / Value Font Weight"
+                sublabel="Stat 1 value thickness"
+                value={typo.founderStat1NumberWeight}
+                defaultValue="700"
+                onChange={(val) => updateTypo('founderStat1NumberWeight', val)}
+              />
+              <SizingControl
+                label="Number / Value Line Height"
+                sublabel="Stat 1 value vertical spacing"
+                value={typo.founderStat1NumberLineHeight}
+                defaultValue="1"
+                min={0.8}
+                max={2.0}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat1NumberLineHeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Font Size"
+                sublabel="Stat 1 label (e.g. Years of Experience)"
+                value={typo.founderStat1LabelSize}
+                defaultValue="clamp(9px, 0.72vw, 10.5px)"
+                min={7}
+                max={20}
+                step={0.5}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat1LabelSize', val)}
+              />
+              <WeightControl
+                label="Description / Label Font Weight"
+                sublabel="Stat 1 label thickness"
+                value={typo.founderStat1LabelWeight}
+                defaultValue="500"
+                onChange={(val) => updateTypo('founderStat1LabelWeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Line Height"
+                sublabel="Stat 1 label line height"
+                value={typo.founderStat1LabelLineHeight}
+                defaultValue="1.35"
+                min={0.9}
+                max={2.2}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat1LabelLineHeight', val)}
+              />
+            </div>
+          </div>
+
+          {/* Stat 2: Projects Completed */}
+          <div className="p-4 rounded-lg bg-[#faf8f5] border border-[#e6dfd3] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#1c1a17]">
+                Statistic 2: Projects Completed (e.g. "13+ Projects Completed")
+              </span>
+              <span className="text-[11px] text-[#b68d54] font-medium font-mono">Stat #2</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <SizingControl
+                label="Number / Value Font Size"
+                sublabel="Stat 2 value (e.g. 13+)"
+                value={typo.founderStat2NumberSize}
+                defaultValue="clamp(24px, 2.2vw, 36px)"
+                min={16}
+                max={60}
+                step={1}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat2NumberSize', val)}
+              />
+              <WeightControl
+                label="Number / Value Font Weight"
+                sublabel="Stat 2 value thickness"
+                value={typo.founderStat2NumberWeight}
+                defaultValue="700"
+                onChange={(val) => updateTypo('founderStat2NumberWeight', val)}
+              />
+              <SizingControl
+                label="Number / Value Line Height"
+                sublabel="Stat 2 value vertical spacing"
+                value={typo.founderStat2NumberLineHeight}
+                defaultValue="1"
+                min={0.8}
+                max={2.0}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat2NumberLineHeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Font Size"
+                sublabel="Stat 2 label (e.g. Projects Completed)"
+                value={typo.founderStat2LabelSize}
+                defaultValue="clamp(9px, 0.72vw, 10.5px)"
+                min={7}
+                max={20}
+                step={0.5}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat2LabelSize', val)}
+              />
+              <WeightControl
+                label="Description / Label Font Weight"
+                sublabel="Stat 2 label thickness"
+                value={typo.founderStat2LabelWeight}
+                defaultValue="500"
+                onChange={(val) => updateTypo('founderStat2LabelWeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Line Height"
+                sublabel="Stat 2 label line height"
+                value={typo.founderStat2LabelLineHeight}
+                defaultValue="1.35"
+                min={0.9}
+                max={2.2}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat2LabelLineHeight', val)}
+              />
+            </div>
+          </div>
+
+          {/* Stat 3: Total Area Designed */}
+          <div className="p-4 rounded-lg bg-[#faf8f5] border border-[#e6dfd3] space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#1c1a17]">
+                Statistic 3: Total Area Designed (e.g. "40,000+ sqft Total Area Designed")
+              </span>
+              <span className="text-[11px] text-[#b68d54] font-medium font-mono">Stat #3</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <SizingControl
+                label="Number / Value Font Size"
+                sublabel="Stat 3 value (e.g. 40,000+ sqft)"
+                value={typo.founderStat3NumberSize}
+                defaultValue="clamp(24px, 2.2vw, 36px)"
+                min={16}
+                max={60}
+                step={1}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat3NumberSize', val)}
+              />
+              <WeightControl
+                label="Number / Value Font Weight"
+                sublabel="Stat 3 value thickness"
+                value={typo.founderStat3NumberWeight}
+                defaultValue="700"
+                onChange={(val) => updateTypo('founderStat3NumberWeight', val)}
+              />
+              <SizingControl
+                label="Number / Value Line Height"
+                sublabel="Stat 3 value vertical spacing"
+                value={typo.founderStat3NumberLineHeight}
+                defaultValue="1"
+                min={0.8}
+                max={2.0}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat3NumberLineHeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Font Size"
+                sublabel="Stat 3 label (e.g. Total Area Designed)"
+                value={typo.founderStat3LabelSize}
+                defaultValue="clamp(9px, 0.72vw, 10.5px)"
+                min={7}
+                max={20}
+                step={0.5}
+                unit="px"
+                onChange={(val) => updateTypo('founderStat3LabelSize', val)}
+              />
+              <WeightControl
+                label="Description / Label Font Weight"
+                sublabel="Stat 3 label thickness"
+                value={typo.founderStat3LabelWeight}
+                defaultValue="500"
+                onChange={(val) => updateTypo('founderStat3LabelWeight', val)}
+              />
+              <SizingControl
+                label="Description / Label Line Height"
+                sublabel="Stat 3 label line height"
+                value={typo.founderStat3LabelLineHeight}
+                defaultValue="1.35"
+                min={0.9}
+                max={2.2}
+                step={0.05}
+                unit=""
+                onChange={(val) => updateTypo('founderStat3LabelLineHeight', val)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 9: ( 07 ) CONTACT SECTION */}
+      <div className="admin-card p-6 space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[#6b6358] flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#b68d54]" />
+          ( 07 ) Contact Section Typography
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SizingControl

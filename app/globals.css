@@ -794,7 +794,7 @@ em { color: var(--bronze); font-style: italic; }
 
 .founder-main-heading {
   font-family: var(--font-display, Georgia, 'Times New Roman', serif);
-  font-size: clamp(32px, 3.2vw, 56px);
+  font-size: var(--font-size-founder-heading, clamp(32px, 3.2vw, 56px));
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.025em;
@@ -805,8 +805,10 @@ em { color: var(--bronze); font-style: italic; }
 .founder-details {
   margin: 0 0 clamp(20px, 1.8vw, 26px);
   color: #dfdbd2;
-  font-size: clamp(14.5px, 1.05vw, 16px);
-  line-height: 1.75;
+  font-size: var(--font-size-founder-body, clamp(14.5px, 1.05vw, 16px));
+  font-weight: var(--font-weight-founder-body, 400);
+  line-height: var(--line-height-founder-body, 1.75);
+  letter-spacing: var(--letter-spacing-founder-body, normal);
   max-width: 640px;
 }
 
@@ -820,7 +822,7 @@ em { color: var(--bronze); font-style: italic; }
 .founder-quote-text {
   margin: 0;
   font-family: var(--font-display, Georgia, 'Times New Roman', serif);
-  font-size: clamp(14px, 1vw, 15.5px);
+  font-size: var(--font-size-founder-quote, clamp(14px, 1vw, 15.5px));
   font-style: italic;
   line-height: 1.65;
   color: #c7c2b6;
@@ -887,6 +889,24 @@ em { color: var(--bronze); font-style: italic; }
   color: #fbf9f4;
 }
 
+.founder-stat-number-1 {
+  font-size: var(--font-size-founder-stat1-number, clamp(24px, 2.2vw, 36px));
+  font-weight: var(--font-weight-founder-stat1-number, 700);
+  line-height: var(--line-height-founder-stat1-number, 1);
+}
+
+.founder-stat-number-2 {
+  font-size: var(--font-size-founder-stat2-number, clamp(24px, 2.2vw, 36px));
+  font-weight: var(--font-weight-founder-stat2-number, 700);
+  line-height: var(--line-height-founder-stat2-number, 1);
+}
+
+.founder-stat-number-3 {
+  font-size: var(--font-size-founder-stat3-number, clamp(24px, 2.2vw, 36px));
+  font-weight: var(--font-weight-founder-stat3-number, 700);
+  line-height: var(--line-height-founder-stat3-number, 1);
+}
+
 .founder-profile-stat-label {
   font-size: clamp(9px, 0.72vw, 10.5px);
   font-weight: 500;
@@ -894,6 +914,24 @@ em { color: var(--bronze); font-style: italic; }
   text-transform: uppercase;
   color: var(--muted);
   line-height: 1.35;
+}
+
+.founder-stat-label-1 {
+  font-size: var(--font-size-founder-stat1-label, clamp(9px, 0.72vw, 10.5px));
+  font-weight: var(--font-weight-founder-stat1-label, 500);
+  line-height: var(--line-height-founder-stat1-label, 1.35);
+}
+
+.founder-stat-label-2 {
+  font-size: var(--font-size-founder-stat2-label, clamp(9px, 0.72vw, 10.5px));
+  font-weight: var(--font-weight-founder-stat2-label, 500);
+  line-height: var(--line-height-founder-stat2-label, 1.35);
+}
+
+.founder-stat-label-3 {
+  font-size: var(--font-size-founder-stat3-label, clamp(9px, 0.72vw, 10.5px));
+  font-weight: var(--font-weight-founder-stat3-label, 500);
+  line-height: var(--line-height-founder-stat3-label, 1.35);
 }
 
 .founder-stats-container {
