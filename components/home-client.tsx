@@ -193,9 +193,10 @@ function ApproachMediaVideo({
         preload="metadata"
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
+        onContextMenu={(e) => e.preventDefault()}
         onError={() => setHasError(true)}
         aria-label={altText || 'Architectural design approach video'}
-        className="w-full h-full object-cover object-center"
+        className="w-full h-full object-cover object-center select-none"
         suppressHydrationWarning
       />
     </ParallaxImage>
@@ -332,7 +333,8 @@ function StudioMediaVideo({
         preload="metadata"
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
-        className="w-full h-full object-cover object-center"
+        onContextMenu={(e) => e.preventDefault()}
+        className="w-full h-full object-cover object-center select-none"
         suppressHydrationWarning
       />
       <VideoMuteButton

@@ -119,9 +119,11 @@ export function MediaRenderer({
           loop={loop}
           playsInline={playsInline}
           controls={controls && !isBackground}
+          controlsList="nodownload"
+          onContextMenu={(e) => e.preventDefault()}
           preload={isBackground ? 'auto' : 'metadata'}
           onError={() => setHasError(true)}
-          className={`w-full h-full object-cover object-center ${videoClassName}`}
+          className={`w-full h-full object-cover object-center select-none ${videoClassName}`}
           aria-label={alt}
         />
       ) : (
@@ -129,12 +131,14 @@ export function MediaRenderer({
           src={src || poster || '/s-design-emblem-clean.png'}
           alt={alt}
           loading="lazy"
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
           onError={() => {
             if (fallbackSrc && src !== fallbackSrc) {
               setHasError(true)
             }
           }}
-          className={`w-full h-full object-cover object-center ${imageClassName}`}
+          className={`w-full h-full object-cover object-center select-none ${imageClassName}`}
         />
       )}
       {children}

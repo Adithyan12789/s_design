@@ -5,6 +5,7 @@ import CrosshairCursor from '@/components/crosshair-cursor'
 import ClickSpark from '@/components/ClickSpark'
 import { ArchitecturalLoaderProvider } from '@/components/architectural-loader'
 import { ContactBot } from '@/components/contact-bot'
+import { MediaProtectionGuard } from '@/components/media-protection-guard'
 import { getPublicSiteData } from '@/lib/cms/queries'
 import './globals.css'
 
@@ -108,6 +109,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           facebookUrl={data.settings.facebookUrl}
           linkedinUrl={data.settings.linkedinUrl}
         />
+        <MediaProtectionGuard />
         <CrosshairCursor />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

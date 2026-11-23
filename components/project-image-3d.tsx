@@ -43,7 +43,9 @@ export function ProjectImage3D({
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           onError={onError}
-          className="w-full h-auto block object-contain object-center"
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
+          className="w-full h-auto block object-contain object-center select-none"
         />
         <span className="project-image-3d__shine" aria-hidden="true" />
       </div>

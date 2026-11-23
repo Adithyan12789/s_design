@@ -4545,4 +4545,32 @@ html.nav-locked, body.nav-locked { overflow: hidden !important; }
   }
 }
 
+/* Media Protection: prevent drag, selection, and save-as on project media */
+.project-image-3d img,
+.gallery-item-wrapper img,
+.gallery-item-wrapper video,
+.gallery-video-card-container video,
+.gallery-video-card-container img,
+.lightbox-image-stage img,
+.lightbox-image-stage video,
+.detail-hero-media img,
+.detail-hero-media video,
+.parallax-image-container,
+.parallax-image-target,
+.parallax-image-container img,
+.reviews-backdrop-img,
+.reviews-video-card video,
+.reviews-video-fallback-img,
+.story-hero-wrapper video,
+.story-hero-bg {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 

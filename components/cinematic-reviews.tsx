@@ -383,8 +383,10 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                   <img
                     src={backdropSrc}
                     alt={current.projectName ? `${current.projectName} architecture` : `${current.client} project`}
-                    className="reviews-backdrop-img"
+                    className="reviews-backdrop-img select-none"
                     loading="lazy"
+                    draggable={false}
+                    onContextMenu={(e) => e.preventDefault()}
                   />
                 ) : (
                   <div className="reviews-backdrop-fallback" />
@@ -424,13 +426,15 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                     loop
                     preload="auto"
                     controls
+                    controlsList="nodownload"
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={handleTogglePlay}
                     onPlay={() => setIsVideoPlaying(true)}
                     onPause={() => setIsVideoPlaying(false)}
                     onError={() => {
                       setIsVideoPlaying(false)
                     }}
-                    className="reviews-video-element"
+                    className="reviews-video-element select-none"
                     aria-label={`Video testimonial from ${current.client}`}
                   />
 
@@ -456,8 +460,10 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                     <img
                       src={posterSrc}
                       alt={`${current.client} testimonial preview`}
-                      className="reviews-video-fallback-img"
+                      className="reviews-video-fallback-img select-none"
                       loading="lazy"
+                      draggable={false}
+                      onContextMenu={(e) => e.preventDefault()}
                     />
                   ) : null}
                   <div className="reviews-video-fallback-scrim" />

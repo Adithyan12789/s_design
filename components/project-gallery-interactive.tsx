@@ -187,6 +187,8 @@ const GalleryVideoCard = forwardRef<
         src={plate.url}
         poster={resolvedPoster || undefined}
         controls={hasStarted}
+        controlsList="nodownload"
+        onContextMenu={(e) => e.preventDefault()}
         playsInline
         preload="metadata"
         onPlay={() => setIsPlaying(true)}
@@ -196,7 +198,7 @@ const GalleryVideoCard = forwardRef<
           setHasStarted(false)
         }}
         onError={onMediaError}
-        className="w-full h-auto block object-contain object-center"
+        className="w-full h-auto block object-contain object-center select-none"
         aria-label={plate.altText || 'Project video'}
       />
 
@@ -208,7 +210,9 @@ const GalleryVideoCard = forwardRef<
               src={resolvedPoster}
               alt={plate.altText || 'Video thumbnail'}
               onError={onMediaError}
-              className="absolute inset-0 w-full h-full object-contain object-center pointer-events-none"
+              draggable={false}
+              onContextMenu={(e) => e.preventDefault()}
+              className="absolute inset-0 w-full h-full object-contain object-center pointer-events-none select-none"
               loading="lazy"
             />
           )}
@@ -433,7 +437,7 @@ export function ProjectGalleryInteractive({
               </button>
             )}
 
-            <div className="lightbox-image-stage">
+            <div className="lightbox-image-stage" onContextMenu={(e) => e.preventDefault()}>
               {isVideoSource(visibleItems[lightboxIndex].url, visibleItems[lightboxIndex].type) ? (
                 <video
                   src={visibleItems[lightboxIndex].url}
@@ -443,15 +447,19 @@ export function ProjectGalleryInteractive({
                     undefined
                   }
                   controls
+                  controlsList="nodownload"
+                  onContextMenu={(e) => e.preventDefault()}
                   autoPlay
                   playsInline
-                  className="max-h-[85vh] max-w-[90vw] object-contain rounded shadow-2xl"
+                  className="max-h-[85vh] max-w-[90vw] object-contain rounded shadow-2xl select-none"
                 />
               ) : (
                 <img
                   src={visibleItems[lightboxIndex].url}
                   alt={visibleItems[lightboxIndex].altText || `${title} view ${lightboxIndex + 1}`}
-                  className="lightbox-active-img"
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="lightbox-active-img select-none"
                 />
               )}
               <div className="lightbox-caption">

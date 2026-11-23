@@ -97,14 +97,16 @@ export function ParallaxImage({
       ref={containerRef}
       className={`parallax-image-container ${className}`}
       style={{ aspectRatio }}
+      onContextMenu={(e) => e.preventDefault()}
       suppressHydrationWarning
     >
       <div
         ref={imageRef}
-        className="parallax-image-target"
+        className="parallax-image-target select-none"
         style={src ? { backgroundImage: `url(${src})` } : undefined}
         role={src ? 'img' : undefined}
         aria-label={src ? alt : undefined}
+        onContextMenu={(e) => e.preventDefault()}
         suppressHydrationWarning
       >
         {children}

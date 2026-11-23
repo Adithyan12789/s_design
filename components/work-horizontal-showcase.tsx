@@ -70,13 +70,15 @@ function ShowcaseSlideVideo({
       loop
       playsInline
       preload="metadata"
+      controlsList="nodownload"
+      onContextMenu={(e) => e.preventDefault()}
       onLoadedMetadata={(e) => {
         const v = e.currentTarget
         if (v.videoWidth && v.videoHeight && onOrientationChange) {
           onOrientationChange(v.videoHeight > v.videoWidth)
         }
       }}
-      className="w-full h-full object-cover object-center pointer-events-none"
+      className="w-full h-full object-cover object-center pointer-events-none select-none"
     />
   )
 }

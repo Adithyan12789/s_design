@@ -50,6 +50,8 @@ export function DetailHeroMedia({
           src={videoUrl}
           poster={resolvedPoster}
           controls
+          controlsList="nodownload"
+          onContextMenu={(e) => e.preventDefault()}
           autoPlay
           muted
           loop
@@ -60,14 +62,16 @@ export function DetailHeroMedia({
               setIsPortrait(v.videoHeight > v.videoWidth)
             }
           }}
-          className="detail-hero-photo w-full h-full object-cover object-center"
+          className="detail-hero-photo w-full h-full object-cover object-center select-none"
           aria-label={alt}
         />
       ) : (
         <img
           src={imageUrl}
           alt={alt}
-          className="detail-hero-photo w-full h-full object-cover object-center"
+          draggable={false}
+          onContextMenu={(e) => e.preventDefault()}
+          className="detail-hero-photo w-full h-full object-cover object-center select-none"
           loading="eager"
         />
       )}

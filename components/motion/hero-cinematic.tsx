@@ -396,7 +396,9 @@ export const HeroCinematic = React.memo(function HeroCinematic({
               loop
               playsInline
               preload="auto"
-              className="w-full h-full object-cover pointer-events-none"
+              controlsList="nodownload"
+              onContextMenu={(e) => e.preventDefault()}
+              className="w-full h-full object-cover pointer-events-none select-none"
             />
           )}
         </div>
