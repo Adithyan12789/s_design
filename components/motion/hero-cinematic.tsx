@@ -2,11 +2,15 @@
 
 import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import SplashCursor from '@/components/SplashCursor'
 import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
+
+const SplashCursor = dynamic(() => import('@/components/SplashCursor'), {
+  ssr: false,
+})
 
 gsap.registerPlugin(ScrollTrigger)
 

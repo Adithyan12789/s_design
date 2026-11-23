@@ -1,3 +1,10 @@
+import withBundleAnalyzer from '@next/bundle-analyzer'
+
+const withAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+})
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compress: true,
@@ -11,6 +18,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   experimental: {
+    optimizePackageImports: ['lucide-react'],
     agentUpgrade: 'security',
     proxyClientMaxBodySize: '100mb',
     serverActions: {
@@ -32,4 +40,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withAnalyzer(nextConfig)
