@@ -1042,6 +1042,106 @@ em { color: var(--bronze); font-style: italic; }
   }
 }
 .contact { background:#161513; border-top:1px solid var(--line); color:#efebe2; }.contact .section-kicker { color:var(--bronze-light); }.contact h2 em { color:var(--bronze-light); font-style:italic; }.contact-layout { display:grid; grid-template-columns:1fr 1fr; gap:10vw; padding-top:90px; }.contact h2 { font-size: var(--font-size-contact-heading, clamp(62px,8vw,118px)); line-height:.85; margin-bottom:42px; }.contact p { color:#c7c2b6; font-size: var(--font-size-contact-body, 14px); }.contact-details { display:flex; flex-direction:column; gap:11px; color:#d8d1c4; font-size: var(--font-size-contact-body, 11px); letter-spacing:.08em; text-transform:uppercase; margin-top:70px; }form { display:flex; flex-direction:column; gap:29px; }label { color:#c7c2b6; font-size:10px; letter-spacing:.12em; text-transform:uppercase; }input, textarea { width:100%; display:block; margin-top:11px; padding:12px 0; background:none; border:0; border-bottom:1px solid rgba(239,235,226,.28); color:#f5f1e9; outline:0; font: 15px Georgia, serif; resize:vertical; }input:focus, textarea:focus { border-color:#c3a681; }input::placeholder,textarea::placeholder { color:#7a756c; }.submit-button { align-self:flex-start; border:1px solid rgba(239,235,226,.45); background:none; color:#f3ede3; padding:17px 21px; display:flex; align-items:center; gap:20px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; transition:.25s; }.submit-button:hover { background:#f4efe6; color:#121110; }
+
+/* Enquiry Form Enhancements */
+.enquiry-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+@media (max-width: 640px) {
+  .enquiry-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+.enquiry-select {
+  width: 100%;
+  display: block;
+  margin-top: 11px;
+  padding: 12px 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(239, 235, 226, 0.28);
+  color: #f5f1e9;
+  outline: 0;
+  font: 15px Georgia, serif;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9b686' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 14px;
+}
+.enquiry-select:focus {
+  border-color: #c3a681;
+}
+.enquiry-select option {
+  background-color: #181614;
+  color: #f5f1e9;
+}
+.enquiry-success-card {
+  padding: 36px 32px;
+  background: rgba(24, 22, 20, 0.85);
+  border: 1px solid rgba(217, 182, 134, 0.35);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+}
+.enquiry-success-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #d9b686;
+  color: #d9b686;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: rgba(217, 182, 134, 0.08);
+}
+.enquiry-success-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: #fbf9f4;
+  margin: 0;
+}
+.enquiry-success-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #c7c2b6;
+  margin: 0;
+}
+.enquiry-reset-btn {
+  align-self: flex-start;
+  margin-top: 8px;
+  background: none;
+  border: 1px solid rgba(239, 235, 226, 0.35);
+  color: #d9b686;
+  padding: 10px 18px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.enquiry-reset-btn:hover {
+  background: #d9b686;
+  color: #121110;
+}
+.enquiry-error-banner {
+  padding: 12px 16px;
+  background: rgba(154, 66, 66, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  font-size: 12px;
+  border-radius: 3px;
+}
 .site-footer { background:#121110; border-top:1px solid var(--line); color:#efebe2; padding:34px 4.8vw 38px; display:flex; align-items:flex-end; justify-content:space-between; }.footer-links, .socials { display:flex; align-items:center; gap:25px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; }.socials { gap:16px; }.socials span { opacity:.45; margin-left:14px; }
 .project-card-link{display:block;color:inherit;text-decoration:none}
 .project-detail-page{min-height:100vh;background:var(--ivory);color:var(--ink);position:relative;overflow-x:clip;width:100%}

@@ -395,7 +395,40 @@ const DesktopNav = React.memo(function DesktopNav({
 
 export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [enquiryForm, setEnquiryForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    projectType: '',
+    message: '',
+  })
+  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const handleEnquirySubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const res = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(enquiryForm),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit inquiry. Please try again.')
+      }
+      setSubmitted(true)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }, [enquiryForm])
   const [activeSection, setActiveSection] = useState<string>('')
   const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null)
 
@@ -861,23 +894,133 @@ export function HomeClient({ siteData }: { siteData: PublicSiteData }) {
           </div>
 
           <ScrollReveal delay={0.3} variant="fade-up">
-            <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true) }} suppressHydrationWarning>
-              <label>
-                Name
-                <input required name="name" placeholder="Your name" suppressHydrationWarning />
-              </label>
-              <label>
-                Email
-                <input required type="email" name="email" placeholder="you@email.com" suppressHydrationWarning />
-              </label>
-              <label>
-                Tell us about your project
-                <textarea required name="message" rows={4} placeholder="A few words to begin..." suppressHydrationWarning />
-              </label>
-              <button className="submit-button cursor-target" data-crosshair-target data-cursor-label="Submit" type="submit" suppressHydrationWarning>
-                {submitted ? 'Message sent — thank you' : 'Send inquiry'} <ArrowUpRight size={17} />
-              </button>
-            </form>
+            {submitted ? (
+              <div className="enquiry-success-card" suppressHydrationWarning>
+                <div className="enquiry-success-icon" aria-hidden="true">✓</div>
+                <h3 className="enquiry-success-title">Inquiry Received</h3>
+                <p className="enquiry-success-text">
+                  Thank you for reaching out to {settings.studioName}. We have received your project brief and will be in touch with you shortly.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitted(false)
+                    setEnquiryForm({
+                      name: '',
+                      email: '',
+                      phone: '',
+                      location: '',
+                      projectType: '',
+                      message: '',
+                    })
+                  }}
+                  className="enquiry-reset-btn cursor-target"
+                >
+                  Send another inquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleEnquirySubmit} suppressHydrationWarning className="enquiry-form">
+                <div className="enquiry-grid-2">
+                  <label>
+                    Full Name *
+                    <input
+                      required
+                      name="name"
+                      value={enquiryForm.name}
+                      onChange={(e) => setEnquiryForm((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder="Your name"
+                      suppressHydrationWarning
+                    />
+                  </label>
+                  <label>
+                    Email Address *
+                    <input
+                      required
+                      type="email"
+                      name="email"
+                      value={enquiryForm.email}
+                      onChange={(e) => setEnquiryForm((prev) => ({ ...prev, email: e.target.value }))}
+                      placeholder="you@email.com"
+                      suppressHydrationWarning
+                    />
+                  </label>
+                </div>
+
+                <div className="enquiry-grid-2">
+                  <label>
+                    Phone Number
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={enquiryForm.phone}
+                      onChange={(e) => setEnquiryForm((prev) => ({ ...prev, phone: e.target.value }))}
+                      placeholder="+351 912 345 678"
+                      suppressHydrationWarning
+                    />
+                  </label>
+                  <label>
+                    Project Location / City
+                    <input
+                      name="location"
+                      value={enquiryForm.location}
+                      onChange={(e) => setEnquiryForm((prev) => ({ ...prev, location: e.target.value }))}
+                      placeholder="e.g. Lisbon, Cascais, London"
+                      suppressHydrationWarning
+                    />
+                  </label>
+                </div>
+
+                <label>
+                  Project Type
+                  <select
+                    name="projectType"
+                    value={enquiryForm.projectType}
+                    onChange={(e) => setEnquiryForm((prev) => ({ ...prev, projectType: e.target.value }))}
+                    className="enquiry-select"
+                    suppressHydrationWarning
+                  >
+                    <option value="">Select project type...</option>
+                    <option value="Residential Architecture">Residential Architecture</option>
+                    <option value="Commercial & Workspace">Commercial &amp; Workspace</option>
+                    <option value="Interior Architecture & Design">Interior Architecture &amp; Design</option>
+                    <option value="Renovation & Historic Restoration">Renovation &amp; Historic Restoration</option>
+                    <option value="Landscape & Spatial Design">Landscape &amp; Spatial Design</option>
+                    <option value="Other / Bespoke Inquiries">Other / Bespoke Inquiries</option>
+                  </select>
+                </label>
+
+                <label>
+                  Tell us about your project *
+                  <textarea
+                    required
+                    name="message"
+                    rows={4}
+                    value={enquiryForm.message}
+                    onChange={(e) => setEnquiryForm((prev) => ({ ...prev, message: e.target.value }))}
+                    placeholder="Brief description of the site, timeline, architectural goals, or spatial vision..."
+                    suppressHydrationWarning
+                  />
+                </label>
+
+                {submitError && (
+                  <div className="enquiry-error-banner" role="alert">
+                    {submitError}
+                  </div>
+                )}
+
+                <button
+                  className="submit-button cursor-target"
+                  data-crosshair-target
+                  data-cursor-label="Submit"
+                  type="submit"
+                  disabled={submitting}
+                  suppressHydrationWarning
+                >
+                  {submitting ? 'Sending inquiry...' : 'Send inquiry'} <ArrowUpRight size={17} />
+                </button>
+              </form>
+            )}
           </ScrollReveal>
         </div>
       </section>

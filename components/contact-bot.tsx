@@ -27,7 +27,7 @@ function sanitizeHttpUrl(val: string): string {
 
 export function ContactBot({
   contactBotSettings,
-  email = 'hello@sdesigns.studio',
+  email = 'adithiruthiparambil12@gmail.com',
   phone = '',
   whatsapp = '',
   instagramUrl = '',

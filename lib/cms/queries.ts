@@ -16,6 +16,7 @@ import {
 } from './defaults'
 import type {
   CmsActivityLog,
+  CmsEnquiry,
   CmsFounderInfo,
   CmsHomepageContent,
   CmsMediaAsset,
@@ -211,6 +212,7 @@ export async function getAdminOverviewData() {
       media: [] as CmsMediaAsset[],
       seo: Object.values(DEFAULT_SEO),
       activity: [] as CmsActivityLog[],
+      inquiries: [] as CmsEnquiry[],
       dbConnected: false,
     }
   }
@@ -226,6 +228,7 @@ export async function getAdminOverviewData() {
     mediaDocs,
     seoDocs,
     activityDocs,
+    inquiriesDocs,
   ] = await Promise.all([
     db.collection('projects').find({}).sort({ displayOrder: 1 }).toArray(),
     db.collection('services').find({}).sort({ displayOrder: 1 }).toArray(),
@@ -237,6 +240,7 @@ export async function getAdminOverviewData() {
     db.collection('media').find({}).sort({ createdAt: -1 }).toArray(),
     db.collection('seo').find({}).sort({ pageKey: 1 }).toArray(),
     db.collection('activityLogs').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
+    db.collection('inquiries').find({}).sort({ createdAt: -1 }).toArray(),
   ])
 
   const studioInfo = studioDoc ? stripMongoId<CmsStudioInfo>(studioDoc) : DEFAULT_STUDIO_INFO
@@ -254,6 +258,7 @@ export async function getAdminOverviewData() {
     media: mediaDocs.map((d) => stripMongoId<CmsMediaAsset>(d)),
     seo: seoDocs.map((d) => stripMongoId<CmsSeoSetting>(d)),
     activity: activityDocs.map((d) => stripMongoId<CmsActivityLog>(d)),
+    inquiries: (inquiriesDocs || []).map((d) => stripMongoId<CmsEnquiry>(d)),
     dbConnected: true,
   }
 }

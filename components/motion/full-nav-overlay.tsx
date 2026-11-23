@@ -218,11 +218,11 @@ export function FullNavOverlay({
           <div className="footer-meta-col">
             <span className="meta-label">INQUIRIES</span>
             <a
-              href={`mailto:${settings?.email || 'hello@sdesigns.studio'}`}
+              href={`mailto:${settings?.email || 'adithiruthiparambil12@gmail.com'}`}
               className="meta-value cursor-target"
               data-cursor-label="Contact"
             >
-              {settings?.email || 'hello@sdesigns.studio'}
+              {settings?.email || 'adithiruthiparambil12@gmail.com'}
             </a>
           </div>
           <div className="footer-meta-col">

@@ -249,7 +249,7 @@ export const DEFAULT_CONTACT_BOT_SETTINGS: ContactBotSettings = {
   },
   email: {
     enabled: true,
-    value: 'hello@sdesigns.studio',
+    value: 'adithiruthiparambil12@gmail.com',
   },
   facebook: {
     enabled: true,
@@ -327,7 +327,7 @@ export const DEFAULT_SETTINGS: CmsWebsiteSettings = {
     contactBodySize: '14px',
     kickerSize: '10px',
   },
-  email: 'hello@sdesigns.studio',
+  email: 'adithiruthiparambil12@gmail.com',
   phone: '',
   whatsapp: '',
   officeAddress: 'Lisbon · Portugal',

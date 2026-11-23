@@ -429,3 +429,22 @@ export type PublicSiteData = {
   seo: Record<string, CmsSeoSetting>
 }
 
+export type EnquiryStatus = 'new' | 'contacted' | 'archived'
+
+export type CmsEnquiry = {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  location?: string
+  projectType?: string
+  budget?: string
+  message: string
+  status: EnquiryStatus
+  notes?: string
+  createdAt: string
+  updatedAt?: string
+  ip?: string
+  userAgent?: string
+}
+

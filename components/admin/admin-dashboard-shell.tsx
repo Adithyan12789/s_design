@@ -26,6 +26,7 @@ import {
   Sliders,
   UserCheck,
   Star,
+  Inbox,
 } from 'lucide-react'
 import type {
   CmsProject,
@@ -39,6 +40,7 @@ import type {
   CmsMediaAsset,
   CmsSeoSetting,
   CmsActivityLog,
+  CmsEnquiry,
 } from '@/lib/cms/types'
 import { MediaPickerModal } from './media-picker-modal'
 import { ProjectsManager } from './projects-manager'
@@ -46,6 +48,7 @@ import { ServicesManager, TestimonialsManager, NavigationManager } from './list-
 import { FounderManager } from './founder-manager'
 import { ProjectReviewsManager } from './project-reviews-manager'
 import { ContactBotManager } from './contact-bot-manager'
+import { EnquiriesManager } from './enquiries-manager'
 import {
   StudioManager,
   BrandingManager,
@@ -59,6 +62,7 @@ import {
 
 type SectionId =
   | 'dashboard'
+  | 'enquiries'
   | 'homepage'
   | 'studio'
   | 'projects'
@@ -94,11 +98,13 @@ interface AdminDashboardShellProps {
     media: CmsMediaAsset[]
     seo: CmsSeoSetting[]
     activity: CmsActivityLog[]
+    inquiries?: CmsEnquiry[]
   }
 }
 
 const NAV_ITEMS: { id: SectionId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'enquiries', label: 'Inquiries & Leads', icon: Inbox },
   { id: 'homepage', label: 'Home / Hero', icon: Home },
   { id: 'studio', label: 'Studio / About', icon: Info },
   { id: 'projects', label: 'Work / Projects', icon: Building2 },
@@ -121,6 +127,9 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
   const [activeTab, setActiveTab] = useState<SectionId>('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
+
+  const [inquiries, setInquiries] = useState<CmsEnquiry[]>(initialData.inquiries || [])
+  const newInquiriesCount = inquiries.filter((i) => i.status === 'new').length
 
   const [projects, setProjects] = useState<CmsProject[]>(initialData.projects)
   const [services, setServices] = useState<CmsService[]>(initialData.services)
@@ -213,15 +222,25 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
             const active = activeTab === item.id
+            const isEnquiries = item.id === 'enquiries'
             return (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => handleTabSwitch(item.id)}
-                className={`admin-nav-btn cursor-target ${active ? 'is-active' : ''}`}
+                className={`admin-nav-btn cursor-target flex items-center justify-between ${
+                  active ? 'is-active' : ''
+                }`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <div className="flex items-center gap-2.5 truncate">
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                </div>
+                {isEnquiries && newInquiriesCount > 0 && (
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-[#d9b686] text-[#121110] leading-none shrink-0">
+                    {newInquiriesCount}
+                  </span>
+                )}
               </button>
             )
           })}
@@ -319,6 +338,11 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                   <p className="text-xs text-[#7c7367] mt-1">Cinematic testimonials</p>
                 </div>
                 <div className="admin-card p-5">
+                  <p className="text-xs uppercase tracking-wider text-[#7c7367]">Client Leads</p>
+                  <p className="admin-serif text-4xl text-[#1c1a17] mt-2">{inquiries.length}</p>
+                  <p className="text-xs text-[#8f6a37] mt-1">{newInquiriesCount} new / unread</p>
+                </div>
+                <div className="admin-card p-5">
                   <p className="text-xs uppercase tracking-wider text-[#7c7367]">Media Assets</p>
                   <p className="admin-serif text-4xl text-[#1c1a17] mt-2">{media.length}</p>
                   <p className="text-xs text-[#7c7367] mt-1">Uploaded via Multer</p>
@@ -331,6 +355,19 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
                     Quick Actions
                   </h3>
                   <div className="flex flex-col gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => handleTabSwitch('enquiries')}
+                      className="admin-btn-secondary cursor-target justify-start relative"
+                    >
+                      <Inbox className="w-4 h-4 text-[#b68d54]" />
+                      <span>Client Inquiries &amp; Leads</span>
+                      {newInquiriesCount > 0 && (
+                        <span className="ml-auto px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#b68d54] text-white">
+                          {newInquiriesCount} new
+                        </span>
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleTabSwitch('projects')}
@@ -428,6 +465,13 @@ export function AdminDashboardShell({ actor, initialData }: AdminDashboardShellP
               onChange={setSettings}
               onNotify={notify}
               onDirtyChange={setIsDirty}
+            />
+          )}
+
+          {activeTab === 'enquiries' && (
+            <EnquiriesManager
+              inquiries={inquiries}
+              onNotify={notify}
             />
           )}
 
