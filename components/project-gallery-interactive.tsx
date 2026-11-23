@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
 import { Maximize2, X, ChevronLeft, ChevronRight, Play, Film } from 'lucide-react'
 import { ProjectImage3D } from '@/components/project-image-3d'
 import {
@@ -25,17 +25,79 @@ type ProjectGalleryInteractiveProps = {
   fallbackImage?: string
 }
 
-function GalleryVideoCard({
-  plate,
-  fallbackImage,
-  onOpenLightbox,
-  onMediaError,
-}: {
-  plate: ProjectGalleryPlate
-  fallbackImage?: string
-  onOpenLightbox?: () => void
-  onMediaError?: () => void
-}) {
+export type GalleryVideoCardHandle = {
+  triggerFullscreen: () => void
+  getVideoElement: () => HTMLVideoElement | null
+}
+
+function requestVideoFullscreen(video: HTMLVideoElement | null) {
+  if (!video) return
+  try {
+    if (typeof video.requestFullscreen === 'function') {
+      const p = video.requestFullscreen()
+      if (p && typeof p.catch === 'function') {
+        p.catch((err) => {
+          console.debug('requestFullscreen was denied or failed:', err)
+        })
+      }
+      return
+    }
+    // iOS Safari
+    if (typeof (video as any).webkitEnterFullscreen === 'function') {
+      try {
+        ;(video as any).webkitEnterFullscreen()
+      } catch (err) {
+        console.debug('webkitEnterFullscreen failed:', err)
+      }
+      return
+    }
+    // Safari / WebKit desktop
+    if (typeof (video as any).webkitRequestFullscreen === 'function') {
+      const p = (video as any).webkitRequestFullscreen()
+      if (p && typeof p.catch === 'function') {
+        p.catch((err: unknown) => {
+          console.debug('webkitRequestFullscreen failed:', err)
+        })
+      }
+      return
+    }
+    // Firefox legacy
+    if (typeof (video as any).mozRequestFullScreen === 'function') {
+      const p = (video as any).mozRequestFullScreen()
+      if (p && typeof p.catch === 'function') {
+        p.catch((err: unknown) => {
+          console.debug('mozRequestFullScreen failed:', err)
+        })
+      }
+      return
+    }
+    // IE / Edge legacy
+    if (typeof (video as any).msRequestFullscreen === 'function') {
+      const p = (video as any).msRequestFullscreen()
+      if (p && typeof p.catch === 'function') {
+        p.catch((err: unknown) => {
+          console.debug('msRequestFullscreen failed:', err)
+        })
+      }
+      return
+    }
+  } catch (err) {
+    console.debug('Fullscreen API error:', err)
+  }
+}
+
+const GalleryVideoCard = forwardRef<
+  GalleryVideoCardHandle,
+  {
+    plate: ProjectGalleryPlate
+    fallbackImage?: string
+    onMediaError?: () => void
+  }
+>(function GalleryVideoCard(
+  { plate, fallbackImage, onMediaError },
+  ref
+) {
+  const [hasStarted, setHasStarted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -62,73 +124,110 @@ function GalleryVideoCard({
     }
   }, [plate.url, resolvedPoster])
 
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsPlaying(true)
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {})
+  const triggerFullscreen = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    // Check if already in native fullscreen
+    const isFullscreen =
+      document.fullscreenElement === video ||
+      (document as any).webkitFullscreenElement === video ||
+      Boolean((video as any).webkitDisplayingFullscreen)
+
+    if (isFullscreen) return
+
+    if (!hasStarted) {
+      setHasStarted(true)
+      video.play().catch(() => {})
+    } else if (video.paused) {
+      // If paused, preserve playback position and do not unexpectedly start playback
+    } else {
+      // Already playing: preserve playback position and continue playing
     }
+
+    requestVideoFullscreen(video)
+  }
+
+  useImperativeHandle(ref, () => ({
+    triggerFullscreen,
+    getVideoElement: () => videoRef.current,
+  }))
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    const video = videoRef.current
+    if (!video) return
+
+    // If currently in native fullscreen, let native controls handle interaction
+    const isFullscreen =
+      document.fullscreenElement === video ||
+      (document as any).webkitFullscreenElement === video ||
+      Boolean((video as any).webkitDisplayingFullscreen)
+
+    if (isFullscreen) return
+
+    // If video has started and controls are visible, ignore clicks on the bottom native controls bar
+    if (hasStarted) {
+      const rect = video.getBoundingClientRect()
+      // Typical native controls bar is within the bottom ~54px of the video
+      if (rect.bottom - e.clientY <= 54) {
+        return
+      }
+    }
+
+    triggerFullscreen()
   }
 
   return (
-    <div className="gallery-video-card-container w-full relative overflow-hidden rounded-md">
-      {isPlaying ? (
-        <video
-          ref={videoRef}
-          src={plate.url}
-          poster={resolvedPoster || undefined}
-          controls
-          autoPlay
-          playsInline
-          onEnded={() => setIsPlaying(false)}
-          onError={onMediaError}
-          className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
-          aria-label={plate.altText || 'Project video'}
-        />
-      ) : (
-        <div
-          className="relative w-full cursor-pointer group/thumb"
-          onClick={handlePlayClick}
-        >
-          {resolvedPoster ? (
+    <div
+      className="gallery-video-card-container w-full relative overflow-hidden rounded-md cursor-pointer group/thumb"
+      onClick={handleCardClick}
+    >
+      <video
+        ref={videoRef}
+        src={plate.url}
+        poster={resolvedPoster || undefined}
+        controls={hasStarted}
+        playsInline
+        preload="metadata"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false)
+          setHasStarted(false)
+        }}
+        onError={onMediaError}
+        className="w-full h-auto block object-contain object-center"
+        aria-label={plate.altText || 'Project video'}
+      />
+
+      {/* Overlay displayed before video is started */}
+      {!hasStarted && (
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          {resolvedPoster && (
             <img
               src={resolvedPoster}
               alt={plate.altText || 'Video thumbnail'}
               onError={onMediaError}
-              className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
+              className="absolute inset-0 w-full h-full object-contain object-center pointer-events-none"
               loading="lazy"
-            />
-          ) : (
-            <video
-              ref={videoRef}
-              src={plate.url}
-              preload="metadata"
-              muted
-              playsInline
-              onError={onMediaError}
-              className="w-full h-auto block object-cover object-center max-h-[min(78vh,840px)]"
-              aria-label={plate.altText || 'Project video'}
             />
           )}
 
           {/* Vignette gradient overlay over thumbnail */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
 
           {/* Luxury Play Icon Badge */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <button
-              type="button"
-              onClick={handlePlayClick}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
               aria-label={`Play ${plate.altText || 'video'}`}
-              className="pointer-events-auto relative z-20 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center bg-[#141311]/85 backdrop-blur-md border border-[#d9b686]/40 text-[#f5f1e9] group-hover/thumb:scale-110 group-hover/thumb:bg-[#141311]/95 group-hover/thumb:border-[#d9b686] group-hover/thumb:text-[#d9b686] transition-all duration-300 shadow-2xl cursor-pointer"
-              suppressHydrationWarning
+              className="relative z-20 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center bg-[#141311]/85 backdrop-blur-md border border-[#d9b686]/40 text-[#f5f1e9] group-hover/thumb:scale-110 group-hover/thumb:bg-[#141311]/95 group-hover/thumb:border-[#d9b686] group-hover/thumb:text-[#d9b686] transition-all duration-300 shadow-2xl"
             >
               <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current translate-x-0.5" />
-            </button>
+            </div>
           </div>
 
           {/* Video indicator tag in bottom-left */}
-          <span className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#141311]/85 backdrop-blur-md border border-white/10 text-[#f5f1e9] text-[10px] sm:text-[11px] font-medium tracking-widest uppercase pointer-events-none">
+          <span className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#141311]/85 backdrop-blur-md border border-white/10 text-[#f5f1e9] text-[10px] sm:text-[11px] font-medium tracking-widest uppercase">
             <Play className="w-2.5 h-2.5 fill-[#d9b686] text-[#d9b686]" />
             Video
           </span>
@@ -136,7 +235,7 @@ function GalleryVideoCard({
       )}
     </div>
   )
-}
+})
 
 export function ProjectGalleryInteractive({
   title,
@@ -146,6 +245,7 @@ export function ProjectGalleryInteractive({
 }: ProjectGalleryInteractiveProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [failedItemKeys, setFailedItemKeys] = useState<Set<string>>(new Set())
+  const videoCardRefs = useRef<Record<string, GalleryVideoCardHandle | null>>({})
 
   // Normalize items to unified ProjectGalleryPlate[] format & filter out invalid / empty URLs
   const items: ProjectGalleryPlate[] = useMemo(() => {
@@ -176,6 +276,18 @@ export function ProjectGalleryInteractive({
     })
   }, [items, failedItemKeys])
 
+  const leftItems = useMemo(() => {
+    return visibleItems
+      .map((item, originalIndex) => ({ item, originalIndex }))
+      .filter(({ originalIndex }) => originalIndex % 2 === 0)
+  }, [visibleItems])
+
+  const rightItems = useMemo(() => {
+    return visibleItems
+      .map((item, originalIndex) => ({ item, originalIndex }))
+      .filter(({ originalIndex }) => originalIndex % 2 !== 0)
+  }, [visibleItems])
+
   const handleMediaError = (key: string) => {
     setFailedItemKeys((prev) => {
       const next = new Set(prev)
@@ -199,53 +311,95 @@ export function ProjectGalleryInteractive({
 
   if (visibleItems.length === 0) return null
 
+  const renderItemCard = (
+    item: ProjectGalleryPlate,
+    index: number,
+    side: 'left' | 'right' | 'single'
+  ) => {
+    const itemKey = item.id || item.url || `gallery-item-${index}`
+    const isVid = item.type === 'video' || isVideoSource(item.url)
+    const alignmentClass =
+      side === 'left'
+        ? 'gallery-item-left'
+        : side === 'right'
+        ? 'gallery-item-right'
+        : 'gallery-item-single'
+
+    return (
+      <div
+        key={`${itemKey}-${side}`}
+        className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
+        data-crosshair-target
+        data-cursor-label={isVid ? 'Play' : 'Expand'}
+        data-alignment={side}
+        data-index={index}
+        onClick={(e) => {
+          if (isVid) {
+            // If the user clicks directly on the wrapper (e.g. border or edge), trigger video fullscreen
+            if (e.target === e.currentTarget) {
+              videoCardRefs.current[itemKey]?.triggerFullscreen()
+            }
+          } else {
+            openLightbox(index)
+          }
+        }}
+      >
+        {isVid ? (
+          <GalleryVideoCard
+            ref={(node) => {
+              videoCardRefs.current[itemKey] = node
+            }}
+            plate={item}
+            fallbackImage={fallbackImage}
+            onMediaError={() => handleMediaError(itemKey)}
+          />
+        ) : (
+          <ProjectImage3D
+            className="detail-gallery-image relative overflow-hidden"
+            src={item.url}
+            alt={item.altText || `${title} detail ${index + 1}`}
+            onError={() => handleMediaError(itemKey)}
+          />
+        )}
+        <div
+          className="gallery-expand-hint"
+          onClick={(e) => {
+            e.stopPropagation()
+            if (isVid) {
+              videoCardRefs.current[itemKey]?.triggerFullscreen()
+            } else {
+              openLightbox(index)
+            }
+          }}
+        >
+          <Maximize2 size={15} />
+          <span>{isVid ? 'Fullscreen' : 'Expand view'}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
-      <div className="detail-gallery-grid">
-        {visibleItems.map((item, index) => {
-          const itemKey = item.id || item.url || `gallery-item-${index}`
-          const isVid = item.type === 'video' || isVideoSource(item.url)
-          const isEven = index % 2 === 0
-          const alignmentClass = isEven ? 'gallery-item-left' : 'gallery-item-right'
+      {/* Desktop / Tablet: Dual column alternating flow with no locked-row empty gaps */}
+      <div className="detail-gallery-dual-flow">
+        <div className="detail-gallery-col detail-gallery-col-left">
+          {leftItems.map(({ item, originalIndex }) =>
+            renderItemCard(item, originalIndex, 'left')
+          )}
+        </div>
+        <div className="detail-gallery-col detail-gallery-col-right">
+          {rightItems.map(({ item, originalIndex }) =>
+            renderItemCard(item, originalIndex, 'right')
+          )}
+        </div>
+      </div>
 
-          return (
-            <div
-              key={itemKey}
-              className={`gallery-item-wrapper ${alignmentClass} group cursor-pointer cursor-target`}
-              data-crosshair-target
-              data-cursor-label={isVid ? 'Play' : 'Expand'}
-              data-alignment={isEven ? 'left' : 'right'}
-              data-index={index}
-              onClick={() => openLightbox(index)}
-            >
-              {isVid ? (
-                <GalleryVideoCard
-                  plate={item}
-                  fallbackImage={fallbackImage}
-                  onOpenLightbox={() => openLightbox(index)}
-                  onMediaError={() => handleMediaError(itemKey)}
-                />
-              ) : (
-                <ProjectImage3D
-                  className="detail-gallery-image relative overflow-hidden"
-                  src={item.url}
-                  alt={item.altText || `${title} detail ${index + 1}`}
-                  onError={() => handleMediaError(itemKey)}
-                />
-              )}
-              <div
-                className="gallery-expand-hint"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  openLightbox(index)
-                }}
-              >
-                <Maximize2 size={15} />
-                <span>{isVid ? 'Full view' : 'Expand view'}</span>
-              </div>
-            </div>
-          )
-        })}
+      {/* Mobile: Single sequential column in original 0, 1, 2, 3... order */}
+      <div className="detail-gallery-single-flow">
+        {visibleItems.map((item, index) =>
+          renderItemCard(item, index, 'single')
+        )}
       </div>
 
       {/* Full-screen Lightbox Modal */}

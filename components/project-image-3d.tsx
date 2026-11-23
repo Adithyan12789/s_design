@@ -43,7 +43,7 @@ export function ProjectImage3D({
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
           onError={onError}
-          className="w-full h-auto block object-cover object-center"
+          className="w-full h-auto block object-contain object-center"
         />
         <span className="project-image-3d__shine" aria-hidden="true" />
       </div>
