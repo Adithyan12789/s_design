@@ -98,6 +98,17 @@ em { color: var(--bronze); font-style: italic; }
 .intro h2 .stagger-line.is-accent,
 .intro h2 .is-accent,
 .intro .intro-subheading { font-size: var(--font-size-studio-subheading, var(--font-size-studio-heading, clamp(42px, 5.3vw, 78px))); }
+.intro h2 .stagger-line:nth-child(2),
+.intro h2 .stagger-line.is-accent {
+  margin-top: clamp(8px, 1vw, 12px);
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.intro h2 .stagger-line:nth-child(2) .stagger-word-wrapper,
+.intro h2 .stagger-line.is-accent .stagger-word-wrapper {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
 .intro p { max-width: 420px; color: var(--muted); font-size: var(--font-size-studio-body, 14px); line-height: 1.65; } .statement p, .contact p { max-width: 420px; color: var(--muted); font-size: 14px; line-height: 1.65; }
 .text-link { display:inline-flex; align-items:center; gap:13px; margin-top: 31px; text-transform:uppercase; font-size:10px; letter-spacing:.1em; border-bottom:1px solid var(--line); padding-bottom:9px; }
 .section-heading { display:flex; justify-content:space-between; align-items:start; margin-bottom: 55px; }.section-heading .text-link { margin-top: -3px; }.section-note { color:var(--muted); font-size:12px; }
