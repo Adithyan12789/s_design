@@ -6,6 +6,7 @@ import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import SplashCursor from '@/components/SplashCursor'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -371,6 +372,9 @@ export const HeroCinematic = React.memo(function HeroCinematic({
     posterUrl ||
     (imageUrl && !isVideoUrlPattern(imageUrl) ? imageUrl : undefined)
 
+  const optimizedImageUrl = imageUrl ? getOptimizedImageUrl(imageUrl, { width: 1920, quality: 'auto' }) : imageUrl
+  const optimizedPosterImage = posterImage ? getOptimizedImageUrl(posterImage, { width: 1920, quality: 'auto' }) : undefined
+
   return (
     <div ref={wrapperRef} className="story-hero-wrapper" id="top">
       <section ref={pinnedRef} className="story-hero-pinned">
@@ -378,10 +382,20 @@ export const HeroCinematic = React.memo(function HeroCinematic({
         <div
           ref={imageRef}
           className="story-hero-bg overflow-hidden"
-          style={!isVideo || !activeVideoUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
+          style={!isVideo || !activeVideoUrl ? { backgroundImage: `url(${optimizedImageUrl})` } : undefined}
           role="img"
           aria-label="Contemporary minimalist architectural concrete residence"
         >
+          {(!isVideo || !activeVideoUrl) && optimizedImageUrl && (
+            <img
+              src={optimizedImageUrl}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-full object-cover pointer-events-none select-none"
+            />
+          )}
           {isVideo && activeVideoUrl && (
             <video
               key={activeVideoUrl}
@@ -392,7 +406,7 @@ export const HeroCinematic = React.memo(function HeroCinematic({
                 }
               }}
               src={activeVideoUrl}
-              poster={posterImage}
+              poster={optimizedPosterImage}
               autoPlay
               muted
               loop

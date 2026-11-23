@@ -13,6 +13,7 @@ import { ScrollReveal } from '@/components/motion/scroll-reveal'
 import { HamburgerButton } from '@/components/motion/hamburger-button'
 import type { Project } from '@/lib/projects'
 import type { PublicSiteData, CmsNavItem } from '@/lib/cms/types'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 const FullNavOverlay = dynamic(
   () => import('@/components/motion/full-nav-overlay').then((mod) => mod.FullNavOverlay),
@@ -81,11 +82,34 @@ function ApproachMediaVideo({
   altText?: string
   fallbackImageUrl?: string
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [hasApproached, setHasApproached] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [isActive, setIsActive] = useState(false)
   const userMutePreferenceRef = useRef<boolean | null>(null)
+
+  // IntersectionObserver to defer video source until approaching viewport
+  useEffect(() => {
+    if (hasApproached) return
+    const el = containerRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setHasApproached(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setHasApproached(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasApproached])
 
   const handleToggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -187,37 +211,45 @@ function ApproachMediaVideo({
   }
 
   return (
-    <ParallaxImage
-      className="statement-parallax-stage approach-video-stage video-portrait aspect-[5/7]"
-      aspectRatio="5 / 7"
-      enableClipReveal
-      parallaxSpeed={12}
-      alt={altText || 'Our architectural approach'}
-      overlay={
-        <VideoMuteButton
-          isMuted={isMuted}
-          isVisible={isActive}
-          onToggle={handleToggleMute}
-          label="Our Approach video"
+    <div ref={containerRef} className="w-full h-full">
+      <ParallaxImage
+        className="statement-parallax-stage approach-video-stage video-portrait aspect-[5/7]"
+        aspectRatio="5 / 7"
+        enableClipReveal
+        parallaxSpeed={12}
+        alt={altText || 'Our architectural approach'}
+        overlay={
+          <VideoMuteButton
+            isMuted={isMuted}
+            isVisible={isActive}
+            onToggle={handleToggleMute}
+            label="Our Approach video"
+          />
+        }
+      >
+        <video
+          ref={videoRef}
+          src={hasApproached ? videoUrl : undefined}
+          poster={
+            posterUrl
+              ? getOptimizedImageUrl(posterUrl, { width: 960, quality: 'auto' })
+              : fallbackImageUrl
+              ? getOptimizedImageUrl(fallbackImageUrl, { width: 960, quality: 'auto' })
+              : undefined
+          }
+          loop
+          playsInline
+          preload={hasApproached ? 'metadata' : 'none'}
+          disablePictureInPicture
+          controlsList="nodownload nofullscreen noremoteplayback"
+          onContextMenu={(e) => e.preventDefault()}
+          onError={() => setHasError(true)}
+          aria-label={altText || 'Architectural design approach video'}
+          className="w-full h-full object-cover object-center select-none"
+          suppressHydrationWarning
         />
-      }
-    >
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        poster={posterUrl || fallbackImageUrl || undefined}
-        loop
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        controlsList="nodownload nofullscreen noremoteplayback"
-        onContextMenu={(e) => e.preventDefault()}
-        onError={() => setHasError(true)}
-        aria-label={altText || 'Architectural design approach video'}
-        className="w-full h-full object-cover object-center select-none"
-        suppressHydrationWarning
-      />
-    </ParallaxImage>
+      </ParallaxImage>
+    </div>
   )
 }
 
@@ -228,11 +260,34 @@ function StudioMediaVideo({
   videoUrl: string
   posterUrl?: string
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [hasApproached, setHasApproached] = useState(false)
   const [isPortrait, setIsPortrait] = useState(true)
   const [isMuted, setIsMuted] = useState(false)
   const [isActive, setIsActive] = useState(false)
   const userMutePreferenceRef = useRef<boolean | null>(null)
+
+  // IntersectionObserver to defer video source until approaching viewport
+  useEffect(() => {
+    if (hasApproached) return
+    const el = containerRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setHasApproached(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setHasApproached(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasApproached])
 
   const handleToggleMute = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -337,18 +392,19 @@ function StudioMediaVideo({
 
   return (
     <div
+      ref={containerRef}
       className={`intro-parallax-stage studio-video-card relative overflow-hidden rounded-lg ${
         isPortrait ? 'video-portrait aspect-[5/7]' : 'video-landscape aspect-[16/9]'
       }`}
     >
       <video
         ref={videoRef}
-        src={videoUrl}
-        poster={posterUrl || undefined}
+        src={hasApproached ? videoUrl : undefined}
+        poster={posterUrl ? getOptimizedImageUrl(posterUrl, { width: 960, quality: 'auto' }) : undefined}
         onLoadedMetadata={handleLoadedMetadata}
         loop
         playsInline
-        preload="metadata"
+        preload={hasApproached ? 'metadata' : 'none'}
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
         onContextMenu={(e) => e.preventDefault()}

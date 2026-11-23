@@ -6,6 +6,7 @@ import { ArrowUpRight, ArrowDown, Compass } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Project } from '@/lib/projects'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -39,6 +40,33 @@ function ShowcaseSlideVideo({
   onOrientationChange?: (isPortrait: boolean) => void
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [hasApproached, setHasApproached] = useState(false)
+
+  useEffect(() => {
+    if (isActive) {
+      setHasApproached(true)
+    }
+  }, [isActive])
+
+  useEffect(() => {
+    if (hasApproached) return
+    const video = videoRef.current
+    if (!video || typeof IntersectionObserver === 'undefined') {
+      setHasApproached(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setHasApproached(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '400px 0px' }
+    )
+    observer.observe(video)
+    return () => observer.disconnect()
+  }, [hasApproached])
 
   useEffect(() => {
     const video = videoRef.current
@@ -51,7 +79,7 @@ function ShowcaseSlideVideo({
       onOrientationChange(video.videoHeight > video.videoWidth)
     }
 
-    if (isActive) {
+    if (isActive && hasApproached) {
       const playPromise = video.play()
       if (playPromise !== undefined) {
         playPromise.catch(() => {})
@@ -59,17 +87,17 @@ function ShowcaseSlideVideo({
     } else {
       video.pause()
     }
-  }, [isActive, onOrientationChange])
+  }, [isActive, hasApproached, onOrientationChange])
 
   return (
     <video
       ref={videoRef}
-      src={videoUrl}
-      poster={posterUrl || undefined}
+      src={hasApproached ? videoUrl : undefined}
+      poster={posterUrl ? getOptimizedImageUrl(posterUrl, { width: 1280, quality: 'auto' }) : undefined}
       muted
       loop
       playsInline
-      preload="metadata"
+      preload={hasApproached ? 'metadata' : 'none'}
       controlsList="nodownload"
       onContextMenu={(e) => e.preventDefault()}
       onLoadedMetadata={(e) => {
@@ -594,7 +622,7 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
                               className="exhibition-frame-img overflow-hidden"
                               style={
                                 !isVideo
-                                  ? { backgroundImage: `url(${project.image})` }
+                                  ? { backgroundImage: `url(${getOptimizedImageUrl(project.image, { width: 1280, quality: 'auto' })})` }
                                   : undefined
                               }
                             >
@@ -633,7 +661,7 @@ export const WorkHorizontalShowcase = React.memo(function WorkHorizontalShowcase
                     >
                       <div
                         className="exhibition-secondary-img"
-                        style={{ backgroundImage: `url(${secondaryImage})` }}
+                        style={{ backgroundImage: `url(${getOptimizedImageUrl(secondaryImage, { width: 640, quality: 'auto' })})` }}
                       />
                     </div>
                   </div>

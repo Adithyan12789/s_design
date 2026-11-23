@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react'
 import { Maximize2, X, ChevronLeft, ChevronRight, Play, Film } from 'lucide-react'
 import { ProjectImage3D } from '@/components/project-image-3d'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 import {
   isVideoSource,
   getCloudinaryVideoThumbnail,
@@ -100,7 +101,32 @@ const GalleryVideoCard = forwardRef<
   const [hasStarted, setHasStarted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null)
+  const [shouldLoadSource, setShouldLoadSource] = useState(false)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  // IntersectionObserver-based deferred loading for below-the-fold gallery videos
+  useEffect(() => {
+    if (shouldLoadSource) return
+    const el = containerRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setShouldLoadSource(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldLoadSource(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px 0px' }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [shouldLoadSource])
 
   // 1. Explicit posterUrl -> 2. Cloudinary 1.5s snapshot -> 3. Auto-extracted canvas frame -> 4. Fallback project image
   const resolvedPoster =
@@ -125,6 +151,9 @@ const GalleryVideoCard = forwardRef<
   }, [plate.url, resolvedPoster])
 
   const triggerFullscreen = () => {
+    if (!shouldLoadSource) {
+      setShouldLoadSource(true)
+    }
     const video = videoRef.current
     if (!video) return
 
@@ -154,6 +183,9 @@ const GalleryVideoCard = forwardRef<
   }))
 
   const handleCardClick = (e: React.MouseEvent) => {
+    if (!shouldLoadSource) {
+      setShouldLoadSource(true)
+    }
     const video = videoRef.current
     if (!video) return
 
@@ -179,18 +211,19 @@ const GalleryVideoCard = forwardRef<
 
   return (
     <div
+      ref={containerRef}
       className="gallery-video-card-container w-full relative overflow-hidden rounded-md cursor-pointer group/thumb"
       onClick={handleCardClick}
     >
       <video
         ref={videoRef}
-        src={plate.url}
-        poster={resolvedPoster || undefined}
+        src={shouldLoadSource || hasStarted ? plate.url : undefined}
+        poster={resolvedPoster ? getOptimizedImageUrl(resolvedPoster, { width: 1280, quality: 'auto' }) : undefined}
         controls={hasStarted}
         controlsList="nodownload"
         onContextMenu={(e) => e.preventDefault()}
         playsInline
-        preload="metadata"
+        preload={shouldLoadSource ? 'metadata' : 'none'}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => {

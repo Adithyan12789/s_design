@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { getCloudinaryVideoThumbnail } from '@/lib/storage/video-thumbnails'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 interface DetailHeroMediaProps {
   mediaType?: 'image' | 'video'
@@ -26,6 +27,9 @@ export function DetailHeroMedia({
     (videoUrl ? getCloudinaryVideoThumbnail(videoUrl, 1.5) : null) ||
     imageUrl ||
     undefined
+  const optimizedPoster = resolvedPoster
+    ? getOptimizedImageUrl(resolvedPoster, { width: 1920, quality: 'auto' })
+    : undefined
 
   useEffect(() => {
     const video = videoRef.current
@@ -48,7 +52,7 @@ export function DetailHeroMedia({
         <video
           ref={videoRef}
           src={videoUrl}
-          poster={resolvedPoster}
+          poster={optimizedPoster}
           controls
           controlsList="nodownload"
           onContextMenu={(e) => e.preventDefault()}
@@ -67,7 +71,7 @@ export function DetailHeroMedia({
         />
       ) : (
         <img
-          src={imageUrl}
+          src={imageUrl ? getOptimizedImageUrl(imageUrl, { width: 1920, quality: 'auto' }) : imageUrl}
           alt={alt}
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}

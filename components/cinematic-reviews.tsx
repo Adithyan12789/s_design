@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowLeft, ArrowRight, Play, Quote, Star, VideoOff } from 'lucide-react'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -59,10 +60,34 @@ export const CinematicReviews = React.memo(function CinematicReviews({
   const [activeIndex, setActiveIndex] = useState(0)
   const [direction, setDirection] = useState(1)
   const [isPaused, setIsPaused] = useState(false)
-  const [isInViewport, setIsInViewport] = useState(true)
+  const [isInViewport, setIsInViewport] = useState(false)
+  const [hasApproached, setHasApproached] = useState(false)
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [videoErrorId, setVideoErrorId] = useState<string | null>(null)
   const [isPortraitVideo, setIsPortraitVideo] = useState(false)
+
+  // Approach observer: defers video source attachment until approaching reviews section
+  useEffect(() => {
+    if (hasApproached) return
+    const section = sectionRef.current
+    if (!section || typeof IntersectionObserver === 'undefined') {
+      setHasApproached(true)
+      return
+    }
+
+    const approachObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setHasApproached(true)
+          approachObserver.disconnect()
+        }
+      },
+      { rootMargin: '350px 0px' }
+    )
+
+    approachObserver.observe(section)
+    return () => approachObserver.disconnect()
+  }, [hasApproached])
 
   const currentIndex = safeReviews.length > 0 ? activeIndex % safeReviews.length : 0
   const current = safeReviews[currentIndex]
@@ -381,10 +406,11 @@ export const CinematicReviews = React.memo(function CinematicReviews({
               >
                 {backdropSrc ? (
                   <img
-                    src={backdropSrc}
+                    src={getOptimizedImageUrl(backdropSrc, { width: 1440, quality: 'auto' })}
                     alt={current.projectName ? `${current.projectName} architecture` : `${current.client} project`}
                     className="reviews-backdrop-img select-none"
                     loading="lazy"
+                    decoding="async"
                     draggable={false}
                     onContextMenu={(e) => e.preventDefault()}
                   />
@@ -412,19 +438,19 @@ export const CinematicReviews = React.memo(function CinematicReviews({
                   <video
                     ref={videoRef}
                     key={videoSrc}
-                    src={videoSrc}
-                    poster={posterSrc || undefined}
+                    src={hasApproached ? videoSrc : undefined}
+                    poster={posterSrc ? getOptimizedImageUrl(posterSrc, { width: 960, quality: 'auto' }) : undefined}
                     onLoadedMetadata={(e) => {
                       const v = e.currentTarget
                       if (v.videoWidth && v.videoHeight) {
                         setIsPortraitVideo(v.videoHeight > v.videoWidth)
                       }
                     }}
-                    autoPlay
+                    autoPlay={!reducedMotion}
                     muted
                     playsInline
                     loop
-                    preload="metadata"
+                    preload={hasApproached ? 'metadata' : 'none'}
                     controls
                     controlsList="nodownload"
                     onContextMenu={(e) => e.preventDefault()}

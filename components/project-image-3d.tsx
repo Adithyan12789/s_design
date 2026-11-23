@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from '@/lib/storage/image-optimization'
 
 type ProjectImage3DProps = {
   src: string
@@ -19,6 +20,9 @@ export function ProjectImage3D({
   onError,
 }: ProjectImage3DProps) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
+
+  const optimizedSrc = getOptimizedImageUrl(src, { width: 1440, quality: 'auto' })
+  const responsiveSrcSet = getResponsiveImageSrcSet(src, [640, 960, 1280, 1600])
 
   function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -39,9 +43,12 @@ export function ProjectImage3D({
     >
       <div className="project-image-3d__frame">
         <img
-          src={src}
+          src={optimizedSrc}
+          srcSet={responsiveSrcSet || undefined}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
           onError={onError}
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}

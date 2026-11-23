@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { getOptimizedImageUrl } from '@/lib/storage/image-optimization'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -103,7 +104,7 @@ export function ParallaxImage({
       <div
         ref={imageRef}
         className="parallax-image-target select-none"
-        style={src ? { backgroundImage: `url(${src})` } : undefined}
+        style={src ? { backgroundImage: `url(${getOptimizedImageUrl(src, { width: 1440, quality: 'auto' })})` } : undefined}
         role={src ? 'img' : undefined}
         aria-label={src ? alt : undefined}
         onContextMenu={(e) => e.preventDefault()}

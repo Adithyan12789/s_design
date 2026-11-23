@@ -25,6 +25,17 @@ export function getOptimizedImageUrl(
     return trimmed
   }
 
+  // Guard: Never modify video delivery URLs with image transformations
+  if (
+    trimmed.includes('/video/upload/') ||
+    trimmed.endsWith('.mp4') ||
+    trimmed.endsWith('.webm') ||
+    trimmed.endsWith('.mov') ||
+    trimmed.endsWith('.ogg')
+  ) {
+    return trimmed
+  }
+
   const {
     width,
     height,
@@ -33,14 +44,14 @@ export function getOptimizedImageUrl(
     crop = 'limit',
   } = options
 
-  // 1. Cloudinary asset transformation
-  if (trimmed.includes('cloudinary.com') && trimmed.includes('/upload/')) {
+  // 1. Cloudinary image asset transformation
+  if (trimmed.includes('cloudinary.com') && trimmed.includes('/upload/') && !trimmed.includes('/video/')) {
     const uploadIndex = trimmed.indexOf('/upload/') + '/upload/'.length
     const prefix = trimmed.slice(0, uploadIndex)
     let rest = trimmed.slice(uploadIndex)
 
     // Check if URL already has transformation flags
-    if (/^f_[^/]+/.test(rest) || /^w_\d+/.test(rest) || /^c_[^/]+/.test(rest) || /^q_[^/]+/.test(rest)) {
+    if (/^(f_[^/]+|w_\d+|c_[^/]+|q_[^/]+)/.test(rest)) {
       return trimmed
     }
 
