@@ -22,19 +22,60 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     getPublishedProjectBySlug(slug),
     getPublicSiteData(),
   ])
-  return project
-    ? {
-        title: project.seoTitle || `${project.title} — ${project.category || ''} Architecture — S_Designs`,
-        description: project.seoDescription || project.shortDescription || project.fullDescription,
-        canonical: new URL(`/work/${project.slug}`, "https://sdesign.co.in").toString(),
-        openGraph: {
-          title: project.seoTitle || project.title,
-          description: project.seoDescription || project.shortDescription,
-          images: [project.mainImage || "/placeholder.jpg"],
-          type: "website",
+
+  if (!project) {
+    return { title: `Project — ${siteData.settings.studioName || 'S_DE_SIGN'}` }
+  }
+
+  const studioName = siteData.settings.studioName || 'S_DE_SIGN'
+  const title =
+    project.seoTitle?.trim() ||
+    `${project.title} — ${project.category ? `${project.category} Architecture — ` : ''}${studioName}`
+  const description =
+    project.seoDescription?.trim() ||
+    project.shortDescription?.trim() ||
+    project.fullDescription?.trim() ||
+    `${project.title} architectural case study in ${project.location} by ${studioName}.`
+  const canonicalUrl = `https://sdesign.co.in/work/${project.slug}`
+  const ogImage = project.mainImage || '/s-design-logo.jpg'
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: studioName,
+      type: 'article',
+      images: [
+        {
+          url: ogImage,
+          alt: project.mainImageAlt || `${project.title} — ${project.location} Architecture`,
         },
-      }
-    : { title: `Project — ${siteData.settings.studioName}` }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  }
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -45,17 +86,85 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   ])
   if (!project || allProjects.length === 0) notFound()
 
-  const projectDesc = project.shortDescription || project.fullDescription || ''
-  const projectJsonString = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    "name": project.title,
-    "description": projectDesc,
-    "author": { "@type": "Organization", "name": siteData.settings.studioName },
-    "url": new URL(`/work/${project.slug}`, "https://sdesign.co.in").toString(),
-    "image": project.mainImage || "/placeholder.jpg",
-    "datePublished": project.updatedAt ? new Date(project.updatedAt).toISOString() : new Date().toISOString()
-  }, null, 2)
+  const studioName = siteData.settings.studioName || 'S_DE_SIGN'
+  const canonicalUrl = `https://sdesign.co.in/work/${project.slug}`
+  const projectDesc = project.shortDescription || project.fullDescription || `${project.title} architectural case study in ${project.location}.`
+  const publishedDate = project.updatedAt
+    ? (!isNaN(new Date(project.updatedAt).getTime()) ? new Date(project.updatedAt).toISOString() : new Date().toISOString())
+    : new Date().toISOString()
+
+  // Comprehensive Schema.org @graph: Breadcrumbs, CreativeWork, and optional VideoObject
+  const structuredDataGraph: any[] = [
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://sdesign.co.in',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Selected Work',
+          item: 'https://sdesign.co.in/work',
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: project.title,
+          item: canonicalUrl,
+        },
+      ],
+    },
+    {
+      '@type': 'CreativeWork',
+      '@id': `${canonicalUrl}#project`,
+      name: project.title,
+      headline: `${project.title} — ${project.category || ''} Architecture`,
+      description: projectDesc,
+      url: canonicalUrl,
+      image: project.mainImage || 'https://sdesign.co.in/s-design-logo.jpg',
+      datePublished: publishedDate,
+      dateModified: publishedDate,
+      inLanguage: 'en',
+      author: {
+        '@type': 'Organization',
+        name: studioName,
+        url: 'https://sdesign.co.in',
+      },
+      creator: {
+        '@type': 'Organization',
+        name: studioName,
+        url: 'https://sdesign.co.in',
+      },
+      ...(project.location ? { contentLocation: { '@type': 'Place', name: project.location } } : {}),
+      ...(project.year ? { copyrightYear: parseInt(project.year, 10) || undefined } : {}),
+    },
+  ]
+
+  if (project.mainMediaType === 'video' && project.mainVideoUrl && project.mainVideoUrl.trim()) {
+    structuredDataGraph.push({
+      '@type': 'VideoObject',
+      '@id': `${canonicalUrl}#video`,
+      name: `${project.title} Architectural Film`,
+      description: `Cinematic walkthrough and spatial study of ${project.title} in ${project.location}.`,
+      thumbnailUrl: project.mainPosterUrl || project.mainImage || 'https://sdesign.co.in/s-design-logo.jpg',
+      uploadDate: publishedDate,
+      contentUrl: project.mainVideoUrl.trim(),
+    })
+  }
+
+  const projectJsonString = JSON.stringify(
+    {
+      '@context': 'https://schema.org',
+      '@graph': structuredDataGraph,
+    },
+    null,
+    2
+  )
 
   const index = allProjects.findIndex((item) => item.slug === project.slug)
   const safeIndex = index === -1 ? 0 : index
@@ -76,7 +185,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         project.mainPosterUrl ||
         getCloudinaryVideoThumbnail(project.mainVideoUrl, 1.5) ||
         (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
-      altText: project.mainImageAlt || `${project.title} presentation video`,
+      altText: project.mainImageAlt || `${project.title} — ${project.location} architectural film and presentation video`,
     })
   } else if (project.mainImage && project.mainImage.trim()) {
     const isVid = isVideoSource(project.mainImage)
@@ -87,7 +196,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       posterUrl: isVid
         ? project.mainPosterUrl || getCloudinaryVideoThumbnail(project.mainImage, 1.5)
         : null,
-      altText: project.mainImageAlt || `${project.title} primary view`,
+      altText: project.mainImageAlt || `${project.title} — ${project.location} ${project.category || ''} primary architectural view`,
     })
   }
 
@@ -107,7 +216,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         item.posterUrl ||
         (isVid ? getCloudinaryVideoThumbnail(trimmedUrl, 1.5) : null) ||
         (project.mainImage && !isVideoSource(project.mainImage) ? project.mainImage : null),
-      altText: item.altText || `${project.title} plate ${idx + 1}`,
+      altText: item.altText || `${project.title} — ${project.location} architectural detail plate ${idx + 1}`,
     })
   })
 
@@ -169,7 +278,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           videoUrl={project.mainVideoUrl}
           posterUrl={project.mainPosterUrl || project.mainImage}
           imageUrl={project.mainImage}
-          alt={project.mainImageAlt || `${project.title} — ${project.location}`}
+          alt={project.mainImageAlt || `${project.title} — ${project.location} ${project.category || ''} architecture by ${studioName}`}
         />
 
         <div className="detail-hero-copy">

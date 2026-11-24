@@ -128,7 +128,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: organizationJson }}
         />
-        <h1 className="sr-only">{data.settings.studioName} Architecture</h1>
+        <div className="sr-only">{data.settings.studioName} Architecture</div>
         <ArchitecturalLoaderProvider
           studioName={data.settings.studioName}
           studioSubtitle={data.settings.studioSubtitle}
