@@ -25,6 +25,21 @@ const nextConfig = {
       bodySizeLimit: '100mb',
     },
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.sdesign.co.in',
+          },
+        ],
+        destination: 'https://sdesign.co.in/:path*',
+        statusCode: 301,
+      },
+    ]
+  },
   async headers() {
     return [
       {

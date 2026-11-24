@@ -27,10 +27,21 @@ export async function generateMetadata(): Promise<Metadata> {
       icon: favicon,
       apple: favicon,
     },
+    alternates: {
+      canonical: 'https://sdesign.co.in/',
+    },
     openGraph: {
       title: homeSeo?.ogTitle || title,
       description: homeSeo?.ogDescription || description,
+      url: 'https://sdesign.co.in/',
+      siteName: data.settings.studioName,
       type: 'website',
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: homeSeo?.ogTitle || title,
+      description: homeSeo?.ogDescription || description,
       images: [ogImage],
     },
   }
